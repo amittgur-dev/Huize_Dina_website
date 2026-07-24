@@ -1,0 +1,37 @@
+{
+  "eyebrow": "Stories from the girls' perspective",
+  "title": "Podcast",
+  "episodes": [
+    {
+      "sideLabel": "Side A",
+      "title": "Episode 1: Tilly",
+      "numeral": "I",
+      "acts": [
+        { "key": "e1a1", "title": "Act 1: Diagnosis", "audio": "" },
+        { "key": "e1a2", "title": "Act 2: Huize Dina", "audio": "" },
+        { "key": "e1a3", "title": "Act 3: Departure", "audio": "" }
+      ]
+    },
+    {
+      "sideLabel": "Side A",
+      "title": "Episode 2",
+      "numeral": "II",
+      "acts": [
+        { "key": "e2a1", "title": "Act 1", "audio": "" },
+        { "key": "e2a2", "title": "Act 2", "audio": "" },
+        { "key": "e2a3", "title": "Act 3", "audio": "" }
+      ]
+    },
+    {
+      "sideLabel": "Side B",
+      "title": "Episode 3",
+      "numeral": "III",
+      "acts": [
+        { "key": "e3a1", "title": "Act 1", "audio": "" },
+        { "key": "e3a2", "title": "Act 2", "audio": "" },
+        { "key": "e3a3", "title": "Act 3", "audio": "" }
+      ]
+    }
+  ],
+  "footerNote": "℗ Polyphonic Archive · AHK"
+}

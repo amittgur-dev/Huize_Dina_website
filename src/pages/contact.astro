@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import contact from '../../content/pages/contact.json';
+---
+
+<BaseLayout title="Contact" active="contact">
+  <Hero title={contact.title} eyebrow={contact.eyebrow} />
+
+  <div class="inner">
+    <div class="text-block">{contact.intro}</div>
+
+    <div class="fields">
+      {
+        contact.fields.map((field: any) => (
+          <div class="field">
+            <div class="field-label">{field.label}</div>
+            <div class="field-value">
+              {field.value.split('\n').map((line: string, i: number, arr: string[]) => (
+                <>
+                  {line}
+                  {i < arr.length - 1 && <br />}
+                </>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="link-row">
+      <a href={contact.link.href}>{contact.link.label}</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .inner {
+    position: relative;
+    z-index: 5;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 1.5rem 5rem;
+  }
+
+  .text-block {
+    font-size: 15px;
+    line-height: 1.85;
+    color: rgba(224, 219, 212, 0.68);
+    text-wrap: pretty;
+  }
+
+  .fields {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  .field {
+    display: flex;
+    gap: 1.2rem;
+    align-items: baseline;
+  }
+
+  .field-label {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(72, 198, 168, 0.6);
+    width: 70px;
+    flex: none;
+  }
+
+  .field-value {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(224, 219, 212, 0.75);
+  }
+
+  .link-row {
+    margin-top: 3.2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .link-row a {
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #48c6a8;
+    text-decoration: none;
+  }
+
+  .link-row a:hover {
+    color: #e0dbd4;
+  }
+
+  @media (max-width: 680px) {
+    .inner {
+      padding: 0 1rem 4rem;
+    }
+  }
+</style>

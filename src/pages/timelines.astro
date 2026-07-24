@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+---
+
+<BaseLayout title="Timelines" active="timelines">
+  <Hero title="Timelines" eyebrow="Three lives, told from the archive" />
+  <div class="inner">
+    <div class="text-block">The interactive timelines are coming soon.</div>
+  </div>
+</BaseLayout>
+
+<style>
+  .inner {
+    position: relative;
+    z-index: 5;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 1.5rem 5rem;
+    text-align: center;
+  }
+  .text-block {
+    font-size: 15px;
+    line-height: 1.85;
+    color: rgba(224, 219, 212, 0.62);
+  }
+</style>

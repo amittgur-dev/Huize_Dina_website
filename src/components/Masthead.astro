@@ -1,0 +1,102 @@
+---
+export interface Props {
+  active?: string;
+}
+const { active = '' } = Astro.props;
+
+const NAV = [
+  { key: 'home', label: 'Home', href: '/' },
+  { key: 'podcast', label: 'Podcast', href: '/podcast' },
+  { key: 'timelines', label: 'Timelines', href: '/timelines' },
+  { key: 'making-of', label: 'The making of', href: '/making-of' },
+  { key: 'team', label: 'Team', href: '/team' },
+  { key: 'contact', label: 'Contact', href: '/contact' },
+];
+---
+
+<div class="hd-header">
+  <div class="hd-row">
+    <div>
+      <a href="/" class="hd-brand">Huize Dina</a>
+      <nav class="hd-nav">
+        {NAV.map((item) => (
+          <a
+            href={item.href}
+            class={`hd-link ${active === item.key ? 'is-active' : ''}`}
+            aria-current={active === item.key ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))}
+      </nav>
+    </div>
+  </div>
+</div>
+
+<style>
+  .hd-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    background: rgba(44, 40, 48, 0.97);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .hd-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1.8rem 0.85rem;
+  }
+
+  .hd-brand {
+    font-size: 16px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(224, 219, 212, 0.92);
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .hd-brand:hover {
+    color: #48c6a8;
+  }
+
+  .hd-nav {
+    display: flex;
+    gap: 1.35rem;
+    margin-top: 9px;
+    flex-wrap: wrap;
+  }
+
+  .hd-link {
+    font-size: 14px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(224, 219, 212, 0.62);
+    text-decoration: none;
+    padding-bottom: 3px;
+    border-bottom: 1px solid transparent;
+  }
+
+  .hd-link:hover {
+    color: #48c6a8;
+  }
+
+  .hd-link.is-active {
+    color: #48c6a8;
+    border-bottom: 1px solid rgba(72, 198, 168, 0.55);
+  }
+
+  @media (max-width: 680px) {
+    .hd-row {
+      padding: 0.7rem 1rem;
+    }
+    .hd-nav {
+      gap: 0.9rem;
+    }
+  }
+</style>

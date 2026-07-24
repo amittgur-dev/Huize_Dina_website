@@ -1,0 +1,10 @@
+{
+  "eyebrow": "Pluralism in Research and the Arts · AHK",
+  "title": "Contact",
+  "intro": "For questions about the project, the archival material, or the podcast, contact the professorship Pluralism in Research and the Arts at the Amsterdam University of the Arts (AHK).",
+  "fields": [
+    { "label": "E-mail", "value": "[e-mail address to follow]" },
+    { "label": "Address", "value": "Amsterdam University of the Arts (AHK)\nAmsterdam" }
+  ],
+  "link": { "label": "Meet the team →", "href": "/team" }
+}

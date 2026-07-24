@@ -1,0 +1,45 @@
+{
+  "eyebrow": "Duinlustparkweg · Santpoort",
+  "title": "Huize Dina",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "Huize Dina (also known as Beth Dina) was a residential home for Jewish girls from disadvantaged backgrounds in Santpoort, the Netherlands. Established in 1930 by the Association for the Protection of Jewish Girls (Vereeniging tot Bescherming van Joodsche Meisjes), the home was named after the association's founder, Dina Sanson. It provided accommodation and care for Jewish girls from age 14 to 21 whose families were no longer able to support them, often due to poverty and difficult social circumstances."
+    },
+    {
+      "type": "image",
+      "file": "assets/site/home-album-bus.jpg",
+      "alt": "Girls of Huize Dina boarding a bus, from a photo album",
+      "caption": "\"De oudste meisjes zijn lid van 'Macabi', een zionistische vereeniging, en gaan per bus naar de landdag in Amersfoort.\" — album inscription."
+    },
+    {
+      "type": "text",
+      "text": "During the Second World War, the home was directed by Harriët Martha Prins, who was living there with her son Ralph Prins. The fifteen girls living in Huize Dina around 1940 were all deported and murdered in the extermination camps of Sobibor and Auschwitz. In the immediate post-war period, the building served as a refuge for Jewish children and young people who had survived the war in hiding or returned from concentration camps."
+    },
+    {
+      "type": "image",
+      "file": "assets/site/home-huize-dina-duinlustparkweg.jpg",
+      "alt": "Huize Dina, Duinlustparkweg, Santpoort",
+      "caption": "Huize Dina, Duinlustparkweg, Santpoort."
+    },
+    {
+      "type": "text",
+      "text": "The podcast *Huize Dina* aims at telling the stories of some of the girls, whose archival material surfaced only recently, in 2025. The stories are told from the girls' perspective. In an imaginary, dream-like space the girls move through a hallway, opening doors that lead to memories and voices from the past."
+    },
+    {
+      "type": "image",
+      "file": "assets/site/home-album-sea.jpg",
+      "alt": "Girls of Huize Dina at the sea, from a photo album",
+      "caption": "\"De jongsten blijven dan ook niet thuis en maken een wandeling naar de zee.\" — album inscription."
+    },
+    {
+      "type": "text",
+      "text": "All the text derives from the archives — but the stories are given as lived experience: where the record falls silent, the podcast listens for the voices it left out."
+    }
+  ],
+  "sourceNote": "Source: Digitaal Joods Monument, \"Oproep voor informatie over bewoners van Huize Dina\" (24 January 2018).",
+  "links": [
+    { "label": "Listen to the podcast →", "href": "/podcast" },
+    { "label": "Explore the timelines →", "href": "/timelines" }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "eyebrow": "Pluralism in Research and the Arts · AHK",
+  "title": "Team",
+  "members": [
+    {
+      "name": "Naomi Bueno de Mesquita",
+      "role": "Professor (Lector), Pluralism in Research and the Arts · Amsterdam University of the Arts (AHK)",
+      "bio": "Naomi is Professor of Pluralism in Research and the Arts at the AHK, where she leads the Polyphonic Archive project. Together with her research team, Naomi investigates pluralism within the arts and humanities, focusing on how diverse perspectives are experienced, negotiated, and shaped within institutional contexts. Her work highlights the public value of the arts as spaces for engaging with complexity, ambiguity, and multiple coexisting perspectives. The professorship collaborates closely with the Conservatory of Amsterdam, the Reinwardt Academy, and the Academy of Architecture.",
+      "photo": "assets/site/team-naomi.webp"
+    },
+    {
+      "name": "Jaïr van Dijk",
+      "role": "Historian and Researcher, Pluralism in Research and the Arts Lectorate (AHK)",
+      "bio": "Jaïr van Dijk is a historian specialising in women's history, sexuality, and migration. He obtained a Research Master's degree in History from the University of Amsterdam, where he researched homosexuality and migration in Amsterdam between 1800 and 1950. In 2025, Jaïr introduced the Huize Dina archive to Naomi, laying the foundation for the Polyphonic Archive project. Within the project, he contributes archival research of Huize Dina. His archival research also formed the basis of his first book, *Wat verzwegen werd*, which tells the story of one of the girls from Huize Dina and her daughter's search for her biological mother after the Second World War.",
+      "photo": "assets/site/team-jair.jpg"
+    },
+    {
+      "name": "Amit Gur",
+      "role": "Composer and Researcher, Pluralism in Research and the Arts Lectorate (AHK)",
+      "bio": "Amit is a composer and researcher based in Amsterdam. He writes music for new music ensembles and has composed for a range of audiovisual installations and documentary films. His research focuses on creating analogies between visual and auditory perception, with the perception of texture in music as a central topic. Amit teaches courses about his research at the Conservatorium van Amsterdam.",
+      "photo": "assets/site/team-amit.jpg"
+    },
+    {
+      "name": "Elena Nguyen",
+      "role": "Research Intern, Pluralism in Research and the Arts Lectorate (AHK)",
+      "bio": "Elena Nguyen is a political scientist and Master's student in Applied History at Erasmus University Rotterdam. She has a strong interest in oral history, audiovisual media, and migration history. As an intern with the Polyphonic Archive project, Elena supports the historical research, contributing to archival work and the development of the project's historical perspectives.",
+      "photo": "assets/site/team-elena.webp"
+    },
+    {
+      "name": "Tzlil Sharon",
+      "role": "Media Studies Scholar and Researcher, Pluralism in Research and the Arts Lectorate (AHK)",
+      "bio": "Tzlil Sharon is a media studies researcher whose work explores the intersection of technologies, cultural practices, and media imaginaries, with a particular focus on podcasting and sound cultures. She was previously a postdoctoral fellow at the Amsterdam School for Cultural Analysis (ASCA) at the University of Amsterdam. Her research combines cultural studies, discourse analysis, and digital methods to examine podcast listening, its cultural meanings, and the datafication of podcasts through digital platforms.",
+      "photo": "assets/site/team-tzlil.webp"
+    },
+    {
+      "name": "Ari Teperberg",
+      "role": "Performer, Director and Researcher, Pluralism in Research and the Arts Lectorate (AHK)",
+      "bio": "Ari Teperberg is a maker, performer, stage director, and dramaturg whose work spans opera, dance, puppetry, theatre, and performance art. He has curated and directed projects that explore dialogue across cultures, places, and political contexts. His artistic practice centres on what he calls performative mechanisms: research-driven works that mediate between the sensory, cognitive, and emotional experiences of performers and audiences, inviting them into immersive worlds of sound, movement, action, and objects.",
+      "photo": "assets/site/team-ari.webp"
+    }
+  ]
+}

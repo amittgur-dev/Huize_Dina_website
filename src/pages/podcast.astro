@@ -1,0 +1,335 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import podcast from '../../content/pages/podcast.json';
+
+const TICKS = 52;
+---
+
+<BaseLayout title="Podcast" active="podcast">
+  <Hero title={podcast.title} eyebrow={podcast.eyebrow} />
+
+  <div class="inner">
+    {
+      podcast.episodes.map((ep: any) => (
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-head">
+              <div>
+                <div class="side-label">{ep.sideLabel}</div>
+                <div class="ep-title">{ep.title}</div>
+              </div>
+              <div class="numeral">{ep.numeral}</div>
+            </div>
+
+            {ep.acts.map((act: any) => (
+              <div class="act" data-key={act.key} data-audio={act.audio ?? ''}>
+                <div class="play-wrap">
+                  <div class="play-ring" />
+                  <button class="play-btn" type="button" aria-label={`Play ${act.title}`}>
+                    ▶
+                  </button>
+                </div>
+                <div class="act-body">
+                  <div class="act-top">
+                    <div class="act-title">{act.title}</div>
+                    <div class="act-note">{act.audio ? '' : 'Recording to follow'}</div>
+                  </div>
+                  <div class="ticks">
+                    {Array.from({ length: TICKS }).map((_, i) => (
+                      <div class={`tick ${i % 13 === 0 ? 'tall' : ''}`} />
+                    ))}
+                  </div>
+                  <div class="time-row">
+                    <div class="time-cur">00:00</div>
+                    <div class="time-dur">— : —</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))
+    }
+
+    <div class="footer-note">{podcast.footerNote}</div>
+  </div>
+</BaseLayout>
+
+<style>
+  .inner {
+    position: relative;
+    z-index: 5;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 1.5rem 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.6rem;
+  }
+
+  .card {
+    padding: 1px;
+    border-radius: 3px;
+    background:
+      linear-gradient(145deg, rgba(72, 198, 168, 0.84) 0%, rgba(72, 198, 168, 0) 48%),
+      linear-gradient(325deg, #09443b 0%, #1c8470 52%, #48c6a8 100%);
+  }
+
+  .card-inner {
+    background: rgba(20, 17, 25, 0.94);
+    border-radius: 2px;
+    padding: 1.6rem 1.8rem 1.7rem;
+  }
+
+  .card-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 1rem;
+  }
+
+  .side-label {
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(72, 198, 168, 0.68);
+  }
+
+  .ep-title {
+    font-size: 1.15rem;
+    letter-spacing: 0.04em;
+    color: rgba(224, 219, 212, 0.92);
+    margin-top: 0.4rem;
+  }
+
+  .numeral {
+    font-size: 30px;
+    color: rgba(224, 219, 212, 0.16);
+    line-height: 1;
+  }
+
+  .act {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.3rem;
+    align-items: center;
+    padding: 1.2rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .act:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .play-wrap {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    flex: none;
+  }
+
+  .play-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(72, 198, 168, 0.25);
+  }
+
+  .play-btn {
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    border: 1px solid rgba(72, 198, 168, 0.6);
+    background: rgba(72, 198, 168, 0.06);
+    color: #48c6a8;
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 3px;
+  }
+
+  .play-btn:hover {
+    background: rgba(72, 198, 168, 0.16);
+  }
+
+  .play-btn.is-playing {
+    padding-left: 0;
+    font-size: 10px;
+  }
+
+  .act-body {
+    min-width: 0;
+  }
+
+  .act-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .act-title {
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    color: rgba(224, 219, 212, 0.88);
+  }
+
+  .act-note {
+    font-size: 11.5px;
+    font-style: italic;
+    color: rgba(224, 219, 212, 0.35);
+    transition: color 200ms ease-out;
+  }
+
+  .act-note.flash {
+    color: rgba(72, 198, 168, 0.8);
+  }
+
+  .ticks {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 16px;
+    margin-top: 0.7rem;
+    cursor: pointer;
+  }
+
+  .tick {
+    flex: 1;
+    height: 8px;
+    background: rgba(224, 219, 212, 0.14);
+    transition: background 120ms ease-out;
+  }
+
+  .tick.tall {
+    height: 16px;
+  }
+
+  .tick.lit {
+    background: rgba(72, 198, 168, 0.75);
+  }
+
+  .time-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.4rem;
+  }
+
+  .time-cur,
+  .time-dur {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: rgba(224, 219, 212, 0.35);
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(224, 219, 212, 0.25);
+    margin-top: 1.5rem;
+  }
+
+  @media (max-width: 680px) {
+    .inner {
+      padding: 0 1rem 4rem;
+    }
+    .act {
+      grid-template-columns: auto 1fr;
+      gap: 1rem;
+    }
+  }
+</style>
+
+<script>
+  function fmt(s: number): string {
+    if (!isFinite(s)) return '— : —';
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${m < 10 ? '0' : ''}${m}:${sec < 10 ? '0' : ''}${sec}`;
+  }
+
+  const players: { el: HTMLElement; audio: HTMLAudioElement | null }[] = [];
+
+  document.querySelectorAll<HTMLElement>('.act').forEach((el) => {
+    const src = el.dataset.audio ?? '';
+    const btn = el.querySelector<HTMLButtonElement>('.play-btn');
+    const ticksWrap = el.querySelector<HTMLElement>('.ticks');
+    const ticks = Array.from(el.querySelectorAll<HTMLElement>('.tick'));
+    const timeEl = el.querySelector<HTMLElement>('.time-cur');
+    const durEl = el.querySelector<HTMLElement>('.time-dur');
+    const noteEl = el.querySelector<HTMLElement>('.act-note');
+    if (!btn || !ticksWrap) return;
+
+    const paint = (frac: number) => {
+      const lit = Math.round(frac * ticks.length);
+      ticks.forEach((t, i) => t.classList.toggle('lit', i < lit));
+    };
+
+    const entry = { el, audio: null as HTMLAudioElement | null };
+    players.push(entry);
+
+    if (!src) {
+      btn.addEventListener('click', () => {
+        if (!noteEl) return;
+        noteEl.classList.add('flash');
+        setTimeout(() => noteEl.classList.remove('flash'), 900);
+      });
+      return;
+    }
+
+    const audio = new Audio(src);
+    entry.audio = audio;
+
+    audio.addEventListener('loadedmetadata', () => {
+      if (durEl) durEl.textContent = fmt(audio.duration);
+    });
+    audio.addEventListener('timeupdate', () => {
+      if (timeEl) timeEl.textContent = fmt(audio.currentTime);
+      if (audio.duration) paint(audio.currentTime / audio.duration);
+    });
+    audio.addEventListener('ended', () => {
+      btn.textContent = '▶';
+      btn.classList.remove('is-playing');
+      paint(0);
+      if (timeEl) timeEl.textContent = '00:00';
+    });
+
+    btn.addEventListener('click', () => {
+      if (audio.paused) {
+        players.forEach((p) => {
+          if (p.audio && p.audio !== audio && !p.audio.paused) {
+            p.audio.pause();
+            const otherBtn = p.el.querySelector<HTMLButtonElement>('.play-btn');
+            if (otherBtn) {
+              otherBtn.textContent = '▶';
+              otherBtn.classList.remove('is-playing');
+            }
+          }
+        });
+        audio.play();
+        btn.textContent = '❚❚';
+        btn.classList.add('is-playing');
+      } else {
+        audio.pause();
+        btn.textContent = '▶';
+        btn.classList.remove('is-playing');
+      }
+    });
+
+    ticksWrap.addEventListener('click', (e) => {
+      if (!audio.duration) return;
+      const r = ticksWrap.getBoundingClientRect();
+      const frac = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      audio.currentTime = frac * audio.duration;
+    });
+  });
+</script>

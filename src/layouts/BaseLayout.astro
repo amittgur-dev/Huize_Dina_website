@@ -1,0 +1,73 @@
+---
+import Masthead from '../components/Masthead.astro';
+import '../styles/global.css';
+
+export interface Props {
+  title: string;
+  description?: string;
+  active?: string;
+}
+
+const {
+  title,
+  description = "Polyphonic Archive — a podcast about the girls of Huize Dina, a Jewish girls' home in Santpoort, 1920s–40s.",
+  active = '',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title} · Huize Dina</title>
+  </head>
+  <body>
+    <div class="page-root">
+      <div class="bg-vignette" aria-hidden="true"></div>
+      <div class="bg-noise" aria-hidden="true"></div>
+      <slot name="bg-extra" />
+
+      <Masthead active={active} />
+
+      <slot />
+    </div>
+  </body>
+</html>
+
+<style>
+  .page-root {
+    position: relative;
+    min-height: 100vh;
+    background: #2c2830;
+    color: #e0dbd4;
+    font-family: 'Courier Prime', 'Courier New', Courier, monospace;
+    overflow-x: hidden;
+  }
+
+  .bg-vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 40%, transparent 52%, rgba(0, 0, 0, 0.13) 100%);
+  }
+
+  .bg-noise {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    background-image: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22220%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%222%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');
+  }
+</style>
