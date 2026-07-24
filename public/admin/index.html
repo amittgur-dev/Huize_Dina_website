@@ -13,6 +13,10 @@
     <!-- Vendored from decap-cms (package.json) by scripts/vendor-decap-cms.mjs
          so this page doesn't depend on a third-party CDN at runtime. -->
     <script src="/admin/decap/decap-cms.js"></script>
+    <!-- Registers a custom preview pane for the Making Of theme nodes so
+         editors see it in the site's own look while writing — see that
+         file for details. -->
+    <script src="/admin/preview-templates.js"></script>
     <script>
       // Netlify Identity sends invite/recovery links to the site root with a
       // #token in the hash; redirect those into the CMS's own auth flow.
