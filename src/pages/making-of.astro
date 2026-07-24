@@ -1,27 +1,1272 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Hero from '../components/Hero.astro';
+import themesRaw from '../../content/themes.json';
+import { buildThemeMap } from '../lib/themes';
+import type { RawThemesData } from '../lib/themes';
+
+const themeMap = buildThemeMap(themesRaw as RawThemesData);
+const regions = themeMap.nodes.filter((n) => n.level === 0);
 ---
 
-<BaseLayout title="The Making Of" active="making-of">
-  <Hero title="The Making Of" eyebrow="A map of the themes behind the podcast" />
-  <div class="inner">
-    <div class="text-block">The theme map is coming soon.</div>
+<BaseLayout
+  title="The Making Of"
+  active="making-of"
+  fullscreen
+  description="A pannable, zoomable map of the themes behind the Polyphonic Archive podcast."
+>
+  <Fragment slot="header-extra">
+    <div class="mk-header-controls">
+      <button type="button" class="mk-btn" data-act="overview">Overview</button>
+      <button type="button" class="mk-btn mk-btn-square" data-act="zoom-out" aria-label="Zoom out">−</button>
+      <button type="button" class="mk-btn mk-btn-square" data-act="zoom-in" aria-label="Zoom in">+</button>
+    </div>
+  </Fragment>
+
+  <div id="mk-viewport">
+    <div id="mk-world">
+      <svg id="mk-lines" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="mk-nodes"></div>
+    </div>
   </div>
+
+  <button type="button" id="mk-to-intro" class="mk-pill" hidden>
+    <span class="mk-pill-arrow">↑</span><span>Intro</span>
+  </button>
+
+  <div id="mk-tooltip" class="mk-tooltip" hidden></div>
+
+  <div class="mk-legend-wrap">
+    <div id="mk-legend" class="mk-legend">
+      <div class="mk-legend-head">
+        <div class="mk-eyebrow mk-legend-title">How to read the map</div>
+        <button type="button" class="mk-btn mk-btn-sm" data-act="legend-close">Hide</button>
+      </div>
+      <div class="mk-eyebrow mk-legend-sub">Regions</div>
+      {
+        regions.map((r) => (
+          <div class="mk-legend-row">
+            <span class="mk-legend-dot" style={`background:${r.color};`} />
+            <span class="mk-legend-label">{r.label}</span>
+          </div>
+        ))
+      }
+      <div class="mk-legend-divider" />
+      <div class="mk-eyebrow mk-legend-sub">Threads</div>
+      <div class="mk-legend-row">
+        <span class="mk-legend-line" style="border-top-color:#ffffff;" />
+        <span class="mk-legend-label">belongs to — sub-theme</span>
+      </div>
+      <div class="mk-legend-row">
+        <span class="mk-legend-line" style="border-top-color:#3fd8c4;" />
+        <span class="mk-legend-label">connects across regions</span>
+      </div>
+      <div class="mk-legend-divider" />
+      <div class="mk-legend-hint">Drag to pan · scroll to zoom · zoom in for more sub-themes</div>
+    </div>
+    <button type="button" id="mk-legend-open" class="mk-btn mk-legend-toggle" hidden data-act="legend-open">Map guide</button>
+  </div>
+
+  <div id="mk-intro" class="mk-intro">
+    <div class="mk-eyebrow mk-intro-eyebrow">Polyphonic Archive · the making-of</div>
+    <div class="mk-intro-title">A map of the themes behind the podcast</div>
+    <div class="mk-intro-body">
+      Four regions grow from one centre —
+      {
+        regions.map((r, i) => (
+          <>
+            <span style={`color:${r.color};`}>{r.label}</span>
+            {i < regions.length - 2 ? ', ' : i === regions.length - 2 ? ' and ' : ''}
+          </>
+        ))
+      }
+      . Themes light up as you move through them; threads show what belongs where, and what connects across.
+    </div>
+    <div class="mk-eyebrow mk-intro-hint">drag to pan · scroll to zoom · press a theme to read</div>
+    <button type="button" id="mk-intro-close" class="mk-intro-enter" aria-label="Enter the map">↓</button>
+    <div class="mk-eyebrow mk-intro-foot">the map lies below ↓ · you can always come back up here</div>
+  </div>
+
+  <aside id="mk-panel" class="mk-panel" hidden>
+    <div class="mk-panel-top">
+      <div id="mk-breadcrumb" class="mk-breadcrumb"></div>
+      <button type="button" class="mk-btn" data-act="close">Close ×</button>
+    </div>
+    <h2 id="mk-panel-title" class="mk-panel-title"></h2>
+    <div id="mk-panel-authors" class="mk-panel-authors" hidden></div>
+    <div id="mk-panel-rule" class="mk-panel-rule"></div>
+    <div id="mk-panel-blurb" class="mk-panel-blurb"></div>
+    <div id="mk-panel-questions" class="mk-panel-questions" hidden>
+      <div class="mk-eyebrow mk-panel-label">Open questions</div>
+      <div id="mk-panel-questions-list"></div>
+    </div>
+    <div id="mk-panel-children" class="mk-panel-children" hidden>
+      <div class="mk-eyebrow mk-panel-label">Sub-themes</div>
+      <div id="mk-panel-children-list"></div>
+    </div>
+    <div id="mk-panel-connections" class="mk-panel-connections" hidden>
+      <div class="mk-eyebrow mk-panel-label mk-panel-label-teal">Connections</div>
+      <div id="mk-panel-connections-list"></div>
+    </div>
+    <div id="mk-panel-parent" class="mk-panel-parent" hidden></div>
+  </aside>
+
+  <script
+    type="application/json"
+    id="mk-data"
+    set:html={JSON.stringify({ nodes: themeMap.nodes, links: themeMap.links, regionColors: themeMap.regionColors, bbox: themeMap.bbox })}
+  />
 </BaseLayout>
 
 <style>
-  .inner {
-    position: relative;
-    z-index: 5;
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 0 1.5rem 5rem;
-    text-align: center;
+  #mk-viewport {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: var(--mk-header-h, 72px);
+    bottom: 0;
+    overflow: hidden;
+    background: #120f18;
+    background-image:
+      radial-gradient(ellipse 900px 600px at 30% 30%, rgba(122, 152, 214, 0.08), transparent 70%),
+      radial-gradient(ellipse 900px 600px at 70% 30%, rgba(214, 170, 88, 0.08), transparent 70%),
+      radial-gradient(ellipse 900px 600px at 30% 75%, rgba(76, 202, 172, 0.08), transparent 70%),
+      radial-gradient(ellipse 900px 600px at 70% 75%, rgba(210, 130, 136, 0.08), transparent 70%);
+    touch-action: none;
+    cursor: grab;
   }
-  .text-block {
-    font-size: 15px;
-    line-height: 1.85;
-    color: rgba(224, 219, 212, 0.62);
+
+  #mk-viewport.is-dragging {
+    cursor: grabbing;
+  }
+
+  #mk-world {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6000px;
+    height: 6000px;
+    transform-origin: 0 0;
+    transition: transform 650ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    will-change: transform;
+  }
+
+  #mk-world.instant {
+    transition: none;
+  }
+
+  #mk-lines {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6000px;
+    height: 6000px;
+    overflow: visible;
+  }
+
+  #mk-nodes {
+    position: absolute;
+    inset: 0;
+  }
+
+  :global(.mk-node) {
+    position: absolute;
+    box-sizing: border-box;
+    cursor: pointer;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    transition: opacity 300ms ease, filter 300ms ease;
+    font-family: 'Courier Prime', 'Courier New', monospace;
+  }
+
+  :global(.mk-node.mk-hidden) {
+    opacity: 0 !important;
+    pointer-events: none;
+  }
+
+  :global(.mk-node.mk-dim) {
+    opacity: 0.32;
+  }
+
+  :global(.mk-node.mk-sel) {
+    outline: 2px solid #f4cb7a;
+    outline-offset: 4px;
+  }
+
+  :global(.mk-node:hover .mk-node-title) {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  :global(.mk-node-title) {
+    font-weight: 400;
+    color: #f2eee6;
+    line-height: 1.15;
+  }
+
+  :global(.mk-node-num) {
+    font-family: 'Courier Prime', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  :global(.mk-node-sub) {
+    letter-spacing: 0.05em;
+    color: #9a938a;
+  }
+
+  :global(.mk-link) {
+    fill: none;
+    stroke-linecap: round;
+    transition: opacity 300ms ease;
+  }
+
+  :global(.mk-link.mk-hidden) {
+    opacity: 0 !important;
+  }
+
+  :global(.mk-link-hit) {
+    fill: none;
+    stroke: #000;
+    stroke-opacity: 0;
+    pointer-events: stroke;
+  }
+
+  :global(.mk-link-hit.is-cross) {
+    cursor: pointer;
+  }
+
+  .mk-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+  }
+
+  .mk-btn {
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    padding: 8px 13px;
+    border: 1px solid rgba(230, 225, 217, 0.5);
+    background: transparent;
+    color: #e6e1d9;
+    cursor: pointer;
+  }
+
+  .mk-btn:hover {
+    border-color: #48c6a8;
+    color: #48c6a8;
+  }
+
+  .mk-btn-square {
+    font-size: 16px;
+    width: 33px;
+    height: 33px;
+    padding: 0;
+  }
+
+  .mk-btn-sm {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .mk-pill {
+    position: fixed;
+    top: calc(var(--mk-header-h, 72px) + 18px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 40;
+    font-family: 'Courier Prime', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1;
+    padding: 7px 12px;
+    border: 1px solid rgba(230, 225, 217, 0.35);
+    background: rgba(26, 23, 32, 0.85);
+    color: #9a938a;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .mk-pill:hover {
+    border-color: #f4cb7a;
+    color: #f4cb7a;
+  }
+
+  .mk-pill[hidden] {
+    display: none;
+  }
+
+  .mk-pill-arrow {
+    font-size: 13px;
+  }
+
+  .mk-tooltip {
+    position: fixed;
+    z-index: 60;
+    pointer-events: none;
+    max-width: 268px;
+    background: #2a2632;
+    border: 1px solid rgba(230, 225, 217, 0.3);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 10px 28px rgba(0, 0, 0, 0.4);
+    padding: 11px 14px;
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #e6e1d9;
+  }
+
+  .mk-legend-wrap {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    z-index: 42;
+  }
+
+  .mk-legend {
+    width: 266px;
+    box-sizing: border-box;
+    background: #2a2632;
+    border: 1px solid rgba(230, 225, 217, 0.28);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 10px 28px rgba(0, 0, 0, 0.4);
+    padding: 15px 16px;
+  }
+
+  .mk-legend[hidden] {
+    display: none;
+  }
+
+  .mk-eyebrow {
+    font-family: 'Courier Prime', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 400;
+  }
+
+  .mk-legend-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 13px;
+  }
+
+  .mk-legend-title {
+    font-size: 12px;
+    color: #48c6a8;
+  }
+
+  .mk-legend-sub {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: #9a938a;
+    margin-bottom: 9px;
+  }
+
+  .mk-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 9px;
+  }
+
+  .mk-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex: none;
+  }
+
+  .mk-legend-line {
+    width: 28px;
+    border-top: 2px solid;
+    flex: none;
+  }
+
+  .mk-legend-label {
+    font-size: 13px;
+    line-height: 1.35;
+    color: #d8d3cb;
+  }
+
+  .mk-legend-divider {
+    height: 1px;
+    background: rgba(230, 225, 217, 0.14);
+    margin: 13px 0;
+  }
+
+  .mk-legend-hint {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #9a938a;
+  }
+
+  .mk-legend-toggle {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    background: #2a2632;
+  }
+
+  .mk-legend-toggle[hidden] {
+    display: none;
+  }
+
+  .mk-intro {
+    position: fixed;
+    inset: 72px 0 0 0;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    text-align: center;
+    padding: 2rem;
+    box-sizing: border-box;
+    background: radial-gradient(ellipse 70% 60% at 50% 42%, rgba(30, 26, 38, 0.92), rgba(18, 15, 24, 0.98));
+    transition: opacity 500ms ease, visibility 500ms;
+  }
+
+  .mk-intro[hidden] {
+    display: flex;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .mk-intro-eyebrow {
+    font-size: 13px;
+    color: #f4cb7a;
+  }
+
+  .mk-intro-title {
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 2.75rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: #f2eee6;
+    max-width: 800px;
+  }
+
+  .mk-intro-body {
+    font-size: 17px;
+    line-height: 1.75;
+    color: #b9b2a7;
+    max-width: 600px;
+  }
+
+  .mk-intro-hint {
+    font-size: 12px;
+    color: #9a938a;
+  }
+
+  .mk-intro-enter {
+    font-family: 'Courier Prime', monospace;
+    margin-top: 6px;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: 1.5px solid #f4cb7a;
+    background: transparent;
+    color: #f4cb7a;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .mk-intro-enter:hover {
+    background: rgba(244, 203, 122, 0.14);
+  }
+
+  .mk-intro-foot {
+    font-size: 11px;
+    color: #655e55;
+  }
+
+  .mk-panel {
+    position: fixed;
+    top: var(--mk-header-h, 72px);
+    right: 0;
+    bottom: 0;
+    width: min(452px, 42vw);
+    z-index: 45;
+    background: #262230;
+    border-left: 1px solid rgba(230, 225, 217, 0.2);
+    padding: 26px 28px 44px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    font-family: 'Courier Prime', monospace;
+    color: #e6e1d9;
+  }
+
+  .mk-panel[hidden] {
+    display: none;
+  }
+
+  .mk-panel-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .mk-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    row-gap: 5px;
+    min-width: 0;
+    padding-top: 4px;
+    font-size: 11px;
+  }
+
+  :global(.mk-crumb) {
+    display: inline-flex;
+    align-items: baseline;
+    cursor: pointer;
+  }
+
+  :global(.mk-crumb-label) {
+    font-size: 11px;
+    color: #9a938a;
+  }
+
+  :global(.mk-crumb-label:hover) {
+    color: #48c6a8;
+    text-decoration: underline;
+  }
+
+  :global(.mk-crumb-sep) {
+    font-size: 11px;
+    color: #655e55;
+    padding: 0 6px;
+  }
+
+  .mk-panel-title {
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1.14;
+    letter-spacing: -0.02em;
+    margin: 13px 0 0;
+    color: #f2eee6;
+  }
+
+  .mk-panel-authors {
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    color: #9a938a;
+    margin-top: 12px;
+  }
+
+  .mk-panel-authors[hidden] {
+    display: none;
+  }
+
+  .mk-panel-rule {
+    height: 1px;
+    opacity: 0.45;
+    margin: 18px 0;
+  }
+
+  .mk-panel-blurb {
+    font-size: 17px;
+    line-height: 1.7;
+    color: #e6e1d9;
+  }
+
+  .mk-panel-label {
+    font-size: 12px;
+    color: #9a938a;
+    margin: 26px 0 10px;
+  }
+
+  .mk-panel-label-teal {
+    color: #48c6a8;
+  }
+
+  .mk-panel-questions[hidden],
+  .mk-panel-children[hidden],
+  .mk-panel-connections[hidden],
+  .mk-panel-parent[hidden] {
+    display: none;
+  }
+
+  :global(.mk-question) {
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #e6e1d9;
+    border-left: 2px solid;
+    padding-left: 14px;
+    margin: 11px 0;
+  }
+
+  :global(.mk-child-row) {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(230, 225, 217, 0.12);
+    cursor: pointer;
+  }
+
+  :global(.mk-child-num) {
+    font-size: 12px;
+    color: #9a938a;
+    flex: none;
+  }
+
+  :global(.mk-child-label) {
+    font-size: 16px;
+    line-height: 1.3;
+    color: #e6e1d9;
+  }
+
+  :global(.mk-child-row:hover .mk-child-label) {
+    color: #48c6a8;
+  }
+
+  :global(.mk-conn) {
+    border: 1px solid rgba(230, 225, 217, 0.3);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    background: #211d27;
+  }
+
+  :global(.mk-conn-head) {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    flex-wrap: nowrap;
+  }
+
+  :global(.mk-conn-num) {
+    font-size: 12px;
+    color: #48c6a8;
+    flex: none;
+    white-space: nowrap;
+  }
+
+  :global(.mk-conn-label) {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.3;
+    color: #e6e1d9;
+    flex: 1;
+  }
+
+  :global(.mk-conn-text) {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #9a938a;
+    margin-top: 7px;
+  }
+
+  .mk-panel-parent {
+    height: 1px;
+    background: rgba(230, 225, 217, 0.12);
+    margin: 22px 0 13px;
+    padding-top: 13px;
+    border-top: none;
+  }
+
+  :global(.mk-parent-link) {
+    font-size: 13px;
+    color: #9a938a;
+    cursor: pointer;
+  }
+
+  :global(.mk-parent-link:hover) {
+    color: #48c6a8;
+  }
+
+  @media (max-width: 780px) {
+    .mk-panel {
+      width: 100%;
+    }
+    .mk-legend-wrap {
+      left: 12px;
+      bottom: 12px;
+    }
+    .mk-legend {
+      width: 230px;
+    }
   }
 </style>
+
+<script>
+  interface ThemeNode {
+    id: string;
+    number: string;
+    label: string;
+    level: number;
+    parent: string | null;
+    blurb: string;
+    questions: string[];
+    authors: string | null;
+    color: string;
+    x: number;
+    y: number;
+    children: string[];
+  }
+  interface ThemeLink {
+    from: string;
+    to: string;
+    note: string;
+  }
+
+  const DATA: { nodes: ThemeNode[]; links: ThemeLink[]; regionColors: Record<string, string>; bbox: any } = JSON.parse(
+    document.getElementById('mk-data')!.textContent || '{}',
+  );
+
+  const byId: Record<string, ThemeNode> = {};
+  DATA.nodes.forEach((n) => (byId[n.id] = n));
+  const root = DATA.nodes.find((n) => n.level === -1)!;
+
+  const OFFSET = 3000;
+
+  const LEVEL_CFG: Record<
+    number,
+    { width: number; font: number; border: number; blob: 'a' | 'b'; bg: string; shadow: string; padding: string }
+  > = {
+    [-1]: { width: 1400, font: 124, border: 4, blob: 'a', bg: 'rgba(40,36,48,0.82)', shadow: '0 18px 44px rgba(0,0,0,0.5)', padding: '46px 60px' },
+    0: { width: 760, font: 84, border: 3.5, blob: 'a', bg: 'rgba(38,34,46,0.7)', shadow: '0 14px 32px rgba(0,0,0,0.46)', padding: '30px 36px' },
+    1: { width: 440, font: 44, border: 2.5, blob: 'b', bg: 'rgba(34,30,42,0.66)', shadow: '0 9px 22px rgba(0,0,0,0.4)', padding: '18px 22px' },
+    2: { width: 380, font: 36, border: 2.5, blob: 'a', bg: 'rgba(30,27,38,0.62)', shadow: '0 6px 15px rgba(0,0,0,0.36)', padding: '14px 18px' },
+    3: { width: 330, font: 31, border: 2.5, blob: 'b', bg: 'rgba(26,23,33,0.58)', shadow: '0 4px 11px rgba(0,0,0,0.32)', padding: '12px 16px' },
+  };
+  const BLOB_A = '332px 20px 293px 20px / 20px 293px 20px 332px';
+  const BLOB_B = '18px 306px 18px 319px / 306px 18px 319px 18px';
+
+  const viewport = document.getElementById('mk-viewport')!;
+  const world = document.getElementById('mk-world')!;
+  const linesSvg = document.getElementById('mk-lines') as unknown as SVGSVGElement;
+  const nodesLayer = document.getElementById('mk-nodes')!;
+  const panel = document.getElementById('mk-panel')!;
+  const tooltip = document.getElementById('mk-tooltip')!;
+  const introEl = document.getElementById('mk-intro')!;
+  const toIntroBtn = document.getElementById('mk-to-intro')!;
+  const legend = document.getElementById('mk-legend')!;
+  const legendOpenBtn = document.getElementById('mk-legend-open')!;
+
+  // --- Build node DOM ---
+  const nodeEls: Record<string, HTMLElement> = {};
+  DATA.nodes.forEach((n) => {
+    const cfg = LEVEL_CFG[n.level] || LEVEL_CFG[3];
+    const el = document.createElement('div');
+    el.className = `mk-node lvl-${n.level}`;
+    el.dataset.id = n.id;
+    el.style.left = `${OFFSET + n.x}px`;
+    el.style.top = `${OFFSET + n.y}px`;
+    el.style.width = `${cfg.width}px`;
+    el.style.background = cfg.bg;
+    el.style.border = `${cfg.border}px solid ${n.color}`;
+    el.style.borderRadius = cfg.blob === 'a' ? BLOB_A : BLOB_B;
+    el.style.padding = cfg.padding;
+    el.style.boxShadow = cfg.shadow;
+    el.style.zIndex = String(30 - Math.max(0, n.level));
+
+    const title = document.createElement('div');
+    title.className = 'mk-node-title';
+    title.style.fontSize = `${cfg.font}px`;
+    title.style.fontWeight = n.level <= -1 ? '700' : '400';
+
+    if (n.level >= 1) {
+      const num = document.createElement('div');
+      num.className = 'mk-node-num';
+      num.style.fontSize = `${cfg.font * 0.44}px`;
+      num.style.color = n.color;
+      num.style.marginBottom = `${cfg.font * 0.18}px`;
+      num.textContent = n.number;
+      el.appendChild(num);
+    }
+
+    title.textContent = n.label;
+    el.appendChild(title);
+
+    if (n.children.length && n.level <= 1) {
+      const sub = document.createElement('div');
+      sub.className = 'mk-node-sub';
+      sub.style.fontSize = `${cfg.font * 0.19}px`;
+      sub.style.marginTop = `${cfg.font * 0.18}px`;
+      sub.textContent = `${n.children.length} sub-theme${n.children.length > 1 ? 's' : ''} →`;
+      el.appendChild(sub);
+    }
+
+    nodesLayer.appendChild(el);
+    nodeEls[n.id] = el;
+  });
+
+  // --- Build SVG lines ---
+  const NS = 'http://www.w3.org/2000/svg';
+  linesSvg.innerHTML = '';
+  interface LineRec {
+    a: string;
+    b: string;
+    type: 'hier' | 'cross';
+    need: number;
+    vis: SVGPathElement;
+    hit: SVGPathElement;
+    note?: string;
+  }
+  const lines: LineRec[] = [];
+
+  function curvePath(a: ThemeNode, b: ThemeNode): string {
+    const ax = OFFSET + a.x;
+    const ay = OFFSET + a.y;
+    const bx = OFFSET + b.x;
+    const by = OFFSET + b.y;
+    const mx = (ax + bx) / 2;
+    const my = (ay + by) / 2;
+    const dx = bx - ax;
+    const dy = by - ay;
+    const len = Math.hypot(dx, dy) || 1;
+    const bow = Math.min(60, len * 0.12);
+    const cx = mx - (dy / len) * bow;
+    const cy = my + (dx / len) * bow;
+    return `M ${ax} ${ay} Q ${cx} ${cy} ${bx} ${by}`;
+  }
+
+  function addLine(a: ThemeNode, b: ThemeNode, type: 'hier' | 'cross', need: number, note?: string) {
+    const d = curvePath(a, b);
+    const vis = document.createElementNS(NS, 'path');
+    vis.setAttribute('d', d);
+    vis.setAttribute('class', 'mk-link');
+    vis.setAttribute('stroke', type === 'cross' ? '#3fd8c4' : 'rgba(255,255,255,0.55)');
+    vis.setAttribute('stroke-width', type === 'cross' ? '5' : '4');
+    if (type === 'cross') vis.setAttribute('stroke-dasharray', '2 14');
+    linesSvg.appendChild(vis);
+
+    const hit = document.createElementNS(NS, 'path');
+    hit.setAttribute('d', d);
+    hit.setAttribute('class', `mk-link-hit${type === 'cross' ? ' is-cross' : ''}`);
+    hit.setAttribute('stroke-width', '40');
+    linesSvg.appendChild(hit);
+
+    if (type === 'cross') {
+      hit.dataset.gotoId = b.id;
+      hit.addEventListener('mouseenter', (e) => showTip(note || '', e as MouseEvent));
+      hit.addEventListener('mousemove', (e) => moveTip(e as MouseEvent));
+      hit.addEventListener('mouseleave', hideTip);
+    }
+
+    lines.push({ a: a.id, b: b.id, type, need, vis, hit, note });
+  }
+
+  DATA.nodes.forEach((n) => {
+    if (n.parent && byId[n.parent]) addLine(byId[n.parent], n, 'hier', Math.max(0, n.level));
+  });
+  DATA.links.forEach((l) => {
+    const a = byId[l.from];
+    const b = byId[l.to];
+    if (a && b) addLine(a, b, 'cross', Math.max(a.level, b.level), l.note);
+  });
+
+  // --- Camera ---
+  const cam = { x: root.x, y: root.y, scale: 0.32 };
+  let panelWidth = 0;
+
+  function vpSize() {
+    return { w: viewport.clientWidth, h: viewport.clientHeight };
+  }
+
+  function centerXY() {
+    const { w, h } = vpSize();
+    return { cx: (w - panelWidth) / 2, cy: h / 2 };
+  }
+
+  function applyTransform() {
+    const { cx, cy } = centerXY();
+    const tx = cx - cam.scale * (OFFSET + cam.x);
+    const ty = cy - cam.scale * (OFFSET + cam.y);
+    world.style.transform = `translate(${tx}px, ${ty}px) scale(${cam.scale})`;
+    updateLOD();
+  }
+
+  function screenToWorld(sx: number, sy: number) {
+    const { cx, cy } = centerXY();
+    return { x: (sx - cx) / cam.scale - OFFSET, y: (sy - cy) / cam.scale - OFFSET };
+  }
+
+  // --- Level of detail ---
+  let maxLvl = 0;
+  let focusLvl = 0;
+  function updateLOD() {
+    const s = cam.scale;
+    const scaleLvl = s < 0.24 ? 0 : s < 0.42 ? 1 : s < 0.72 ? 2 : 3;
+    maxLvl = Math.max(scaleLvl, focusLvl);
+    DATA.nodes.forEach((n) => {
+      const el = nodeEls[n.id];
+      const vis = n.level === -1 || n.level <= maxLvl;
+      el.classList.toggle('mk-hidden', !vis);
+    });
+    lines.forEach((l) => {
+      const vis = l.need <= maxLvl;
+      l.vis.classList.toggle('mk-hidden', !vis);
+      // opacity alone doesn't stop hit-testing, so an LOD-culled link's
+      // invisible hit-stroke would otherwise stay clickable/hoverable
+      l.hit.style.pointerEvents = vis ? '' : 'none';
+    });
+  }
+
+  // --- Focus dimming on selection ---
+  function applyFocus(selId: string | null) {
+    const litSet = new Set<string>();
+    if (selId) {
+      litSet.add(selId);
+      const sel = byId[selId];
+      let p = sel.parent;
+      while (p) {
+        litSet.add(p);
+        p = byId[p]?.parent ?? null;
+      }
+      sel.children.forEach((c) => litSet.add(c));
+    }
+    DATA.nodes.forEach((n) => {
+      const el = nodeEls[n.id];
+      const dim = !!selId && !litSet.has(n.id);
+      el.classList.toggle('mk-dim', dim);
+      el.classList.toggle('mk-sel', n.id === selId);
+    });
+  }
+
+  // --- Fit / animate helpers ---
+  function regionBBox() {
+    let minx = Infinity;
+    let miny = Infinity;
+    let maxx = -Infinity;
+    let maxy = -Infinity;
+    DATA.nodes.forEach((n) => {
+      // Fit level-1 in too, not just the regions — otherwise the overview
+      // scale ends up just past the LOD threshold that reveals level 1,
+      // clipping those nodes at the viewport edge the moment they appear.
+      if (n.level <= 1) {
+        minx = Math.min(minx, n.x);
+        miny = Math.min(miny, n.y);
+        maxx = Math.max(maxx, n.x);
+        maxy = Math.max(maxy, n.y);
+      }
+    });
+    return { minx, miny, maxx, maxy };
+  }
+
+  function setInstant(instant: boolean) {
+    world.classList.toggle('instant', instant);
+  }
+
+  function flyToBox(minx: number, miny: number, maxx: number, maxy: number) {
+    const { w, h } = vpSize();
+    const availW = Math.max(200, w - panelWidth) * 0.86;
+    const availH = h * 0.86;
+    const bw = Math.max(1, maxx - minx);
+    const bh = Math.max(1, maxy - miny);
+    let s = Math.min(availW / bw, availH / bh);
+    s = Math.max(0.06, Math.min(2.6, s));
+    setInstant(false);
+    cam.x = (minx + maxx) / 2;
+    cam.y = (miny + maxy) / 2;
+    cam.scale = s;
+    focusLvl = 0;
+    applyTransform();
+  }
+
+  function fitOverview() {
+    const b = regionBBox();
+    const pad = 480;
+    flyToBox(b.minx - pad, b.miny - pad, b.maxx + pad, b.maxy + pad);
+  }
+
+  // --- Panel population ---
+  function ancestorPath(id: string): ThemeNode[] {
+    const path: ThemeNode[] = [];
+    let p = byId[id]?.parent;
+    while (p) {
+      path.unshift(byId[p]);
+      p = byId[p]?.parent ?? null;
+    }
+    return path;
+  }
+
+  function crumbLabel(n: ThemeNode) {
+    return n.id === 'root' ? 'The making of' : n.label;
+  }
+
+  let selId: string | null = null;
+
+  function select(id: string) {
+    const n = byId[id];
+    if (!n) return;
+    selId = id;
+    panelWidth = Math.min(452, viewport.clientWidth * 0.42);
+    focusLvl = Math.min(3, Math.max(0, n.level) + 1);
+
+    // Breadcrumb
+    const crumbWrap = document.getElementById('mk-breadcrumb')!;
+    crumbWrap.innerHTML = '';
+    ancestorPath(id).forEach((p) => {
+      const span = document.createElement('span');
+      span.className = 'mk-crumb';
+      span.innerHTML = `<span class="mk-crumb-label">${escapeHtml(crumbLabel(p))}</span><span class="mk-crumb-sep">/</span>`;
+      span.addEventListener('click', () => select(p.id));
+      crumbWrap.appendChild(span);
+    });
+    const cur = document.createElement('span');
+    cur.className = 'mk-crumb-label';
+    cur.style.color = n.color;
+    cur.textContent = crumbLabel(n);
+    crumbWrap.appendChild(cur);
+
+    (document.getElementById('mk-panel-title') as HTMLElement).textContent = crumbLabel(n);
+
+    const authorsEl = document.getElementById('mk-panel-authors')!;
+    if (n.authors) {
+      authorsEl.hidden = false;
+      authorsEl.textContent = `DRAFT · ${n.authors}`;
+    } else {
+      authorsEl.hidden = true;
+    }
+
+    (document.getElementById('mk-panel-rule') as HTMLElement).style.background = n.color;
+    (document.getElementById('mk-panel-blurb') as HTMLElement).textContent = n.blurb;
+
+    const qWrap = document.getElementById('mk-panel-questions')!;
+    const qList = document.getElementById('mk-panel-questions-list')!;
+    qList.innerHTML = '';
+    if (n.questions.length) {
+      qWrap.hidden = false;
+      n.questions.forEach((q) => {
+        const d = document.createElement('div');
+        d.className = 'mk-question';
+        d.style.borderColor = n.color;
+        d.textContent = q;
+        qList.appendChild(d);
+      });
+    } else {
+      qWrap.hidden = true;
+    }
+
+    const cWrap = document.getElementById('mk-panel-children')!;
+    const cList = document.getElementById('mk-panel-children-list')!;
+    cList.innerHTML = '';
+    if (n.children.length) {
+      cWrap.hidden = false;
+      n.children.forEach((cid) => {
+        const c = byId[cid];
+        const row = document.createElement('div');
+        row.className = 'mk-child-row';
+        row.innerHTML = `<span class="mk-child-num">${escapeHtml(c.number)}</span><span class="mk-child-label">${escapeHtml(c.label)}</span>`;
+        row.addEventListener('click', () => select(cid));
+        cList.appendChild(row);
+      });
+    } else {
+      cWrap.hidden = true;
+    }
+
+    const connWrap = document.getElementById('mk-panel-connections')!;
+    const connList = document.getElementById('mk-panel-connections-list')!;
+    connList.innerHTML = '';
+    const conns = DATA.links
+      .filter((l) => l.from === id || l.to === id)
+      .map((l) => (l.from === id ? { other: byId[l.to], note: l.note } : { other: byId[l.from], note: l.note }));
+    if (conns.length) {
+      connWrap.hidden = false;
+      conns.forEach(({ other, note }) => {
+        const row = document.createElement('div');
+        row.className = 'mk-conn';
+        row.innerHTML = `<div class="mk-conn-head"><span class="mk-conn-num">${escapeHtml(other.number)} →</span><span class="mk-conn-label">${escapeHtml(other.label)}</span></div><div class="mk-conn-text">${escapeHtml(note)}</div>`;
+        row.addEventListener('click', () => select(other.id));
+        connList.appendChild(row);
+      });
+    } else {
+      connWrap.hidden = true;
+    }
+
+    const parentWrap = document.getElementById('mk-panel-parent')!;
+    parentWrap.innerHTML = '';
+    if (n.parent) {
+      parentWrap.hidden = false;
+      const p = byId[n.parent];
+      const link = document.createElement('span');
+      link.className = 'mk-parent-link';
+      link.textContent = `← Part of ${p.number} · ${crumbLabel(p)}`;
+      link.addEventListener('click', () => select(p.id));
+      parentWrap.appendChild(link);
+    } else {
+      parentWrap.hidden = true;
+    }
+
+    panel.hidden = false;
+    introEl.hidden = true;
+    toIntroBtn.hidden = false;
+    applyFocus(id);
+
+    const kids = n.children.map((cid) => byId[cid]);
+    const pts = [n, ...kids];
+    const minx = Math.min(...pts.map((p) => p.x));
+    const miny = Math.min(...pts.map((p) => p.y));
+    const maxx = Math.max(...pts.map((p) => p.x));
+    const maxy = Math.max(...pts.map((p) => p.y));
+    const pad = kids.length ? 340 : 280;
+    flyToBox(minx - pad, miny - pad, maxx + pad, maxy + pad);
+  }
+
+  function deselect() {
+    selId = null;
+    panel.hidden = true;
+    panelWidth = 0;
+    focusLvl = 0;
+    applyFocus(null);
+    fitOverview();
+  }
+
+  function escapeHtml(s: string) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  // --- Tooltip ---
+  function showTip(text: string, ev: MouseEvent) {
+    tooltip.textContent = text;
+    tooltip.hidden = false;
+    moveTip(ev);
+  }
+  function moveTip(ev: MouseEvent) {
+    const pad = 14;
+    let x = ev.clientX + pad;
+    let y = ev.clientY + pad;
+    const w = tooltip.offsetWidth || 200;
+    const h = tooltip.offsetHeight || 60;
+    if (x + w > window.innerWidth - 10) x = ev.clientX - w - pad;
+    if (y + h > window.innerHeight - 10) y = ev.clientY - h - pad;
+    tooltip.style.left = `${x}px`;
+    tooltip.style.top = `${y}px`;
+  }
+  function hideTip() {
+    tooltip.hidden = true;
+  }
+
+  // --- Pan / zoom interaction ---
+  // Click-to-select is handled here (not via a plain `click` listener on each
+  // node/link) because `setPointerCapture` below redirects the click that
+  // follows a captured pointer sequence to the capturing element, so a
+  // listener on the node itself never fires.
+  let drag: { x: number; y: number; sx: number; sy: number; moved: boolean; target: EventTarget | null } | null = null;
+  let dragTimer: number | undefined;
+
+  viewport.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false, target: e.target };
+    viewport.setPointerCapture(e.pointerId);
+    viewport.classList.add('is-dragging');
+  });
+  viewport.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x;
+    const dy = e.clientY - drag.y;
+    if (Math.abs(e.clientX - drag.sx) + Math.abs(e.clientY - drag.sy) > 5) drag.moved = true;
+    cam.x -= dx / cam.scale;
+    cam.y -= dy / cam.scale;
+    drag.x = e.clientX;
+    drag.y = e.clientY;
+    setInstant(true);
+    applyTransform();
+  });
+  function endDrag() {
+    viewport.classList.remove('is-dragging');
+    const result = drag && !drag.moved ? { wasClick: true, target: drag.target } : { wasClick: false, target: null };
+    drag = null;
+    window.clearTimeout(dragTimer);
+    dragTimer = window.setTimeout(() => setInstant(false), 50);
+    return result;
+  }
+  viewport.addEventListener('pointerup', () => {
+    const { wasClick, target } = endDrag();
+    if (!wasClick) return;
+    const el = target as HTMLElement | null;
+    const nodeEl = el?.closest<HTMLElement>('.mk-node');
+    const linkEl = el?.closest<SVGElement>('.mk-link-hit.is-cross') as (SVGElement & { dataset: DOMStringMap }) | null;
+    if (nodeEl?.dataset.id) select(nodeEl.dataset.id);
+    else if (linkEl?.dataset.gotoId) select(linkEl.dataset.gotoId);
+    else if (selId) deselect();
+  });
+  viewport.addEventListener('pointercancel', () => endDrag());
+
+  viewport.addEventListener(
+    'wheel',
+    (e) => {
+      e.preventDefault();
+      const rect = viewport.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      const before = screenToWorld(mx, my);
+      const factor = e.deltaY < 0 ? 1.12 : 0.89;
+      cam.scale = Math.max(0.05, Math.min(3, cam.scale * factor));
+      const after = screenToWorld(mx, my);
+      cam.x += before.x - after.x;
+      cam.y += before.y - after.y;
+      setInstant(true);
+      applyTransform();
+      window.clearTimeout(dragTimer);
+      dragTimer = window.setTimeout(() => setInstant(false), 50);
+    },
+    { passive: false },
+  );
+
+  // --- Header / legend / intro controls ---
+  document.querySelectorAll<HTMLButtonElement>('[data-act]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const act = btn.dataset.act;
+      if (act === 'overview' || act === 'close') deselect();
+      else if (act === 'zoom-in') zoomBy(1.35);
+      else if (act === 'zoom-out') zoomBy(0.74);
+      else if (act === 'legend-open') {
+        legend.hidden = false;
+        legendOpenBtn.hidden = true;
+      } else if (act === 'legend-close') {
+        legend.hidden = true;
+        legendOpenBtn.hidden = false;
+      }
+    });
+  });
+
+  function zoomBy(f: number) {
+    setInstant(false);
+    cam.scale = Math.max(0.05, Math.min(3, cam.scale * f));
+    applyTransform();
+  }
+
+  document.getElementById('mk-intro-close')!.addEventListener('click', () => {
+    introEl.hidden = true;
+    toIntroBtn.hidden = false;
+    fitOverview();
+  });
+  toIntroBtn.addEventListener('click', () => {
+    introEl.hidden = false;
+    toIntroBtn.hidden = true;
+    if (selId) deselect();
+  });
+
+  window.addEventListener('resize', () => applyTransform());
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && selId) deselect();
+  });
+
+  // --- Init ---
+  function syncHeaderHeight() {
+    const header = document.querySelector<HTMLElement>('.hd-header');
+    if (header) document.documentElement.style.setProperty('--mk-header-h', `${header.offsetHeight}px`);
+    applyTransform();
+  }
+  window.addEventListener('resize', syncHeaderHeight);
+  syncHeaderHeight();
+
+  if (window.matchMedia('(max-width: 680px)').matches) {
+    legend.hidden = true;
+    legendOpenBtn.hidden = false;
+  }
+  fitOverview();
+</script>

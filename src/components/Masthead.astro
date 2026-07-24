@@ -30,6 +30,7 @@ const NAV = [
         ))}
       </nav>
     </div>
+    <div class="hd-extra"><slot name="extra" /></div>
   </div>
 </div>
 
@@ -42,6 +43,14 @@ const NAV = [
     z-index: 20;
     background: rgba(44, 40, 48, 0.97);
     border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .hd-extra {
+    flex: none;
+  }
+
+  .hd-extra:empty {
+    display: none;
   }
 
   .hd-row {

@@ -6,12 +6,14 @@ export interface Props {
   title: string;
   description?: string;
   active?: string;
+  fullscreen?: boolean;
 }
 
 const {
   title,
   description = "Polyphonic Archive — a podcast about the girls of Huize Dina, a Jewish girls' home in Santpoort, 1920s–40s.",
   active = '',
+  fullscreen = false,
 } = Astro.props;
 ---
 
@@ -31,12 +33,20 @@ const {
     <title>{title} · Huize Dina</title>
   </head>
   <body>
-    <div class="page-root">
-      <div class="bg-vignette" aria-hidden="true"></div>
-      <div class="bg-noise" aria-hidden="true"></div>
+    <div class:list={['page-root', { fullscreen }]}>
+      {
+        !fullscreen && (
+          <>
+            <div class="bg-vignette" aria-hidden="true" />
+            <div class="bg-noise" aria-hidden="true" />
+          </>
+        )
+      }
       <slot name="bg-extra" />
 
-      <Masthead active={active} />
+      <Masthead active={active}>
+        <slot name="header-extra" slot="extra" />
+      </Masthead>
 
       <slot />
     </div>
@@ -51,6 +61,12 @@ const {
     color: #e0dbd4;
     font-family: 'Courier Prime', 'Courier New', Courier, monospace;
     overflow-x: hidden;
+  }
+
+  .page-root.fullscreen {
+    height: 100vh;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .bg-vignette {
