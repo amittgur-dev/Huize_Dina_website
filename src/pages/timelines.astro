@@ -14,37 +14,9 @@ const timelinesRaw = Object.values(timelineFiles).sort(
 
 const timelines = timelinesRaw.map(buildTimeline);
 const SLUGS = timelines.map((t) => t.slug);
-
-const BG_IMAGES = [
-  { file: 'assets/timeline/dejong-huize-dina.png', l: '-4%', t: '-8%', w: 1160, rot: -3, sy: 260, sx: 24, op: 0.36 },
-  { file: 'assets/timeline/dejong-eikenstein-zeist.jpg', l: '44%', t: '-12%', w: 1060, rot: 4, sy: 365, sx: 38, op: 0.32 },
-  { file: 'assets/timeline/swaab-laundry-1932.jpg', l: '65%', t: '1%', w: 760, rot: -7, sy: 195, sx: 28, op: 0.26 },
-  { file: 'assets/timeline/engers-orphanage-utrecht.jpg', l: '7%', t: '28%', w: 980, rot: -5, sy: 415, sx: 18, op: 0.3 },
-  { file: 'assets/timeline/dejong-beth-san.jpg', l: '52%', t: '24%', w: 880, rot: 6, sy: 312, sx: 32, op: 0.34 },
-  { file: 'assets/timeline/swaab-kruimel-1.jpg', l: '1%', t: '60%', w: 680, rot: -4, sy: 234, sx: 14, op: 0.28 },
-  { file: 'assets/timeline/engers-apeldoornsche-bosch.jpg', l: '47%', t: '53%', w: 940, rot: -2, sy: 455, sx: 26, op: 0.32 },
-  { file: 'assets/timeline/dejong-pieter-schaap.jpg', l: '15%', t: '66%', w: 1020, rot: 3, sy: 340, sx: 20, op: 0.36 },
-];
 ---
 
 <BaseLayout title="Timelines" active="timelines" description="Three life stories from the Huize Dina archive, told episode by episode.">
-  <Fragment slot="bg-extra">
-    <div id="pa-bg" class="pa-bg" aria-hidden="true">
-      {
-        BG_IMAGES.map((f) => (
-          <div
-            class="pa-bg-frame"
-            style={`left:${f.l};top:${f.t};width:${f.w}px;transform:rotate(${f.rot}deg);`}
-            data-rot={f.rot}
-            data-sy={f.sy}
-            data-sx={f.sx}
-          >
-            <img src={`/${f.file}`} alt="" style={`opacity:${f.op};`} loading="lazy" />
-          </div>
-        ))
-      }
-    </div>
-  </Fragment>
 
   <section class="pa-hero">
     <div class="pa-hero-title" id="hero-title">{timelines[0].title}</div>
@@ -145,27 +117,6 @@ const BG_IMAGES = [
 </BaseLayout>
 
 <style>
-  .pa-bg {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-    pointer-events: none;
-    opacity: 0.88;
-  }
-
-  .pa-bg-frame {
-    position: absolute;
-    transform-origin: center;
-    will-change: transform;
-  }
-
-  .pa-bg-frame img {
-    width: 100%;
-    display: block;
-    filter: saturate(0.55) brightness(0.78);
-  }
-
   .pa-hero {
     position: relative;
     z-index: 6;
@@ -731,39 +682,6 @@ const BG_IMAGES = [
   }
   window.addEventListener('scroll', updateGauge, { passive: true });
 
-  // --- Background collage parallax ---
-  const bgFrames = Array.from(document.querySelectorAll<HTMLElement>('.pa-bg-frame'));
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let mx = 0;
-  let my = 0;
-  let raf: number | null = null;
-
-  function paintParallax() {
-    const totalH = document.documentElement.scrollHeight - window.innerHeight;
-    const scrollFrac = window.scrollY / Math.max(1, totalH);
-    bgFrames.forEach((el) => {
-      const rot = Number(el.dataset.rot);
-      const sy = Number(el.dataset.sy);
-      const sx = Number(el.dataset.sx);
-      const tx = -mx * sx;
-      const ty = -my * sx - scrollFrac * sy;
-      el.style.transform = `translate3d(${tx}px,${ty}px,0) rotate(${rot}deg)`;
-    });
-    raf = null;
-  }
-  function schedule() {
-    if (!raf) raf = requestAnimationFrame(paintParallax);
-  }
-  if (!prefersReducedMotion) {
-    window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule, { passive: true });
-    window.addEventListener('mousemove', (e) => {
-      mx = e.clientX / window.innerWidth - 0.5;
-      my = e.clientY / window.innerHeight - 0.5;
-      schedule();
-    });
-  }
-
   // --- Lightbox ---
   const lightbox = document.getElementById('lightbox')!;
   const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
@@ -784,5 +702,4 @@ const BG_IMAGES = [
 
   // --- Init ---
   setActive(activateFromHash(), { fromHash: true });
-  paintParallax();
 </script>
