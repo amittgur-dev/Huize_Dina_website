@@ -13,7 +13,7 @@ import team from '../../content/team.json';
       team.members.map((member: any) => (
         <div class="row">
           <div class="photo">
-            <img src={`/${member.photo}`} alt={member.name} loading="lazy" />
+            <img src={member.photo} alt={member.name} loading="lazy" />
           </div>
           <div>
             <div class="name">{member.name}</div>

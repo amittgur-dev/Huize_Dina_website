@@ -26,7 +26,7 @@
       "heading": "New Huize Dina built",
       "text": "A larger Huize Dina opens at Duinlustparkweg in Santpoort, replacing the older location at the Vinkenbaan. A large group had gathered for the official ceremony. In the main hall, the association’s president Margo Roos-Jacobson (mother of the later well-known journalist Jeanne Roos) gave the welcoming speech.",
       "image": {
-        "file": "assets/timeline/dejong-huize-dina.png",
+        "file": "/assets/timeline/dejong-huize-dina.png",
         "caption": "Huize Dina, Duinlustparkweg, Santpoort, ca. 1930.",
         "full": false,
         "focus": null,
@@ -68,7 +68,7 @@
       "heading": "Sent to Beth San",
       "text": "Tilly is admitted to Beth San, a Protestant reformatory on Nieuwe Herengracht in Amsterdam — an observation home for girls with difficult backgrounds who had become caught up in an immoral and troubled life. Beth San sought to guide its girls toward a calm, modest, and respectable life in society.",
       "image": {
-        "file": "assets/timeline/dejong-beth-san.jpg",
+        "file": "/assets/timeline/dejong-beth-san.jpg",
         "caption": "Beth San, home for girls, Nieuwe Herengracht, Amsterdam.",
         "full": false,
         "focus": null,
@@ -82,7 +82,7 @@
       "heading": "Sent to reformatory",
       "text": "Tilly is transferred from Amsterdam to the State Reformatory Eikenstein in Zeist — since 1909 a disciplinary school where young delinquent girls served their sentences or received re-education. Here Tilly met her friend Lenie Beaujean from Limburg, with whom she stayed in contact even after her time in Zeist.",
       "image": {
-        "file": "assets/timeline/dejong-eikenstein-zeist.jpg",
+        "file": "/assets/timeline/dejong-eikenstein-zeist.jpg",
         "caption": "The state reformatory Eikenstein, Zeist.",
         "full": false,
         "focus": null,
@@ -96,7 +96,7 @@
       "heading": "Returns to Huize Dina",
       "text": "Tilly enters Huize Dina in Santpoort. After her time in Zeist she was allowed to go to Huize Dina, near the dunes, where she had more freedom. However, she also experienced periods of depression there. Here too, she attempted suicide.",
       "image": {
-        "file": "assets/timeline/dejong-tilly-1939.png",
+        "file": "/assets/timeline/dejong-tilly-1939.png",
         "caption": "Alida “Tilly” de Jong, ca. 1939.",
         "full": true,
         "focus": null,
@@ -124,7 +124,7 @@
       "heading": "Tilly is pregnant",
       "text": "Tilly becomes pregnant. Alwin Jacob Garcia, a jazz musician from Paramaribo, Surinam, is identified as the father.",
       "image": {
-        "file": "assets/timeline/dejong-garcia.png",
+        "file": "/assets/timeline/dejong-garcia.png",
         "caption": "Alwin Jacob Garcia. Foto: Heron, Rotterdam.",
         "full": false,
         "focus": null,
@@ -152,7 +152,7 @@
       "heading": "Mirjam (Mieke) is born",
       "text": "Tilly’s daughter Mirjam “Mieke” de Jong is born in the Wilhelmina Gasthuis, a large public hospital in Amsterdam. The support dossier names Alwin Jacob Garcia as the father. Not long after the pregnancy, Garcia broke off all contact with Tilly.",
       "image": {
-        "file": "assets/timeline/dejong-mieke-father-fragment.jpg",
+        "file": "/assets/timeline/dejong-mieke-father-fragment.jpg",
         "caption": "Archival fragment first naming Mieke’s father. Amsterdam City Archives.",
         "full": false,
         "focus": null,
@@ -180,7 +180,7 @@
       "heading": "Arrested by collaborator",
       "text": "Tilly is arrested by police officer Pieter Schaap and taken to a police station in Amsterdam. Schaap was a Dutch employee of the SD — a fanatical persecutor of Jews who shot countless people dead. After the war he was sentenced to death and executed.",
       "image": {
-        "file": "assets/timeline/dejong-pieter-schaap.jpg",
+        "file": "/assets/timeline/dejong-pieter-schaap.jpg",
         "caption": "Pieter Schaap, the Dutch police officer who arrested Tilly.",
         "full": false,
         "focus": null,
@@ -194,7 +194,7 @@
       "heading": "Deported to Auschwitz",
       "text": "Alida is deported in a cattle train from Westerbork to Auschwitz. Of the 949 people who were forced into the train wagons together with Tilly that day, only thirty would return after the war. Three days later, upon arrival, Tilly is murdered in the gas chamber.",
       "image": {
-        "file": "assets/timeline/dejong-auschwitz-station.jpg",
+        "file": "/assets/timeline/dejong-auschwitz-station.jpg",
         "caption": "The train station of Auschwitz-Birkenau.",
         "full": false,
         "focus": null,

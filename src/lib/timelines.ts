@@ -132,7 +132,7 @@ export function buildTimeline(raw: RawTimeline): BuiltTimeline {
     if (ev.image) {
       const variant: PositionedImage['variant'] = ev.image.full ? 'full' : ev.image.zoom ? 'zoom' : 'default';
       image = {
-        src: `/${ev.image.file}`,
+        src: ev.image.file,
         caption: ev.image.caption,
         variant,
         focus: ev.image.focus || 'center',

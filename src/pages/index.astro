@@ -15,7 +15,7 @@ import home from '../../content/pages/home.json';
           <div class="text-block" set:html={renderInline(block.text)} />
         ) : (
           <figure class="image-block">
-            <img src={`/${block.file}`} alt={block.alt} loading="lazy" />
+            <img src={block.file} alt={block.alt} loading="lazy" />
             {block.caption && <figcaption set:html={renderInline(block.caption)} />}
           </figure>
         ),

@@ -13,7 +13,7 @@
       "text": "Mina Engers is born in Amsterdam, eldest child of Salomon Engers and Klara Markus — married five months earlier, a union forced when Salomon cut his wrist to compel Klara’s consent. Mina is named after her paternal grandmother.",
       "sister": "mina",
       "image": {
-        "file": "assets/timeline/engers-children-1940.jpg",
+        "file": "/assets/timeline/engers-children-1940.jpg",
         "caption": "The Engers children, ca. 1940 — Mina in the middle, holding the youngest.",
         "full": false,
         "focus": null,
@@ -28,7 +28,7 @@
       "text": "Mina spends her first four years with her grandparents at Waterlooplein 16 while her father sits in prison. In 1930 her mother Klara forcibly takes her back.",
       "sister": "mina",
       "image": {
-        "file": "assets/timeline/engers-levy-grandfather.jpg",
+        "file": "/assets/timeline/engers-levy-grandfather.jpg",
         "caption": "Levy Engers, Mina's and Sara’s grandfather.",
         "full": false,
         "focus": null,
@@ -43,7 +43,7 @@
       "text": "Sara (Lientje) is born in Amsterdam. As a baby she is boarded out for seven months in Naaldwijk; rickets and clinic treatment mark her earliest record.",
       "sister": "sara",
       "image": {
-        "file": "assets/timeline/engers-children-1940.jpg",
+        "file": "/assets/timeline/engers-children-1940.jpg",
         "caption": "Sara, standing behind Mina on the right, ca. 1940.",
         "full": false,
         "focus": null,
@@ -74,7 +74,7 @@
       "text": "The girls’ mother Klara dies of an ectopic pregnancy, aged 31, and is buried at the Jewish cemetery in Diemen. Salomon drifts from address to address; six children are left without care.",
       "sister": "both",
       "image": {
-        "file": "assets/timeline/engers-klara-tombstone.jpg",
+        "file": "/assets/timeline/engers-klara-tombstone.jpg",
         "caption": "Tombstone of Klara Engers-Markus, Jewish cemetery, Diemen.",
         "full": false,
         "focus": null,
@@ -97,7 +97,7 @@
       "text": "Mina, Sara and Levy are placed in the Jewish orphanage in Utrecht; Marietje, Alexander and Jeannette elsewhere in Amsterdam. Six siblings, four institutions.",
       "sister": "both",
       "image": {
-        "file": "assets/timeline/engers-orphanage-utrecht.jpg",
+        "file": "/assets/timeline/engers-orphanage-utrecht.jpg",
         "caption": "The Jewish orphanage in Utrecht.",
         "full": false,
         "focus": null,
@@ -128,7 +128,7 @@
       "text": "Sara is sent for observation to Achisomog (‘Helper of Orphans’), an Apeldoorn institution for Jewish children considered ‘difficult to educate’.",
       "sister": "sara",
       "image": {
-        "file": "assets/timeline/engers-apeldoornsche-bosch.jpg",
+        "file": "/assets/timeline/engers-apeldoornsche-bosch.jpg",
         "caption": "The Jewish asylum Apeldoornsche Bosch, Apeldoorn.",
         "full": false,
         "focus": null,
@@ -191,7 +191,7 @@
       "text": "Mina and Sara are transported to Westerbork, together with directress Hetta Prins and the other Huize Dina girls. Mina is sixteen; Sara, fourteen.",
       "sister": "both",
       "image": {
-        "file": "assets/timeline/engers-mina-council-card.jpg",
+        "file": "/assets/timeline/engers-mina-council-card.jpg",
         "caption": "Jewish Council index card of Mina Engers.",
         "full": false,
         "focus": null,
@@ -206,7 +206,7 @@
       "text": "The juvenile judge asks Hetta Prins, the directress — herself now in Westerbork — how the girls are doing. He does not yet know they were deported almost a year earlier.",
       "sister": "both",
       "image": {
-        "file": "assets/timeline/engers-juvenile-file.jpg",
+        "file": "/assets/timeline/engers-juvenile-file.jpg",
         "caption": "From the juvenile file of the Engers sisters.",
         "full": false,
         "focus": null,
@@ -221,7 +221,7 @@
       "text": "Liberation. Of the whole family only Jeannette (1938–2025), the youngest sister, survives, hidden in an Amsterdam children’s home. Stolpersteine (brass ‘stumbling stones’ commemorating victims of the Nazis) for Mina and Sara now lie at Duinlustparkweg 96, Huize Dina’s old address — Mina’s laid in 2018, Sara’s beside it in April 2026.",
       "sister": "both",
       "image": {
-        "file": "assets/timeline/engers-jeannette.jpg",
+        "file": "/assets/timeline/engers-jeannette.jpg",
         "caption": "Jeannette Engers, the youngest and only surviving Engers child.",
         "full": false,
         "focus": null,

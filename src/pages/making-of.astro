@@ -1605,7 +1605,7 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
       }
       const wrap = document.createElement('div');
       wrap.className = 'mk-block-media';
-      const src = b.file ? `/${b.file}` : '';
+      const src = b.file || '';
       if (b.type === 'image') {
         const img = document.createElement('img');
         img.src = src;
