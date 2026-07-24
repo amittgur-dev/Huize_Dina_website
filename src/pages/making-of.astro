@@ -34,9 +34,28 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
   </Fragment>
 
   <div id="mk-viewport">
-    <div id="mk-world">
-      <svg id="mk-lines" xmlns="http://www.w3.org/2000/svg"></svg>
-      <div id="mk-nodes"></div>
+    <svg id="mk-lines" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="mk-terr"></div>
+    <div id="mk-nodes">
+      <div id="mk-intro" class="mk-intro">
+        <div class="mk-eyebrow mk-intro-eyebrow">Polyphonic Archive · the making-of</div>
+        <div class="mk-intro-title">A map of the themes behind the podcast</div>
+        <div class="mk-intro-body">
+          Four regions grow from one centre —
+          {
+            regions.map((r, i) => (
+              <>
+                <span style={`color:${r.color};`}>{r.label}</span>
+                {i < regions.length - 2 ? ', ' : i === regions.length - 2 ? ' and ' : ''}
+              </>
+            ))
+          }
+          . Themes light up as you move through them; wires show what belongs where, and each theme's reading panel surfaces what it connects across.
+        </div>
+        <div class="mk-eyebrow mk-intro-hint">drag to pan · scroll to zoom · press a theme to read</div>
+        <button type="button" id="mk-intro-close" class="mk-intro-enter" aria-label="Enter the map">↓</button>
+        <div class="mk-eyebrow mk-intro-foot">the map lies below ↓ · you can always drag your way back up here</div>
+      </div>
     </div>
   </div>
 
@@ -44,31 +63,16 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     <span class="mk-pill-arrow">↑</span><span>Intro</span>
   </button>
 
-  <div id="mk-intro" class="mk-intro">
-    <div class="mk-eyebrow mk-intro-eyebrow">Polyphonic Archive · the making-of</div>
-    <div class="mk-intro-title">A map of the themes behind the podcast</div>
-    <div class="mk-intro-body">
-      Four regions grow from one centre —
-      {
-        regions.map((r, i) => (
-          <>
-            <span style={`color:${r.color};`}>{r.label}</span>
-            {i < regions.length - 2 ? ', ' : i === regions.length - 2 ? ' and ' : ''}
-          </>
-        ))
-      }
-      . Themes light up as you move through them; wires show what belongs where, and each theme's reading panel surfaces what it connects across.
-    </div>
-    <div class="mk-eyebrow mk-intro-hint">drag to pan · scroll to zoom · press a theme to read</div>
-    <button type="button" id="mk-intro-close" class="mk-intro-enter" aria-label="Enter the map">↓</button>
-    <div class="mk-eyebrow mk-intro-foot">the map lies below ↓ · you can always come back up here</div>
-  </div>
+  <div id="mk-nudge" class="mk-nudge" hidden>Press a lit theme to read more</div>
+
+  <div id="mk-tooltip" class="mk-tooltip" hidden></div>
 
   <aside id="mk-panel" class="mk-panel" hidden>
     <div class="mk-panel-top">
       <div id="mk-breadcrumb" class="mk-breadcrumb"></div>
       <button type="button" class="mk-btn" data-act="close">Close ×</button>
     </div>
+    <div id="mk-panel-hint" class="mk-panel-hint" hidden>The path above shows where you are — press a step to go back out, or a sub-theme below to go deeper.</div>
     <h2 id="mk-panel-title" class="mk-panel-title"></h2>
     <div id="mk-panel-authors" class="mk-panel-authors" hidden></div>
     <div id="mk-panel-rule" class="mk-panel-rule"></div>
@@ -117,57 +121,40 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     cursor: grabbing;
   }
 
-  #mk-world {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 6000px;
-    height: 6000px;
-    transform-origin: 0 0;
-    transition: transform 650ms cubic-bezier(0.22, 0.61, 0.36, 1);
-    will-change: transform;
-  }
-
-  #mk-world.instant {
-    transition: none;
-  }
-
   #mk-lines {
     position: absolute;
     left: 0;
     top: 0;
-    width: 6000px;
-    height: 6000px;
+    width: 100%;
+    height: 100%;
     overflow: visible;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  #mk-terr {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
   }
 
   #mk-nodes {
     position: absolute;
     inset: 0;
+    pointer-events: none;
+    z-index: 10;
   }
 
   :global(.mk-node) {
     position: absolute;
+    left: 0;
+    top: 0;
     box-sizing: border-box;
     cursor: pointer;
     text-align: center;
-    transform: translate(-50%, -50%);
-    transition: opacity 300ms ease, filter 300ms ease;
+    will-change: transform;
     font-family: 'Courier Prime', 'Courier New', monospace;
-  }
-
-  :global(.mk-node.mk-hidden) {
-    opacity: 0 !important;
-    pointer-events: none;
-  }
-
-  :global(.mk-node.mk-dim) {
-    opacity: 0.32;
-  }
-
-  :global(.mk-node.mk-sel) {
-    outline: 2px solid #f4cb7a;
-    outline-offset: 4px;
   }
 
   :global(.mk-node:hover .mk-node-title) {
@@ -195,11 +182,87 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
   :global(.mk-link) {
     fill: none;
     stroke-linecap: round;
-    transition: opacity 300ms ease;
+    pointer-events: none;
   }
 
-  :global(.mk-link.mk-hidden) {
-    opacity: 0 !important;
+  :global(.mk-link-hit) {
+    stroke: #000;
+    stroke-opacity: 0;
+    stroke-width: 16;
+    pointer-events: stroke;
+    cursor: default;
+  }
+
+  @keyframes mkpulse {
+    0%,
+    100% {
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42), 0 0 0 0 rgba(244, 203, 122, 0);
+    }
+    50% {
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42), 0 0 0 16px rgba(244, 203, 122, 0.17);
+    }
+  }
+
+  :global(.mk-node.mk-pulse) {
+    animation: mkpulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes mkfadein {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  :global(.mk-terr-label) {
+    position: absolute;
+    left: 0;
+    top: 0;
+    white-space: nowrap;
+    font-family: 'Courier Prime', monospace;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    font-size: 118px;
+    will-change: transform, opacity;
+  }
+
+  .mk-tooltip {
+    position: fixed;
+    z-index: 60;
+    pointer-events: none;
+    max-width: 268px;
+    background: #2a2632;
+    border: 1px solid rgba(230, 225, 217, 0.3);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 10px 28px rgba(0, 0, 0, 0.4);
+    padding: 11px 14px;
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #e6e1d9;
+  }
+
+  .mk-tooltip[hidden] {
+    display: none;
+  }
+
+  .mk-nudge {
+    position: fixed;
+    top: calc(var(--mk-header-h, 72px) + 28px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 41;
+    pointer-events: none;
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    color: #48c6a8;
+    animation: mkfadein 0.5s ease;
+  }
+
+  .mk-nudge[hidden] {
+    display: none;
   }
 
   .mk-header-controls {
@@ -280,26 +343,19 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
   }
 
   .mk-intro {
-    position: fixed;
-    inset: 72px 0 0 0;
-    z-index: 30;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 860px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 24px;
+    gap: 26px;
     text-align: center;
-    padding: 2rem;
-    box-sizing: border-box;
-    background: radial-gradient(ellipse 70% 60% at 50% 42%, rgba(30, 26, 38, 0.92), rgba(18, 15, 24, 0.98));
-    transition: opacity 500ms ease, visibility 500ms;
-  }
-
-  .mk-intro[hidden] {
-    display: flex;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
+    z-index: 15;
+    will-change: transform, opacity;
   }
 
   .mk-intro-eyebrow {
@@ -408,6 +464,17 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     font-size: 11px;
     color: #655e55;
     padding: 0 6px;
+  }
+
+  .mk-panel-hint {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: #f4cb7a;
+    margin-top: 10px;
+  }
+
+  .mk-panel-hint[hidden] {
+    display: none;
   }
 
   .mk-panel-title {
@@ -627,8 +694,6 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
   DATA.nodes.forEach((n) => (byId[n.id] = n));
   const root = DATA.nodes.find((n) => n.level === -1)!;
 
-  const OFFSET = 3000;
-
   const LEVEL_CFG: Record<
     number,
     { width: number; font: number; border: number; blob: 'a' | 'b'; bg: string; shadow: string; padding: string }
@@ -643,29 +708,36 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
   const BLOB_B = '18px 306px 18px 319px / 306px 18px 319px 18px';
 
   const viewport = document.getElementById('mk-viewport')!;
-  const world = document.getElementById('mk-world')!;
   const linesSvg = document.getElementById('mk-lines') as unknown as SVGSVGElement;
+  const terrLayer = document.getElementById('mk-terr')!;
   const nodesLayer = document.getElementById('mk-nodes')!;
   const panel = document.getElementById('mk-panel')!;
   const introEl = document.getElementById('mk-intro')!;
   const toIntroBtn = document.getElementById('mk-to-intro')!;
+  const nudgeEl = document.getElementById('mk-nudge')!;
+  const tooltipEl = document.getElementById('mk-tooltip')!;
+  const panelHintEl = document.getElementById('mk-panel-hint')!;
 
-  // --- Build node DOM ---
+  function hexA(hex: string, a: number) {
+    const v = Math.max(0, Math.min(1, a));
+    return hex.slice(0, 7) + Math.round(v * 255).toString(16).padStart(2, '0');
+  }
+
+  // --- Build node DOM. Position is driven entirely by the 3D camera every
+  // frame (see applyCam below) — these elements carry no left/top of their
+  // own, only their level-based size/shape/color. ---
   const nodeEls: Record<string, HTMLElement> = {};
   DATA.nodes.forEach((n) => {
     const cfg = LEVEL_CFG[n.level] || LEVEL_CFG[3];
     const el = document.createElement('div');
     el.className = `mk-node lvl-${n.level}`;
     el.dataset.id = n.id;
-    el.style.left = `${OFFSET + n.x}px`;
-    el.style.top = `${OFFSET + n.y}px`;
     el.style.width = `${cfg.width}px`;
     el.style.background = cfg.bg;
     el.style.border = `${cfg.border}px solid ${n.color}`;
     el.style.borderRadius = cfg.blob === 'a' ? BLOB_A : BLOB_B;
     el.style.padding = cfg.padding;
     el.style.boxShadow = cfg.shadow;
-    el.style.zIndex = String(30 - Math.max(0, n.level));
 
     const title = document.createElement('div');
     title.className = 'mk-node-title';
@@ -698,129 +770,207 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     nodeEls[n.id] = el;
   });
 
-  // --- Build SVG lines ---
+  // --- Region territory labels: giant background text sized to each
+  // region's own node cluster, its position computed from the auto-layout
+  // (no hardcoded spots) by walking each node up to its level-0 ancestor. ---
+  function topRegion(n: ThemeNode): ThemeNode | null {
+    let cur: ThemeNode | undefined = n;
+    while (cur && cur.level > 0) cur = cur.parent ? byId[cur.parent] : undefined;
+    return cur && cur.level === 0 ? cur : null;
+  }
+  const regionGroups: Record<string, { label: string; color: string; sx: number; sy: number; n: number }> = {};
+  DATA.nodes.forEach((n) => {
+    const reg = topRegion(n);
+    if (!reg) return;
+    const g = (regionGroups[reg.id] ??= { label: reg.label, color: reg.color, sx: 0, sy: 0, n: 0 });
+    g.sx += n.x;
+    g.sy += n.y;
+    g.n += 1;
+  });
+  const territories = Object.values(regionGroups).map((g) => {
+    const el = document.createElement('div');
+    el.className = 'mk-terr-label';
+    el.style.color = g.color;
+    el.textContent = g.label.toUpperCase();
+    terrLayer.appendChild(el);
+    return { el, x: g.sx / g.n, y: g.sy / g.n };
+  });
+
+  // --- Build SVG lines: hierarchy ("belongs to — sub-theme") wires only.
+  // Cross-region relationships (content/themes/cross-links.json) stay fully
+  // intact as data and surface as clickable cards in the reading panel's
+  // "Connections" section — they're just not drawn as wires here. Each wire
+  // is a slightly irregular, hand-drawn-looking thread (a few random knots
+  // plus an SVG turbulence filter) that plucks when you select a theme and
+  // drifts gently on its own now and then. ---
   const NS = 'http://www.w3.org/2000/svg';
   linesSvg.innerHTML = '';
+  const defs = document.createElementNS(NS, 'defs');
+  defs.innerHTML =
+    '<filter id="mk-thread"><feTurbulence type="fractalNoise" baseFrequency="0.011 0.018" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter>';
+  linesSvg.appendChild(defs);
+  const fxGroup = document.createElementNS(NS, 'g');
+  fxGroup.setAttribute('filter', 'url(#mk-thread)');
+  const haloLayer = document.createElementNS(NS, 'g');
+  const coreLayer = document.createElementNS(NS, 'g');
+  fxGroup.appendChild(haloLayer);
+  fxGroup.appendChild(coreLayer);
+  linesSvg.appendChild(fxGroup);
+  const hitLayer = document.createElementNS(NS, 'g');
+  linesSvg.appendChild(hitLayer);
+
+  interface Knot {
+    f: number;
+    off: number;
+  }
   interface LineRec {
     a: string;
     b: string;
-    need: number;
+    halo: SVGPathElement;
     vis: SVGPathElement;
+    hit: SVGLineElement;
+    knots: Knot[];
+    freq: number;
+    phase: number;
+    ampBase: number;
+    amp: number;
+    t0: number;
+    delay: number;
+    dur: number;
+    decay: number;
+    hover: boolean;
   }
   const lines: LineRec[] = [];
-
-  function curvePath(a: ThemeNode, b: ThemeNode): string {
-    const ax = OFFSET + a.x;
-    const ay = OFFSET + a.y;
-    const bx = OFFSET + b.x;
-    const by = OFFSET + b.y;
-    const mx = (ax + bx) / 2;
-    const my = (ay + by) / 2;
-    const dx = bx - ax;
-    const dy = by - ay;
-    const len = Math.hypot(dx, dy) || 1;
-    const bow = Math.min(60, len * 0.12);
-    const cx = mx - (dy / len) * bow;
-    const cy = my + (dx / len) * bow;
-    return `M ${ax} ${ay} Q ${cx} ${cy} ${bx} ${by}`;
+  const adj: Record<string, string[]> = {};
+  function addAdj(x: string, y: string) {
+    (adj[x] ??= []).push(y);
+    (adj[y] ??= []).push(x);
   }
 
-  // Only the tree's hierarchy ("belongs to — sub-theme") wires are drawn on
-  // the map canvas — they're purely decorative (never hovered or clicked),
-  // so each is a single visible path with no separate hit-testing element.
-  // Cross-region relationships (content/themes/cross-links.json) stay fully
-  // intact as data and still surface as clickable cards in the reading
-  // panel's "Connections" section — they're just not drawn as wires here.
-  function addLine(a: ThemeNode, b: ThemeNode, need: number) {
+  function addLine(a: ThemeNode, b: ThemeNode) {
+    const halo = document.createElementNS(NS, 'path');
+    halo.setAttribute('class', 'mk-link');
+    halo.setAttribute('stroke', '#cbd2d4');
     const vis = document.createElementNS(NS, 'path');
-    vis.setAttribute('d', curvePath(a, b));
     vis.setAttribute('class', 'mk-link');
-    vis.setAttribute('stroke', 'rgba(255,255,255,0.55)');
-    vis.setAttribute('stroke-width', '4');
-    linesSvg.appendChild(vis);
+    vis.setAttribute('stroke', '#ffffff');
+    const hit = document.createElementNS(NS, 'line');
+    hit.setAttribute('class', 'mk-link-hit');
+    haloLayer.appendChild(halo);
+    coreLayer.appendChild(vis);
+    hitLayer.appendChild(hit);
 
-    lines.push({ a: a.id, b: b.id, need, vis });
+    const wlen = Math.hypot(b.x - a.x, b.y - a.y);
+    const nK = 3 + Math.floor(Math.random() * 2);
+    const knots: Knot[] = [];
+    for (let q = 1; q <= nK; q++) {
+      let f = q / (nK + 1) + (Math.random() * 2 - 1) * 0.04;
+      f = Math.max(0.06, Math.min(0.94, f));
+      knots.push({ f, off: (Math.random() * 2 - 1) * 0.05 });
+    }
+    knots.sort((p, q2) => p.f - q2.f);
+
+    const rec: LineRec = {
+      a: a.id,
+      b: b.id,
+      halo,
+      vis,
+      hit,
+      knots,
+      freq: Math.max(1.0, Math.min(2.6, 820 / wlen)),
+      phase: Math.random() * 6.283,
+      ampBase: 0.045 + Math.random() * 0.025,
+      amp: 0,
+      t0: 0,
+      delay: 0,
+      dur: 3.4,
+      decay: 1.45,
+      hover: false,
+    };
+    hit.addEventListener('pointerenter', (ev) => {
+      rec.hover = true;
+      showTip(`${b.label} — sub-theme of ${a.label}`, ev as PointerEvent);
+      renderStrings();
+    });
+    hit.addEventListener('pointermove', (ev) => moveTip(ev as PointerEvent));
+    hit.addEventListener('pointerleave', () => {
+      rec.hover = false;
+      hideTip();
+      renderStrings();
+    });
+    lines.push(rec);
   }
 
   DATA.nodes.forEach((n) => {
-    if (n.parent && byId[n.parent]) addLine(byId[n.parent], n, Math.max(0, n.level));
+    if (n.parent && byId[n.parent]) addAdj(n.parent, n.id);
+  });
+  DATA.nodes.forEach((n) => {
+    if (n.parent && byId[n.parent]) addLine(byId[n.parent], n);
   });
 
-  // --- Camera ---
-  const cam = { x: root.x, y: root.y, scale: 0.32 };
+  // During pans/zooms/flights, drop the SVG displacement filter on the
+  // threads (the most expensive repaint) and restore it once movement rests.
+  let fxHeld = false;
+  let motionTimer: number | undefined;
+  function motion() {
+    if (!fxHeld) {
+      fxHeld = true;
+      fxGroup.removeAttribute('filter');
+    }
+    window.clearTimeout(motionTimer);
+    motionTimer = window.setTimeout(() => {
+      fxHeld = false;
+      fxGroup.setAttribute('filter', 'url(#mk-thread)');
+    }, 180);
+  }
+
+  // --- Camera: a fake-3D perspective camera (F/dz projection) applied to
+  // each node's auto-computed (x,y) plus a fixed z-depth per hierarchy
+  // level — this is what gives the map its depth-of-field "fly through"
+  // feel while still needing zero hand-placed coordinates. ---
+  const F = 1300;
+  const NEAR = 240;
+  const ZLEVEL: Record<number, number> = { [-1]: 40, 0: 340, 1: 660, 2: 980, 3: 1300 };
+  function zForLvl(l: number) {
+    return ZLEVEL[l] ?? 0;
+  }
+
+  // The intro card lives at a world position above the map itself — the
+  // camera starts there and "flies down" into the map on entry, and back up
+  // again via the Intro pill or by pulling back past the overview edge.
+  const INTRO = { x: root.x, y: root.y - 2980 };
+  const INTRO_THRESHOLD = INTRO.y + 1060;
+
+  const cam = { x: INTRO.x, y: INTRO.y, z: 0 };
+  let refZ = zForLvl(0);
+  let fitZ = zForLvl(0);
   let panelWidth = 0;
+  let selId: string | null = null;
+  let atIntro = true;
+  let userMoved = false;
+  let manualPan = false;
+  let nudgeOn = true;
+  let panelHintSeen = false;
+  let panelHintShownThisSelection = false;
+  try {
+    panelHintSeen = !!localStorage.getItem('pa-mk-hint-panel');
+  } catch (e) {}
 
   function vpSize() {
     return { w: viewport.clientWidth, h: viewport.clientHeight };
   }
-
   function centerXY() {
     const { w, h } = vpSize();
     return { cx: (w - panelWidth) / 2, cy: h / 2 };
   }
 
-  function applyTransform() {
-    const { cx, cy } = centerXY();
-    const tx = cx - cam.scale * (OFFSET + cam.x);
-    const ty = cy - cam.scale * (OFFSET + cam.y);
-    world.style.transform = `translate(${tx}px, ${ty}px) scale(${cam.scale})`;
-    updateLOD();
-  }
-
-  function screenToWorld(sx: number, sy: number) {
-    const { cx, cy } = centerXY();
-    return { x: (sx - cx) / cam.scale - OFFSET, y: (sy - cy) / cam.scale - OFFSET };
-  }
-
-  // --- Level of detail ---
-  let maxLvl = 0;
-  let focusLvl = 0;
-  function updateLOD() {
-    const s = cam.scale;
-    const scaleLvl = s < 0.24 ? 0 : s < 0.42 ? 1 : s < 0.72 ? 2 : 3;
-    maxLvl = Math.max(scaleLvl, focusLvl);
-    DATA.nodes.forEach((n) => {
-      const el = nodeEls[n.id];
-      const vis = n.level === -1 || n.level <= maxLvl;
-      el.classList.toggle('mk-hidden', !vis);
-    });
-    lines.forEach((l) => {
-      l.vis.classList.toggle('mk-hidden', l.need > maxLvl);
-    });
-  }
-
-  // --- Focus dimming on selection ---
-  function applyFocus(selId: string | null) {
-    const litSet = new Set<string>();
-    if (selId) {
-      litSet.add(selId);
-      const sel = byId[selId];
-      let p = sel.parent;
-      while (p) {
-        litSet.add(p);
-        p = byId[p]?.parent ?? null;
-      }
-      sel.children.forEach((c) => litSet.add(c));
-    }
-    DATA.nodes.forEach((n) => {
-      const el = nodeEls[n.id];
-      const dim = !!selId && !litSet.has(n.id);
-      el.classList.toggle('mk-dim', dim);
-      el.classList.toggle('mk-sel', n.id === selId);
-    });
-  }
-
-  // --- Fit / animate helpers ---
   function regionBBox() {
     let minx = Infinity;
     let miny = Infinity;
     let maxx = -Infinity;
     let maxy = -Infinity;
     DATA.nodes.forEach((n) => {
-      // Fit level-1 in too, not just the regions — otherwise the overview
-      // scale ends up just past the LOD threshold that reveals level 1,
-      // clipping those nodes at the viewport edge the moment they appear.
-      if (n.level <= 1) {
+      if (n.level <= 0) {
         minx = Math.min(minx, n.x);
         miny = Math.min(miny, n.y);
         maxx = Math.max(maxx, n.x);
@@ -830,30 +980,426 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     return { minx, miny, maxx, maxy };
   }
 
-  function setInstant(instant: boolean) {
-    world.classList.toggle('instant', instant);
+  function overviewDz() {
+    const { w, h } = vpSize();
+    if (!w || !h) return F * 6;
+    const b = regionBBox();
+    const pad = 460;
+    const bw = b.maxx - b.minx + pad * 2;
+    const bh = b.maxy - b.miny + pad * 2;
+    let s = Math.min((w * 0.97) / bw, (h * 0.97) / bh);
+    s = Math.max(0.1, Math.min(1.2, s));
+    return F / s;
   }
 
-  function flyToBox(minx: number, miny: number, maxx: number, maxy: number) {
+  // --- Theatrical spotlight: which nodes are "lit" right now. With nothing
+  // selected, deeper levels fade in smoothly as you zoom past the overview;
+  // with a theme selected, its direct sub-themes stay fully lit, its
+  // grandchildren and unrelated branches sink into shadow, and its
+  // ancestors stay dimly visible for context. ---
+  function focusMul(id: string): number {
+    if (!selId) {
+      const n0 = byId[id];
+      if (!n0 || n0.level <= 0) return 1;
+      const s = F / Math.max(1, refZ - cam.z);
+      const k = Math.max(0, Math.min(1, (s - 0.42) / 0.33));
+      const base = n0.level === 1 ? 0.3 : n0.level === 2 ? 0.16 : 0.1;
+      return base + (1 - base) * k;
+    }
+    if (id === selId) return 1;
+    const n = byId[id];
+    if (!n) return 0.18;
+    let cur: ThemeNode | undefined = n;
+    let steps = 0;
+    while (cur && cur.parent) {
+      steps++;
+      if (cur.parent === selId) break;
+      cur = byId[cur.parent];
+    }
+    if (cur && cur.parent === selId) {
+      if (steps === 1) return 1;
+      if (steps === 2) return 0.1;
+      return 0.05;
+    }
+    let s: ThemeNode | undefined = byId[selId];
+    while (s && s.parent) {
+      if (s.parent === id) return 0.26;
+      s = byId[s.parent];
+    }
+    return 0.05;
+  }
+
+  let fm: Record<string, number> = {};
+  let fmFrom: Record<string, number> = {};
+  let focusT0: number | null = null;
+  let focusDur = 1500;
+  let focusRaf: number | null = null;
+  function tickFocus() {
+    applyCam();
+    focusRaf = focusT0 != null ? requestAnimationFrame(tickFocus) : null;
+  }
+  function startFocus() {
+    fmFrom = { ...fm };
+    focusT0 = performance.now();
+    focusDur = 1600;
+    if (!focusRaf) focusRaf = requestAnimationFrame(tickFocus);
+  }
+
+  function setAtIntro(v: boolean) {
+    atIntro = v;
+    toIntroBtn.hidden = v;
+    updateNudge();
+  }
+  function updateNudge() {
+    nudgeEl.hidden = !(nudgeOn && !selId && !atIntro);
+  }
+
+  const nodePos: Record<string, { sx: number; sy: number; m: number; dz: number; op: number }> = {};
+
+  function applyCam() {
+    const { cx, cy } = centerXY();
+    const camZ = cam.z;
+    const refDz = Math.max(NEAR + 1, refZ - camZ);
+
+    territories.forEach((t) => {
+      const dz = zForLvl(0) - camZ;
+      if (dz <= NEAR) {
+        t.el.style.opacity = '0';
+        return;
+      }
+      const m = F / dz;
+      const sx = cx + (t.x - cam.x) * m;
+      const sy = cy + (t.y - cam.y) * m;
+      t.el.style.transform = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-50%) scale(${m.toFixed(4)})`;
+      let op = 0.11;
+      if (m > 0.5) op *= Math.max(0, 1 - (m - 0.5) / 0.45);
+      t.el.style.opacity = op.toFixed(3);
+    });
+
+    {
+      const dzI = zForLvl(0) - camZ;
+      if (dzI <= NEAR) {
+        introEl.style.opacity = '0';
+        introEl.style.pointerEvents = 'none';
+      } else {
+        const mI = F / dzI;
+        const sxI = cx + (INTRO.x - cam.x) * mI;
+        const syI = cy + (INTRO.y - cam.y) * mI;
+        introEl.style.transform = `translate(${sxI.toFixed(1)}px,${syI.toFixed(1)}px) translate(-50%,-50%) scale(${(mI * 3.2).toFixed(4)})`;
+        introEl.style.opacity = '1';
+        introEl.style.pointerEvents = 'auto';
+      }
+    }
+
+    let focusK = 1;
+    let focusActive = false;
+    if (focusT0 != null) {
+      const tt = Math.min(1, (performance.now() - focusT0) / focusDur);
+      focusK = tt < 0.5 ? 4 * tt * tt * tt : 1 - Math.pow(-2 * tt + 2, 3) / 2;
+      if (tt >= 1) focusT0 = null;
+      else focusActive = true;
+    }
+
+    DATA.nodes.forEach((n) => {
+      const el = nodeEls[n.id];
+      const wz = zForLvl(n.level);
+      const dz = wz - camZ;
+      if (dz <= NEAR) {
+        el.style.opacity = '0';
+        el.style.pointerEvents = 'none';
+        return;
+      }
+      const m = F / dz;
+      const sx = cx + (n.x - cam.x) * m;
+      const sy = cy + (n.y - cam.y) * m;
+      el.style.transform = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-50%) scale(${m.toFixed(4)})`;
+      const ratio = dz / refDz;
+      const fade = ratio <= 1 ? 1 : Math.max(0.05, 1 - (ratio - 1) / 1.7);
+      let blur = ratio <= 1.05 ? 0 : Math.min(2.4, (ratio - 1.05) * 2.2);
+      const tgtFm = focusMul(n.id);
+      const fromFm = fmFrom[n.id] != null ? fmFrom[n.id] : tgtFm;
+      const nfm = fromFm + (tgtFm - fromFm) * focusK;
+      fm[n.id] = nfm;
+      let op = fade * (0.5 + 0.5 * nfm);
+      if (nfm >= 0.985) op = Math.max(op, 0.94);
+      else blur = Math.max(blur, (1 - nfm) * 1.2);
+      op = Math.max(op, 0.05);
+      const nearFade = Math.min(1, Math.max(0, (dz - NEAR) / (NEAR * 1.2)));
+      op *= nearFade;
+      el.style.opacity = op.toFixed(2);
+      const fmq = Math.round(nfm * 16) / 16;
+      const blq = Math.round(blur * 3) / 3;
+      let filt = (blq > 0.1 ? `blur(${blq.toFixed(2)}px) ` : '') + `brightness(${Math.min(1.08, 0.5 + 0.58 * fmq).toFixed(2)})`;
+      filt += ` drop-shadow(0 0 ${(8 + 14 * fmq).toFixed(0)}px ${hexA(n.color, 0.18 + 0.42 * fmq)})`;
+      const lit = fmq >= 0.985 && (!!selId || focusActive || n.level <= 0);
+      if (lit) filt += ' drop-shadow(0 0 24px rgba(255,209,130,0.45)) drop-shadow(0 0 58px rgba(255,196,110,0.22))';
+      el.style.filter = filt;
+      el.style.zIndex = String(4000 - Math.round(dz / 40) * 20 + (nfm >= 0.985 ? 500 : 0));
+      el.style.pointerEvents = op > 0.12 && nearFade > 0.5 ? 'auto' : 'none';
+      el.style.outline = n.id === selId ? '2px solid #f4cb7a' : '';
+      el.style.outlineOffset = n.id === selId ? '3px' : '';
+      nodePos[n.id] = { sx, sy, m, dz, op };
+    });
+
+    if (manualPan && !flyRaf) {
+      const inIntro = cam.y < INTRO_THRESHOLD && !selId;
+      if (inIntro !== atIntro) setAtIntro(inIntro);
+    }
+
+    renderStrings();
+  }
+
+  // --- Camera flight (rAF-eased) ---
+  let flyRaf: number | null = null;
+  let flyTimer: number | undefined;
+  function animateTo(target: { x: number; y: number; z: number }, dur = 700) {
+    manualPan = false;
+    const start = { x: cam.x, y: cam.y, z: cam.z };
+    const t0 = performance.now();
+    const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const step = (now: number) => {
+      const k = Math.min(1, (now - t0) / dur);
+      const e = ease(k);
+      motion();
+      cam.x = start.x + (target.x - start.x) * e;
+      cam.y = start.y + (target.y - start.y) * e;
+      cam.z = start.z + (target.z - start.z) * e;
+      applyCam();
+      if (k < 1) flyRaf = requestAnimationFrame(step);
+    };
+    cancelFly();
+    flyRaf = requestAnimationFrame(step);
+    flyTimer = window.setTimeout(() => {
+      cam.x = target.x;
+      cam.y = target.y;
+      cam.z = target.z;
+      applyCam();
+    }, dur + 60);
+  }
+  function cancelFly() {
+    if (flyRaf) cancelAnimationFrame(flyRaf);
+    flyRaf = null;
+    if (flyTimer) window.clearTimeout(flyTimer);
+    flyTimer = undefined;
+  }
+
+  function fitBox(minx: number, miny: number, maxx: number, maxy: number, dur: number) {
     const { w, h } = vpSize();
-    const availW = Math.max(200, w - panelWidth) * 0.86;
-    const availH = h * 0.86;
+    const availW = (w - (panelWidth || 0)) * 0.86;
+    const availH = h * 0.9;
     const bw = Math.max(1, maxx - minx);
     const bh = Math.max(1, maxy - miny);
     let s = Math.min(availW / bw, availH / bh);
-    s = Math.max(0.06, Math.min(2.6, s));
-    setInstant(false);
-    cam.x = (minx + maxx) / 2;
-    cam.y = (miny + maxy) / 2;
-    cam.scale = s;
-    focusLvl = 0;
-    applyTransform();
+    s = Math.max(0.1, Math.min(3.6, s));
+    const planeZ = fitZ != null ? fitZ : refZ;
+    animateTo({ x: (minx + maxx) / 2, y: (miny + maxy) / 2, z: planeZ - F / s }, dur);
   }
 
-  function fitOverview() {
+  function fitOverview(dur = 1200) {
     const b = regionBBox();
     const pad = 480;
-    flyToBox(b.minx - pad, b.miny - pad, b.maxx + pad, b.maxy + pad);
+    refZ = zForLvl(0);
+    fitZ = zForLvl(0);
+    fitBox(b.minx - pad, b.miny - pad, b.maxx + pad, b.maxy + pad, dur);
+  }
+
+  function flyToIntro() {
+    setAtIntro(true);
+    userMoved = true;
+    hideTip();
+    panelWidth = 0;
+    refZ = zForLvl(0);
+    fitZ = zForLvl(0);
+    startFocus();
+    animateTo({ x: INTRO.x, y: INTRO.y, z: zForLvl(0) - overviewDz() }, 1400);
+  }
+
+  function zoomBy(f: number) {
+    let dz = (refZ - cam.z) / f;
+    dz = Math.max(NEAR + 60, Math.min(overviewDz() * 1.3, dz));
+    animateTo({ x: cam.x, y: cam.y, z: refZ - dz }, 300);
+  }
+
+  // --- Wires: hand-drawn wobble + gentle "pluck" on select / ambient
+  // "breeze" over time ---
+  function bfs(start: string): Record<string, number> {
+    const dist: Record<string, number> = { [start]: 0 };
+    const q = [start];
+    while (q.length) {
+      const u = q.shift()!;
+      (adj[u] || []).forEach((v) => {
+        if (dist[v] == null) {
+          dist[v] = dist[u] + 1;
+          q.push(v);
+        }
+      });
+    }
+    return dist;
+  }
+
+  let vibTimer: number | undefined;
+  let anyVib = false;
+  function vibStep() {
+    renderStrings();
+    if (!anyVib && vibTimer) {
+      window.clearInterval(vibTimer);
+      vibTimer = undefined;
+    }
+  }
+
+  function pluck(id: string, strength = 1) {
+    const dist = bfs(id);
+    const now = performance.now();
+    lines.forEach((o) => {
+      const da = dist[o.a] == null ? 99 : dist[o.a];
+      const db = dist[o.b] == null ? 99 : dist[o.b];
+      const d = Math.min(da, db);
+      o.amp = strength * o.ampBase * Math.exp(-0.5 * d);
+      o.delay = d * 60;
+      o.t0 = now;
+      o.dur = 3.8;
+      o.decay = 1.25;
+    });
+    if (!vibTimer) vibTimer = window.setInterval(vibStep, 16);
+  }
+
+  function scheduleBreeze() {
+    const next = 2400 + Math.random() * 6800;
+    window.setTimeout(() => {
+      breeze();
+      scheduleBreeze();
+    }, next);
+  }
+  function breeze() {
+    if (!lines.length) return;
+    const strength = 0.05 + Math.random() * 0.13;
+    const origin = DATA.nodes[Math.floor(Math.random() * DATA.nodes.length)].id;
+    const dist = bfs(origin);
+    const now = performance.now();
+    lines.forEach((o) => {
+      const da = dist[o.a] == null ? 99 : dist[o.a];
+      const db = dist[o.b] == null ? 99 : dist[o.b];
+      const d = Math.min(da, db);
+      const a = strength * o.ampBase * 0.32 * Math.exp(-0.4 * d) * (0.4 + Math.random() * 0.7);
+      if (a > 0.0015) {
+        o.amp = Math.max(o.amp, a);
+        o.t0 = now;
+        o.delay = d * 110 + Math.random() * 240;
+        o.dur = 6.5;
+        o.decay = 0.62;
+      }
+    });
+    if (!vibTimer) vibTimer = window.setInterval(vibStep, 16);
+  }
+
+  function renderStrings() {
+    const now = performance.now();
+    let vib = false;
+    lines.forEach((o) => {
+      const A = nodePos[o.a];
+      const B = nodePos[o.b];
+      if (!A || !B) {
+        o.vis.style.display = 'none';
+        o.halo.style.display = 'none';
+        o.hit.style.display = 'none';
+        return;
+      }
+      o.vis.style.display = '';
+      o.halo.style.display = '';
+      o.hit.style.display = '';
+      let decayAmp = 0;
+      let tt = 0;
+      if (o.amp >= 0.001) {
+        const t = (now - o.t0 - o.delay) / 1000;
+        if (t < 0) vib = true;
+        else if (t < o.dur) {
+          vib = true;
+          tt = t;
+          decayAmp = o.amp * Math.exp(-o.decay * t);
+        } else o.amp = 0;
+      }
+      const ax = A.sx;
+      const ay = A.sy;
+      const bx = B.sx;
+      const by = B.sy;
+      const dx = bx - ax;
+      const dy = by - ay;
+      const len = Math.hypot(dx, dy) || 1;
+      const px = -dy / len;
+      const py = dx / len;
+      const pts: [number, number][] = [[ax, ay]];
+      o.knots.forEach((k) => {
+        const f = k.f;
+        const env = Math.sin(Math.PI * f);
+        const vibOff = decayAmp * env * Math.sin(2 * Math.PI * o.freq * tt + o.phase);
+        const amt = (k.off * 0.07 + vibOff) * len;
+        const sagY = len * 0.01 * env;
+        pts.push([ax + dx * f + px * amt, ay + dy * f + py * amt + sagY]);
+      });
+      pts.push([bx, by]);
+      let dpath = `M${ax.toFixed(1)} ${ay.toFixed(1)}`;
+      for (let p = 0; p < pts.length - 1; p++) {
+        const p0 = pts[p - 1] || pts[p];
+        const p1 = pts[p];
+        const p2 = pts[p + 1];
+        const p3 = pts[p + 2] || pts[p + 1];
+        const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+        const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+        const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+        const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+        dpath += ` C${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+      }
+      o.vis.setAttribute('d', dpath);
+      o.halo.setAttribute('d', dpath);
+      o.hit.setAttribute('x1', ax.toFixed(1));
+      o.hit.setAttribute('y1', ay.toFixed(1));
+      o.hit.setAttribute('x2', bx.toFixed(1));
+      o.hit.setAttribute('y2', by.toFixed(1));
+      const mAvg = (A.m + B.m) / 2;
+      let w = Math.max(0.5, mAvg * 2.0);
+      let op = 0.6 * Math.min(A.op, B.op);
+      const fmA = fm[o.a] != null ? fm[o.a] : focusMul(o.a);
+      const fmB = fm[o.b] != null ? fm[o.b] : focusMul(o.b);
+      const fmMin = Math.min(fmA, fmB);
+      op *= Math.max(selId ? 0.04 : 0.25, fmMin);
+      let haloK = 0.22;
+      if (selId && fmMin > 0.9) {
+        w *= 1.3;
+        op = Math.min(1, op + 0.22);
+        haloK = 0.5;
+      }
+      if (o.hover) {
+        w *= 1.7;
+        op = Math.min(1, op + 0.4);
+        haloK = 0.55;
+      }
+      o.vis.setAttribute('stroke-width', w.toFixed(2));
+      o.vis.setAttribute('stroke-opacity', op.toFixed(2));
+      o.halo.setAttribute('stroke-width', (w * 3).toFixed(2));
+      o.halo.setAttribute('stroke-opacity', (op * haloK).toFixed(3));
+    });
+    anyVib = vib;
+    if (vib && !vibTimer) vibTimer = window.setInterval(vibStep, 16);
+  }
+
+  function showTip(text: string, ev: PointerEvent) {
+    tooltipEl.textContent = text;
+    tooltipEl.hidden = false;
+    moveTip(ev);
+  }
+  function moveTip(ev: PointerEvent) {
+    const pad = 14;
+    let x = ev.clientX + pad;
+    let y = ev.clientY + pad;
+    const w = tooltipEl.offsetWidth;
+    const h = tooltipEl.offsetHeight;
+    if (x + w > window.innerWidth - 8) x = ev.clientX - w - pad;
+    if (y + h > window.innerHeight - 8) y = ev.clientY - h - pad;
+    tooltipEl.style.left = `${x}px`;
+    tooltipEl.style.top = `${y}px`;
+  }
+  function hideTip() {
+    tooltipEl.hidden = true;
   }
 
   // --- Panel population ---
@@ -871,14 +1417,21 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     return n.id === 'root' ? 'The making of' : n.label;
   }
 
-  let selId: string | null = null;
-
   function select(id: string) {
     const n = byId[id];
     if (!n) return;
     selId = id;
+    userMoved = true;
+    hideTip();
     panelWidth = Math.min(452, viewport.clientWidth * 0.42);
-    focusLvl = Math.min(3, Math.max(0, n.level) + 1);
+    nudgeOn = false;
+    updateNudge();
+    panelHintEl.hidden = panelHintSeen;
+    if (!panelHintSeen) panelHintShownThisSelection = true;
+    refZ = zForLvl(n.level);
+    fitZ = zForLvl(n.level);
+    startFocus();
+    pluck(id);
 
     // Breadcrumb
     const crumbWrap = document.getElementById('mk-breadcrumb')!;
@@ -976,9 +1529,8 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     }
 
     panel.hidden = false;
-    introEl.hidden = true;
+    setAtIntro(false);
     toIntroBtn.hidden = false;
-    applyFocus(id);
 
     const kids = n.children.map((cid) => byId[cid]);
     const pts = [n, ...kids];
@@ -986,17 +1538,25 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     const miny = Math.min(...pts.map((p) => p.y));
     const maxx = Math.max(...pts.map((p) => p.x));
     const maxy = Math.max(...pts.map((p) => p.y));
-    const pad = kids.length ? 340 : 280;
-    flyToBox(minx - pad, miny - pad, maxx + pad, maxy + pad);
+    const pad = kids.length ? 360 : 300;
+    fitBox(minx - pad, miny - pad, maxx + pad, maxy + pad, 1700);
   }
 
   function deselect() {
     selId = null;
+    if (panelHintShownThisSelection && !panelHintSeen) {
+      try {
+        localStorage.setItem('pa-mk-hint-panel', '1');
+      } catch (e) {}
+      panelHintSeen = true;
+    }
     panel.hidden = true;
     panelWidth = 0;
-    focusLvl = 0;
-    applyFocus(null);
-    fitOverview();
+    refZ = zForLvl(0);
+    fitZ = zForLvl(0);
+    startFocus();
+    setAtIntro(false);
+    fitOverview(1500);
   }
 
   function escapeHtml(s: string) {
@@ -1058,7 +1618,6 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
   // follows a captured pointer sequence to the capturing element, so a
   // listener on the node itself never fires.
   let drag: { x: number; y: number; sx: number; sy: number; moved: boolean; target: EventTarget | null } | null = null;
-  let dragTimer: number | undefined;
 
   viewport.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
@@ -1070,49 +1629,87 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     if (!drag) return;
     const dx = e.clientX - drag.x;
     const dy = e.clientY - drag.y;
-    if (Math.abs(e.clientX - drag.sx) + Math.abs(e.clientY - drag.sy) > 5) drag.moved = true;
-    cam.x -= dx / cam.scale;
-    cam.y -= dy / cam.scale;
+    if (Math.abs(e.clientX - drag.sx) + Math.abs(e.clientY - drag.sy) > 5) {
+      drag.moved = true;
+      userMoved = true;
+      manualPan = true;
+    }
+    const mRef = F / Math.max(1, refZ - cam.z);
+    cam.x -= dx / mRef;
+    cam.y -= dy / mRef;
     drag.x = e.clientX;
     drag.y = e.clientY;
-    setInstant(true);
-    applyTransform();
+    motion();
+    cancelFly();
+    applyCam();
   });
   function endDrag() {
     viewport.classList.remove('is-dragging');
     const result = drag && !drag.moved ? { wasClick: true, target: drag.target } : { wasClick: false, target: null };
     drag = null;
-    window.clearTimeout(dragTimer);
-    dragTimer = window.setTimeout(() => setInstant(false), 50);
     return result;
   }
   viewport.addEventListener('pointerup', () => {
     const { wasClick, target } = endDrag();
     if (!wasClick) return;
     const el = target as HTMLElement | null;
+    if (el?.closest('.mk-link-hit')) return;
+    // The intro's enter button lives inside #mk-viewport (so it can be
+    // camera-projected like a node) — pointer capture above redirects the
+    // native click away from it for real mouse/touch input, so route it the
+    // same way node selection is routed.
+    if (el?.closest('#mk-intro-close')) {
+      userMoved = true;
+      deselect();
+      return;
+    }
     const nodeEl = el?.closest<HTMLElement>('.mk-node');
     if (nodeEl?.dataset.id) select(nodeEl.dataset.id);
     else if (selId) deselect();
   });
   viewport.addEventListener('pointercancel', () => endDrag());
 
+  let exitT = 0;
+  let exitAcc = 0;
   viewport.addEventListener(
     'wheel',
     (e) => {
       e.preventDefault();
+      userMoved = true;
+      manualPan = true;
       const rect = viewport.getBoundingClientRect();
       const mx = e.clientX - rect.left;
       const my = e.clientY - rect.top;
-      const before = screenToWorld(mx, my);
-      const factor = e.deltaY < 0 ? 1.12 : 0.89;
-      cam.scale = Math.max(0.05, Math.min(3, cam.scale * factor));
-      const after = screenToWorld(mx, my);
-      cam.x += before.x - after.x;
-      cam.y += before.y - after.y;
-      setInstant(true);
-      applyTransform();
-      window.clearTimeout(dragTimer);
-      dragTimer = window.setTimeout(() => setInstant(false), 50);
+      const { cx, cy } = centerXY();
+      const dz0 = Math.max(NEAR + 1, refZ - cam.z);
+      const maxDz = overviewDz() * 1.3;
+
+      // Pulling back past the overview edge flies back up to the intro.
+      if (e.deltaY > 0 && !selId && !atIntro && dz0 >= maxDz * 0.98) {
+        const now = performance.now();
+        if (!exitT || now - exitT > 900) exitAcc = 0;
+        exitT = now;
+        exitAcc += e.deltaY;
+        if (exitAcc > 260) {
+          exitAcc = 0;
+          flyToIntro();
+        }
+        return;
+      }
+
+      const m0 = F / dz0;
+      const worldX = cam.x + (mx - cx) / m0;
+      const worldY = cam.y + (my - cy) / m0;
+      const f = e.deltaY < 0 ? 1.07 : 0.934;
+      let dz1 = dz0 / f;
+      dz1 = Math.max(NEAR + 60, Math.min(maxDz, dz1));
+      const m1 = F / dz1;
+      cam.z = refZ - dz1;
+      cam.x = worldX - (mx - cx) / m1;
+      cam.y = worldY - (my - cy) / m1;
+      motion();
+      cancelFly();
+      applyCam();
     },
     { passive: false },
   );
@@ -1127,24 +1724,16 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     });
   });
 
-  function zoomBy(f: number) {
-    setInstant(false);
-    cam.scale = Math.max(0.05, Math.min(3, cam.scale * f));
-    applyTransform();
-  }
-
   document.getElementById('mk-intro-close')!.addEventListener('click', () => {
-    introEl.hidden = true;
-    toIntroBtn.hidden = false;
-    fitOverview();
+    userMoved = true;
+    deselect();
   });
   toIntroBtn.addEventListener('click', () => {
-    introEl.hidden = false;
-    toIntroBtn.hidden = true;
     if (selId) deselect();
+    flyToIntro();
   });
 
-  window.addEventListener('resize', () => applyTransform());
+  window.addEventListener('resize', () => applyCam());
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && selId) deselect();
   });
@@ -1153,10 +1742,26 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
   function syncHeaderHeight() {
     const header = document.querySelector<HTMLElement>('.hd-header');
     if (header) document.documentElement.style.setProperty('--mk-header-h', `${header.offsetHeight}px`);
-    applyTransform();
+    applyCam();
   }
   window.addEventListener('resize', syncHeaderHeight);
   syncHeaderHeight();
 
-  fitOverview();
+  updateNudge();
+  scheduleBreeze();
+
+  // Camera starts on the intro; a short settle loop re-fits it as the
+  // viewport's real size becomes available (fonts/layout can shift it late).
+  let fitTries = 0;
+  function initFit() {
+    if (userMoved) return;
+    refZ = zForLvl(0);
+    fitZ = zForLvl(0);
+    cam.x = INTRO.x;
+    cam.y = INTRO.y;
+    cam.z = zForLvl(0) - overviewDz();
+    applyCam();
+    if (++fitTries < 22) window.setTimeout(initFit, 90);
+  }
+  window.setTimeout(initFit, 30);
 </script>
