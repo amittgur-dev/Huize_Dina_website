@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#2c2830;}
+a{color:#48C6A8;text-decoration:none;}
+a:hover{color:#e0dbd4;}
+@media(max-width:680px){
+  .tm-row{grid-template-columns:1fr!important;gap:1.1rem!important;}
+  .tm-photo{width:150px!important;}
+  .hd-row{padding:0.7rem 1rem!important;}
+  .hd-nav{gap:0.9rem!important;}
+  .tm-hero{padding-top:8rem!important;padding-bottom:2rem!important;}
+  .tm-hero-title{font-size:1.5rem!important;}
+  .tm-inner{padding:0 1rem 4rem!important;}
+}
+</style>
+</helmet>
+
+<div id="tm-root" style="position:relative;min-height:100vh;background:#2c2830;color:#e0dbd4;font-family:'Courier Prime','Courier New',Courier,monospace;overflow-x:hidden;">
+
+  <div style="position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 40%, transparent 52%, rgba(0,0,0,0.13) 100%);"></div>
+
+  <div style="position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0.04;mix-blend-mode:overlay;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22220%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%222%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');"></div>
+
+  <div class="tm-header" style="position:fixed;top:0;left:0;right:0;z-index:20;background:rgba(44,40,48,0.97);border-bottom:1px solid rgba(255,255,255,0.07);">
+    <div class="hd-row" style="display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;padding:0.9rem 1.8rem 0.85rem;">
+    <div>
+      <a href="Home.dc.html" style="font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:rgba(224,219,212,0.92);text-decoration:none;display:inline-block;" style-hover="color:#48C6A8;">Huize Dina</a>
+      <nav class="hd-nav" style="display:flex;gap:1.35rem;margin-top:9px;flex-wrap:wrap;">
+        <a href="Home.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Home</a>
+        <a href="Podcast.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Podcast</a>
+        <a href="Polyphonic Archive.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Timelines</a>
+        <a href="Making Of Map.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">The making of</a>
+        <a href="Team.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:#48C6A8;text-decoration:none;padding-bottom:3px;border-bottom:1px solid rgba(72,198,168,0.55);">Team</a>
+        <a href="Contact.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Contact</a>
+      </nav>
+    </div>
+    </div>
+  </div>
+
+  <div class="tm-hero" data-screen-label="Team hero" style="position:relative;z-index:5;text-align:center;padding:8.5rem 1rem 3rem;border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:2.5rem;">
+    <div class="tm-hero-title" style="font-size:2rem;font-weight:400;letter-spacing:.03em;color:rgba(224,219,212,0.92);text-wrap:pretty;">Team</div>
+    <div style="font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:rgba(224,219,212,0.32);margin-top:.6rem;">Pluralism in Research and the Arts · AHK</div>
+  </div>
+
+  <div class="tm-inner" style="position:relative;z-index:5;max-width:860px;margin:0 auto;padding:0 1.5rem 5rem;display:flex;flex-direction:column;">
+
+    <div class="tm-row" data-screen-label="Naomi" style="display:grid;grid-template-columns:190px 1fr;gap:2.2rem;padding:2.2rem 0;border-bottom:1px solid rgba(255,255,255,0.07);align-items:start;">
+      <div class="tm-photo" style="border:1px solid rgba(224,219,212,0.14);padding:6px;background:rgba(20,17,25,0.5);">
+        <img class="tm-img" src="uploads/Naomi.webp" alt="Naomi Bueno de Mesquita" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;filter:saturate(0.95) brightness(0.97);">
+      </div>
+      <div>
+        <div style="font-size:0.95rem;font-weight:400;letter-spacing:.05em;color:rgba(224,219,212,0.92);">Naomi Bueno de Mesquita</div>
+        <div style="font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(72,198,168,0.72);margin:.45rem 0 .9rem;line-height:1.7;">Professor (Lector), Pluralism in Research and the Arts · Amsterdam University of the Arts (AHK)</div>
+        <div style="font-size:14px;line-height:1.7;color:rgba(224,219,212,0.62);text-wrap:pretty;">Naomi is Professor of Pluralism in Research and the Arts at the AHK, where she leads the Polyphonic Archive project. Together with her research team, Naomi investigates pluralism within the arts and humanities, focusing on how diverse perspectives are experienced, negotiated, and shaped within institutional contexts. Her work highlights the public value of the arts as spaces for engaging with complexity, ambiguity, and multiple coexisting perspectives. The professorship collaborates closely with the Conservatory of Amsterdam, the Reinwardt Academy, and the Academy of Architecture.</div>
+      </div>
+    </div>
+
+    <div class="tm-row" data-screen-label="Jaïr" style="display:grid;grid-template-columns:190px 1fr;gap:2.2rem;padding:2.2rem 0;border-bottom:1px solid rgba(255,255,255,0.07);align-items:start;">
+      <div class="tm-photo" style="border:1px solid rgba(224,219,212,0.14);padding:6px;background:rgba(20,17,25,0.5);">
+        <img class="tm-img" src="uploads/Jair .jpeg" alt="Jaïr van Dijk" style="width:100%;aspect-ratio:1/1;object-fit:cover;object-position:center top;display:block;filter:saturate(0.95) brightness(0.97);">
+      </div>
+      <div>
+        <div style="font-size:0.95rem;font-weight:400;letter-spacing:.05em;color:rgba(224,219,212,0.92);">Jaïr van Dijk</div>
+        <div style="font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(72,198,168,0.72);margin:.45rem 0 .9rem;line-height:1.7;">Historian and Researcher, Pluralism in Research and the Arts Lectorate (AHK)</div>
+        <div style="font-size:14px;line-height:1.7;color:rgba(224,219,212,0.62);text-wrap:pretty;">Jaïr van Dijk is a historian specialising in women's history, sexuality, and migration. He obtained a Research Master's degree in History from the University of Amsterdam, where he researched homosexuality and migration in Amsterdam between 1800 and 1950. In 2025, Jaïr introduced the Huize Dina archive to Naomi, laying the foundation for the Polyphonic Archive project. Within the project, he contributes archival research of Huize Dina. His archival research also formed the basis of his first book, <span style="font-style:italic;">Wat verzwegen werd</span>, which tells the story of one of the girls from Huize Dina and her daughter's search for her biological mother after the Second World War.</div>
+      </div>
+    </div>
+
+    <div class="tm-row" data-screen-label="Amit" style="display:grid;grid-template-columns:190px 1fr;gap:2.2rem;padding:2.2rem 0;border-bottom:1px solid rgba(255,255,255,0.07);align-items:start;">
+      <div class="tm-photo" style="border:1px solid rgba(224,219,212,0.14);padding:6px;background:rgba(20,17,25,0.5);">
+        <img class="tm-img" src="assets/amit_portrait.jpg" alt="Amit Gur" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;filter:saturate(0.95) brightness(0.97);">
+      </div>
+      <div>
+        <div style="font-size:0.95rem;font-weight:400;letter-spacing:.05em;color:rgba(224,219,212,0.92);">Amit Gur</div>
+        <div style="font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(72,198,168,0.72);margin:.45rem 0 .9rem;line-height:1.7;">Composer and Researcher, Pluralism in Research and the Arts Lectorate (AHK)</div>
+        <div style="font-size:14px;line-height:1.7;color:rgba(224,219,212,0.62);text-wrap:pretty;">Amit is a composer and researcher based in Amsterdam. He writes music for new music ensembles and has composed for a range of audiovisual installations and documentary films. His research focuses on creating analogies between visual and auditory perception, with the perception of texture in music as a central topic. Amit teaches courses about his research at the Conservatorium van Amsterdam.</div>
+      </div>
+    </div>
+
+    <div class="tm-row" data-screen-label="Elena" style="display:grid;grid-template-columns:190px 1fr;gap:2.2rem;padding:2.2rem 0;border-bottom:1px solid rgba(255,255,255,0.07);align-items:start;">
+      <div class="tm-photo" style="border:1px solid rgba(224,219,212,0.14);padding:6px;background:rgba(20,17,25,0.5);">
+        <img class="tm-img" src="uploads/Elena.webp" alt="Elena Nguyen" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;filter:saturate(0.95) brightness(0.97);">
+      </div>
+      <div>
+        <div style="font-size:0.95rem;font-weight:400;letter-spacing:.05em;color:rgba(224,219,212,0.92);">Elena Nguyen</div>
+        <div style="font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(72,198,168,0.72);margin:.45rem 0 .9rem;line-height:1.7;">Research Intern, Pluralism in Research and the Arts Lectorate (AHK)</div>
+        <div style="font-size:14px;line-height:1.7;color:rgba(224,219,212,0.62);text-wrap:pretty;">Elena Nguyen is a political scientist and Master's student in Applied History at Erasmus University Rotterdam. She has a strong interest in oral history, audiovisual media, and migration history. As an intern with the Polyphonic Archive project, Elena supports the historical research, contributing to archival work and the development of the project's historical perspectives.</div>
+      </div>
+    </div>
+
+    <div class="tm-row" data-screen-label="Tzlil" style="display:grid;grid-template-columns:190px 1fr;gap:2.2rem;padding:2.2rem 0;border-bottom:1px solid rgba(255,255,255,0.07);align-items:start;">
+      <div class="tm-photo" style="border:1px solid rgba(224,219,212,0.14);padding:6px;background:rgba(20,17,25,0.5);">
+        <img class="tm-img" src="uploads/Tzlil.webp" alt="Tzlil Sharon" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;filter:saturate(0.95) brightness(0.97);">
+      </div>
+      <div>
+        <div style="font-size:0.95rem;font-weight:400;letter-spacing:.05em;color:rgba(224,219,212,0.92);">Tzlil Sharon</div>
+        <div style="font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(72,198,168,0.72);margin:.45rem 0 .9rem;line-height:1.7;">Media Studies Scholar and Researcher, Pluralism in Research and the Arts Lectorate (AHK)</div>
+        <div style="font-size:14px;line-height:1.7;color:rgba(224,219,212,0.62);text-wrap:pretty;">Tzlil Sharon is a media studies researcher whose work explores the intersection of technologies, cultural practices, and media imaginaries, with a particular focus on podcasting and sound cultures. She was previously a postdoctoral fellow at the Amsterdam School for Cultural Analysis (ASCA) at the University of Amsterdam. Her research combines cultural studies, discourse analysis, and digital methods to examine podcast listening, its cultural meanings, and the datafication of podcasts through digital platforms.</div>
+      </div>
+    </div>
+
+    <div class="tm-row" data-screen-label="Ari" style="display:grid;grid-template-columns:190px 1fr;gap:2.2rem;padding:2.2rem 0;align-items:start;">
+      <div class="tm-photo" style="border:1px solid rgba(224,219,212,0.14);padding:6px;background:rgba(20,17,25,0.5);">
+        <img class="tm-img" src="uploads/Ari.webp" alt="Ari Teperberg" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;filter:saturate(0.95) brightness(0.97);">
+      </div>
+      <div>
+        <div style="font-size:0.95rem;font-weight:400;letter-spacing:.05em;color:rgba(224,219,212,0.92);">Ari Teperberg</div>
+        <div style="font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:rgba(72,198,168,0.72);margin:.45rem 0 .9rem;line-height:1.7;">Performer, Director and Researcher, Pluralism in Research and the Arts Lectorate (AHK)</div>
+        <div style="font-size:14px;line-height:1.7;color:rgba(224,219,212,0.62);text-wrap:pretty;">Ari Teperberg is a maker, performer, stage director, and dramaturg whose work spans opera, dance, puppetry, theatre, and performance art. He has curated and directed projects that explore dialogue across cultures, places, and political contexts. His artistic practice centres on what he calls performative mechanisms: research-driven works that mediate between the sensory, cognitive, and emotional experiences of performers and audiences, inviting them into immersive worlds of sound, movement, action, and objects.</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;photoTreatment&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;natural&quot;,&quot;options&quot;:[&quot;muted&quot;,&quot;duotone&quot;,&quot;natural&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Photos&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() {
+    this.applyTweaks();
+  }
+  componentDidUpdate() {
+    this.applyTweaks();
+  }
+  applyTweaks() {
+    var treatment = this.props.photoTreatment ?? 'muted';
+    var filter = treatment === 'natural' ? 'none'
+      : treatment === 'duotone' ? 'grayscale(1) sepia(0.18) brightness(0.85) contrast(1.05)'
+      : 'saturate(0.95) brightness(0.97)';
+    document.querySelectorAll('#tm-root .tm-img').forEach(function(img) {
+      img.style.filter = filter;
+    });
+  }
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#2c2830;}
+a{color:#48C6A8;text-decoration:none;}
+a:hover{color:#e0dbd4;}
+@media(max-width:680px){
+  .hd-row{padding:0.7rem 1rem!important;}
+  .hd-nav{gap:0.9rem!important;}
+  .hd-hero{padding-top:8rem!important;padding-bottom:2rem!important;}
+  .hd-hero-title{font-size:1.6rem!important;}
+  .hd-inner{padding:0 1rem 4rem!important;}
+  .pod-act{grid-template-columns:auto 1fr!important;gap:1rem!important;}
+}
+</style>
+</helmet>
+
+<div id="pod-root" style="position:relative;min-height:100vh;background:#2c2830;color:#e0dbd4;font-family:'Courier Prime','Courier New',Courier,monospace;overflow-x:hidden;">
+
+  <div style="position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 40%, transparent 52%, rgba(0,0,0,0.13) 100%);"></div>
+
+  <div style="position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0.04;mix-blend-mode:overlay;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22220%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%222%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');"></div>
+
+  <div class="hd-header" style="position:fixed;top:0;left:0;right:0;z-index:20;background:rgba(44,40,48,0.97);border-bottom:1px solid rgba(255,255,255,0.07);">
+    <div class="hd-row" style="display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;padding:0.9rem 1.8rem 0.85rem;">
+    <div>
+      <a href="Home.dc.html" style="font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:rgba(224,219,212,0.92);text-decoration:none;display:inline-block;" style-hover="color:#48C6A8;">Huize Dina</a>
+      <nav class="hd-nav" style="display:flex;gap:1.35rem;margin-top:9px;flex-wrap:wrap;">
+        <a href="Home.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Home</a>
+        <a href="Podcast.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:#48C6A8;text-decoration:none;padding-bottom:3px;border-bottom:1px solid rgba(72,198,168,0.55);">Podcast</a>
+        <a href="Polyphonic Archive.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Timelines</a>
+        <a href="Making Of Map.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">The making of</a>
+        <a href="Team.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Team</a>
+        <a href="Contact.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Contact</a>
+      </nav>
+    </div>
+    </div>
+  </div>
+
+  <div class="hd-hero" data-screen-label="Podcast hero" style="position:relative;z-index:5;text-align:center;padding:9.5rem 1rem 3rem;border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:3rem;">
+    <div class="hd-hero-title" style="font-size:2.2rem;font-weight:400;letter-spacing:.03em;color:rgba(224,219,212,0.92);text-wrap:pretty;">Podcast</div>
+    <div style="font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:rgba(224,219,212,0.32);margin-top:.6rem;">Stories from the girls' perspective</div>
+  </div>
+
+  <div class="hd-inner" style="position:relative;z-index:5;max-width:720px;margin:0 auto;padding:0 1.5rem 5rem;display:flex;flex-direction:column;gap:2.6rem;">
+
+    <div class="pod-card" data-screen-label="Episode 1: Tilly" style="padding:1px;border-radius:3px;background:linear-gradient(145deg, rgba(72,198,168,0.84) 0%, rgba(72,198,168,0) 48%), linear-gradient(325deg, #09443b 0%, #1c8470 52%, #48c6a8 100%);">
+      <div style="background:rgba(20,17,25,0.94);border-radius:2px;padding:1.6rem 1.8rem 1.7rem;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:1rem;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:1rem;">
+          <div>
+            <div style="font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:rgba(72,198,168,0.68);">Side A</div>
+            <div style="font-size:1.15rem;letter-spacing:.04em;color:rgba(224,219,212,0.92);margin-top:.4rem;">Episode 1: Tilly</div>
+          </div>
+          <div style="font-size:30px;color:rgba(224,219,212,0.16);line-height:1;">I</div>
+        </div>
+
+        <div class="pod-act pod-player" data-key="e1a1" style="display:grid;grid-template-columns:auto 1fr;gap:1.3rem;align-items:center;padding:1.2rem 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <div style="position:relative;width:56px;height:56px;flex:none;">
+            <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(72,198,168,0.25);"></div>
+            <button class="pod-play" style="position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(72,198,168,0.6);background:rgba(72,198,168,0.06);color:#48C6A8;font-family:'Courier Prime',monospace;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding-left:3px;" style-hover="background:rgba(72,198,168,0.16);">▶</button>
+          </div>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:1rem;">
+              <div class="pod-title" style="font-size:0.95rem;letter-spacing:.04em;color:rgba(224,219,212,0.88);">Act 1: Diagnosis</div>
+              <div class="pod-note" style="font-size:11.5px;font-style:italic;color:rgba(224,219,212,0.35);">Recording to follow</div>
+            </div>
+            <div class="pod-ticks" style="display:flex;align-items:flex-end;gap:3px;height:16px;margin-top:.7rem;cursor:pointer;"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:.4rem;">
+              <div class="pod-time" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">00:00</div>
+              <div class="pod-dur" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">— : —</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pod-act pod-player" data-key="e1a2" style="display:grid;grid-template-columns:auto 1fr;gap:1.3rem;align-items:center;padding:1.2rem 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <div style="position:relative;width:56px;height:56px;flex:none;">
+            <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(72,198,168,0.25);"></div>
+            <button class="pod-play" style="position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(72,198,168,0.6);background:rgba(72,198,168,0.06);color:#48C6A8;font-family:'Courier Prime',monospace;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding-left:3px;" style-hover="background:rgba(72,198,168,0.16);">▶</button>
+          </div>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:1rem;">
+              <div class="pod-title" style="font-size:0.95rem;letter-spacing:.04em;color:rgba(224,219,212,0.88);">Act 2: Huize Dina</div>
+              <div class="pod-note" style="font-size:11.5px;font-style:italic;color:rgba(224,219,212,0.35);">Recording to follow</div>
+            </div>
+            <div class="pod-ticks" style="display:flex;align-items:flex-end;gap:3px;height:16px;margin-top:.7rem;cursor:pointer;"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:.4rem;">
+              <div class="pod-time" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">00:00</div>
+              <div class="pod-dur" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">— : —</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pod-act pod-player" data-key="e1a3" style="display:grid;grid-template-columns:auto 1fr;gap:1.3rem;align-items:center;padding:1.2rem 0 0;">
+          <div style="position:relative;width:56px;height:56px;flex:none;">
+            <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(72,198,168,0.25);"></div>
+            <button class="pod-play" style="position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(72,198,168,0.6);background:rgba(72,198,168,0.06);color:#48C6A8;font-family:'Courier Prime',monospace;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding-left:3px;" style-hover="background:rgba(72,198,168,0.16);">▶</button>
+          </div>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:1rem;">
+              <div class="pod-title" style="font-size:0.95rem;letter-spacing:.04em;color:rgba(224,219,212,0.88);">Act 3: Departure</div>
+              <div class="pod-note" style="font-size:11.5px;font-style:italic;color:rgba(224,219,212,0.35);">Recording to follow</div>
+            </div>
+            <div class="pod-ticks" style="display:flex;align-items:flex-end;gap:3px;height:16px;margin-top:.7rem;cursor:pointer;"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:.4rem;">
+              <div class="pod-time" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">00:00</div>
+              <div class="pod-dur" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">— : —</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pod-card" data-screen-label="Episode 2" style="padding:1px;border-radius:3px;background:linear-gradient(145deg, rgba(72,198,168,0.84) 0%, rgba(72,198,168,0) 48%), linear-gradient(325deg, #09443b 0%, #1c8470 52%, #48c6a8 100%);">
+      <div style="background:rgba(20,17,25,0.94);border-radius:2px;padding:1.6rem 1.8rem 1.7rem;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:1rem;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:1rem;">
+          <div>
+            <div style="font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:rgba(72,198,168,0.68);">Side A</div>
+            <div style="font-size:1.15rem;letter-spacing:.04em;color:rgba(224,219,212,0.92);margin-top:.4rem;">Episode 2</div>
+          </div>
+          <div style="font-size:30px;color:rgba(224,219,212,0.16);line-height:1;">II</div>
+        </div>
+
+        <div class="pod-act pod-player" data-key="e2a1" style="display:grid;grid-template-columns:auto 1fr;gap:1.3rem;align-items:center;padding:1.2rem 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <div style="position:relative;width:56px;height:56px;flex:none;">
+            <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(72,198,168,0.25);"></div>
+            <button class="pod-play" style="position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(72,198,168,0.6);background:rgba(72,198,168,0.06);color:#48C6A8;font-family:'Courier Prime',monospace;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding-left:3px;" style-hover="background:rgba(72,198,168,0.16);">▶</button>
+          </div>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:1rem;">
+              <div class="pod-title" style="font-size:0.95rem;letter-spacing:.04em;color:rgba(224,219,212,0.88);">Act 1</div>
+              <div class="pod-note" style="font-size:11.5px;font-style:italic;color:rgba(224,219,212,0.35);">Recording to follow</div>
+            </div>
+            <div class="pod-ticks" style="display:flex;align-items:flex-end;gap:3px;height:16px;margin-top:.7rem;cursor:pointer;"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:.4rem;">
+              <div class="pod-time" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">00:00</div>
+              <div class="pod-dur" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">— : —</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pod-act pod-player" data-key="e2a2" style="display:grid;grid-template-columns:auto 1fr;gap:1.3rem;align-items:center;padding:1.2rem 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <div style="position:relative;width:56px;height:56px;flex:none;">
+            <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(72,198,168,0.25);"></div>
+            <button class="pod-play" style="position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(72,198,168,0.6);background:rgba(72,198,168,0.06);color:#48C6A8;font-family:'Courier Prime',monospace;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding-left:3px;" style-hover="background:rgba(72,198,168,0.16);">▶</button>
+          </div>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:1rem;">
+              <div class="pod-title" style="font-size:0.95rem;letter-spacing:.04em;color:rgba(224,219,212,0.88);">Act 2</div>
+              <div class="pod-note" style="font-size:11.5px;font-style:italic;color:rgba(224,219,212,0.35);">Recording to follow</div>
+            </div>
+            <div class="pod-ticks" style="display:flex;align-items:flex-end;gap:3px;height:16px;margin-top:.7rem;cursor:pointer;"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:.4rem;">
+              <div class="pod-time" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">00:00</div>
+              <div class="pod-dur" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">— : —</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pod-act pod-player" data-key="e2a3" style="display:grid;grid-template-columns:auto 1fr;gap:1.3rem;align-items:center;padding:1.2rem 0 0;">
+          <div style="position:relative;width:56px;height:56px;flex:none;">
+            <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(72,198,168,0.25);"></div>
+            <button class="pod-play" style="position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(72,198,168,0.6);background:rgba(72,198,168,0.06);color:#48C6A8;font-family:'Courier Prime',monospace;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding-left:3px;" style-hover="background:rgba(72,198,168,0.16);">▶</button>
+          </div>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:1rem;">
+              <div class="pod-title" style="font-size:0.95rem;letter-spacing:.04em;color:rgba(224,219,212,0.88);">Act 3</div>
+              <div class="pod-note" style="font-size:11.5px;font-style:italic;color:rgba(224,219,212,0.35);">Recording to follow</div>
+            </div>
+            <div class="pod-ticks" style="display:flex;align-items:flex-end;gap:3px;height:16px;margin-top:.7rem;cursor:pointer;"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:.4rem;">
+              <div class="pod-time" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">00:00</div>
+              <div class="pod-dur" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">— : —</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pod-card" data-screen-label="Episode 3" style="padding:1px;border-radius:3px;background:linear-gradient(145deg, rgba(72,198,168,0.84) 0%, rgba(72,198,168,0) 48%), linear-gradient(325deg, #09443b 0%, #1c8470 52%, #48c6a8 100%);">
+      <div style="background:rgba(20,17,25,0.94);border-radius:2px;padding:1.6rem 1.8rem 1.7rem;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:1rem;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:1rem;">
+          <div>
+            <div style="font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:rgba(72,198,168,0.68);">Side B</div>
+            <div style="font-size:1.15rem;letter-spacing:.04em;color:rgba(224,219,212,0.92);margin-top:.4rem;">Episode 3</div>
+          </div>
+          <div style="font-size:30px;color:rgba(224,219,212,0.16);line-height:1;">III</div>
+        </div>
+
+        <div class="pod-act pod-player" data-key="e3a1" style="display:grid;grid-template-columns:auto 1fr;gap:1.3rem;align-items:center;padding:1.2rem 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <div style="position:relative;width:56px;height:56px;flex:none;">
+            <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(72,198,168,0.25);"></div>
+            <button class="pod-play" style="position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(72,198,168,0.6);background:rgba(72,198,168,0.06);color:#48C6A8;font-family:'Courier Prime',monospace;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding-left:3px;" style-hover="background:rgba(72,198,168,0.16);">▶</button>
+          </div>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:1rem;">
+              <div class="pod-title" style="font-size:0.95rem;letter-spacing:.04em;color:rgba(224,219,212,0.88);">Act 1</div>
+              <div class="pod-note" style="font-size:11.5px;font-style:italic;color:rgba(224,219,212,0.35);">Recording to follow</div>
+            </div>
+            <div class="pod-ticks" style="display:flex;align-items:flex-end;gap:3px;height:16px;margin-top:.7rem;cursor:pointer;"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:.4rem;">
+              <div class="pod-time" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">00:00</div>
+              <div class="pod-dur" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">— : —</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pod-act pod-player" data-key="e3a2" style="display:grid;grid-template-columns:auto 1fr;gap:1.3rem;align-items:center;padding:1.2rem 0;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <div style="position:relative;width:56px;height:56px;flex:none;">
+            <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(72,198,168,0.25);"></div>
+            <button class="pod-play" style="position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(72,198,168,0.6);background:rgba(72,198,168,0.06);color:#48C6A8;font-family:'Courier Prime',monospace;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding-left:3px;" style-hover="background:rgba(72,198,168,0.16);">▶</button>
+          </div>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:1rem;">
+              <div class="pod-title" style="font-size:0.95rem;letter-spacing:.04em;color:rgba(224,219,212,0.88);">Act 2</div>
+              <div class="pod-note" style="font-size:11.5px;font-style:italic;color:rgba(224,219,212,0.35);">Recording to follow</div>
+            </div>
+            <div class="pod-ticks" style="display:flex;align-items:flex-end;gap:3px;height:16px;margin-top:.7rem;cursor:pointer;"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:.4rem;">
+              <div class="pod-time" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">00:00</div>
+              <div class="pod-dur" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">— : —</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pod-act pod-player" data-key="e3a3" style="display:grid;grid-template-columns:auto 1fr;gap:1.3rem;align-items:center;padding:1.2rem 0 0;">
+          <div style="position:relative;width:56px;height:56px;flex:none;">
+            <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(72,198,168,0.25);"></div>
+            <button class="pod-play" style="position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(72,198,168,0.6);background:rgba(72,198,168,0.06);color:#48C6A8;font-family:'Courier Prime',monospace;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding-left:3px;" style-hover="background:rgba(72,198,168,0.16);">▶</button>
+          </div>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:1rem;">
+              <div class="pod-title" style="font-size:0.95rem;letter-spacing:.04em;color:rgba(224,219,212,0.88);">Act 3</div>
+              <div class="pod-note" style="font-size:11.5px;font-style:italic;color:rgba(224,219,212,0.35);">Recording to follow</div>
+            </div>
+            <div class="pod-ticks" style="display:flex;align-items:flex-end;gap:3px;height:16px;margin-top:.7rem;cursor:pointer;"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:.4rem;">
+              <div class="pod-time" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">00:00</div>
+              <div class="pod-dur" style="font-size:10px;letter-spacing:.18em;color:rgba(224,219,212,0.35);">— : —</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(224,219,212,0.25);margin-top:1.5rem;">℗ Polyphonic Archive · AHK</div>
+
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;e1a1Src&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Episode 1: Tilly&quot;},&quot;e1a2Src&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Episode 1: Tilly&quot;},&quot;e1a3Src&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Episode 1: Tilly&quot;},&quot;e2a1Src&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Episode 2&quot;},&quot;e2a2Src&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Episode 2&quot;},&quot;e2a3Src&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Episode 2&quot;},&quot;e3a1Src&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Episode 3&quot;},&quot;e3a2Src&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Episode 3&quot;},&quot;e3a3Src&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Episode 3&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() {
+    this._players = [];
+    var self = this;
+    var tries = 0;
+    var init = function() {
+      var players = document.querySelectorAll('#pod-root .pod-player');
+      if (players.length < 9 && tries++ < 20) { setTimeout(init, 200); return; }
+      players.forEach(function(el) { self.wire(el); });
+    };
+    setTimeout(init, 100);
+  }
+
+  componentWillUnmount() {
+    (this._players || []).forEach(function(p) { if (p.audio) { p.audio.pause(); } });
+  }
+
+  fmt(s) {
+    if (!isFinite(s)) return '— : —';
+    var m = Math.floor(s / 60), sec = Math.floor(s % 60);
+    return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  wire(el) {
+    var self = this;
+    var key = el.getAttribute('data-key');
+    var src = this.props[key + 'Src'] ?? '';
+    var btn = el.querySelector('.pod-play');
+    var ticksWrap = el.querySelector('.pod-ticks');
+    var timeEl = el.querySelector('.pod-time');
+    var durEl = el.querySelector('.pod-dur');
+    var noteEl = el.querySelector('.pod-note');
+    if (!btn || !ticksWrap) return;
+
+    // Build tape-counter ticks
+    ticksWrap.innerHTML = '';
+    var TICKS = 52;
+    var ticks = [];
+    for (var i = 0; i < TICKS; i++) {
+      var t = document.createElement('div');
+      var tall = (i % 13 === 0);
+      t.style.cssText = 'flex:1;height:' + (tall ? 16 : 8) + 'px;background:rgba(224,219,212,0.14);transition:background 120ms ease-out;';
+      ticksWrap.appendChild(t);
+      ticks.push(t);
+    }
+
+    var p = { el: el, ticks: ticks, audio: null };
+    this._players.push(p);
+
+    var paint = function(frac) {
+      var lit = Math.round(frac * TICKS);
+      ticks.forEach(function(t, i) {
+        t.style.background = i < lit ? 'rgba(72,198,168,0.75)' : 'rgba(224,219,212,0.14)';
+      });
+    };
+
+    if (!src) {
+      btn.addEventListener('click', function() {
+        if (!noteEl) return;
+        noteEl.style.color = 'rgba(72,198,168,0.8)';
+        setTimeout(function() { noteEl.style.color = 'rgba(224,219,212,0.35)'; }, 900);
+      });
+      return;
+    }
+
+    var audio = new Audio(src);
+    p.audio = audio;
+    if (noteEl) noteEl.textContent = '';
+
+    audio.addEventListener('loadedmetadata', function() {
+      if (durEl) durEl.textContent = self.fmt(audio.duration);
+    });
+    audio.addEventListener('timeupdate', function() {
+      if (timeEl) timeEl.textContent = self.fmt(audio.currentTime);
+      if (audio.duration) paint(audio.currentTime / audio.duration);
+    });
+    audio.addEventListener('ended', function() {
+      btn.textContent = '▶';
+      btn.style.paddingLeft = '3px';
+      btn.style.fontSize = '13px';
+      paint(0);
+      if (timeEl) timeEl.textContent = '00:00';
+    });
+
+    btn.addEventListener('click', function() {
+      if (audio.paused) {
+        self._players.forEach(function(o) {
+          if (o.audio && o.audio !== audio && !o.audio.paused) {
+            o.audio.pause();
+            var ob = o.el.querySelector('.pod-play');
+            if (ob) { ob.textContent = '▶'; ob.style.paddingLeft = '3px'; ob.style.fontSize = '13px'; }
+          }
+        });
+        audio.play();
+        btn.textContent = '❚❚';
+        btn.style.paddingLeft = '0';
+        btn.style.fontSize = '10px';
+      } else {
+        audio.pause();
+        btn.textContent = '▶';
+        btn.style.paddingLeft = '3px';
+        btn.style.fontSize = '13px';
+      }
+    });
+
+    ticksWrap.addEventListener('click', function(e) {
+      if (!audio.duration) return;
+      var r = ticksWrap.getBoundingClientRect();
+      var frac = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      audio.currentTime = frac * audio.duration;
+    });
+  }
+
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

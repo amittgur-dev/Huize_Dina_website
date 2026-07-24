@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#2c2830;}
+a{color:#48C6A8;} a:hover{color:#6fdec2;}
+.cd{opacity:0;}
+.cdl{transform-origin:right center;}
+.cdr{transform-origin:left center;}
+@media(max-width:680px){
+  .pa-spine{left:28px!important;transform:none!important;}
+  .pa-nd-dot{left:28px!important;transform:translateX(0)!important;}
+  .pa-conn{display:none!important;}
+  .cdl{right:auto!important;left:50px!important;top:42px!important;}
+  .cdr{left:50px!important;top:42px!important;}
+  .ci{width:calc(100vw - 74px)!important;max-width:none!important;box-sizing:border-box!important;}
+  .hd-row{padding:0.7rem 1rem!important;}
+  .hd-nav{gap:0.9rem!important;}
+  .pa-hero{padding-top:8rem!important;padding-bottom:1.5rem!important;}
+  .pa-hero-title{font-size:1.5rem!important;}
+  #pa-inner{padding:0 4px 0 0!important;}
+  .tl-tab{padding:0.7rem 0.9rem!important;}
+  .nd-date{font-size:13px!important;}
+}
+</style>
+</helmet>
+
+<div id="pa-root" style="position:relative;min-height:100vh;background:#2c2830;color:#e0dbd4;font-family:'Courier Prime','Courier New',Courier,monospace;overflow-x:hidden;">
+
+  <div id="pa-bg" style="position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;opacity:0.88;"></div>
+
+  <div style="position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 40%, transparent 52%, rgba(0,0,0,0.13) 100%);"></div>
+
+  <div style="position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0.04;mix-blend-mode:overlay;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22220%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%222%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');"></div>
+
+  <div class="pa-header" style="position:fixed;top:0;left:0;right:0;z-index:20;background:rgba(44,40,48,0.97);border-bottom:1px solid rgba(255,255,255,0.07);">
+    <div class="hd-row" style="display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;padding:0.9rem 1.8rem 0.85rem;">
+    <div>
+      <a href="Home.dc.html" style="font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:rgba(224,219,212,0.92);text-decoration:none;display:inline-block;" style-hover="color:#48C6A8;">Huize Dina</a>
+      <nav class="hd-nav" style="display:flex;gap:1.35rem;margin-top:9px;flex-wrap:wrap;">
+        <a href="Home.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Home</a>
+        <a href="Podcast.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Podcast</a>
+        <a href="Polyphonic Archive.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:#48C6A8;text-decoration:none;padding-bottom:3px;border-bottom:1px solid rgba(72,198,168,0.55);">Timelines</a>
+        <a href="Making Of Map.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">The making of</a>
+        <a href="Team.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Team</a>
+        <a href="Contact.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Contact</a>
+      </nav>
+    </div>
+    </div>
+  </div>
+
+  <div class="pa-hero" style="position:relative;z-index:6;text-align:center;padding:9rem 1rem 2.5rem;border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:2.5rem;">
+    
+    <div class="pa-hero-title" style="font-size:2.2rem;font-weight:400;letter-spacing:.03em;color:rgba(224,219,212,0.92);text-wrap:pretty;">{{ heroTitle }}</div>
+    <div style="font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:rgba(224,219,212,0.32);margin-bottom:2.2rem;margin-top:2px;">{{ heroYears }}</div>
+
+    <sc-if value="{{ heroShowSisters }}" hint-placeholder-val="{{ false }}">
+      <div class="sis-row" style="display:flex;justify-content:center;align-items:baseline;gap:1.1rem;margin-top:-1.6rem;margin-bottom:2rem;flex-wrap:wrap;">
+        <span style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:rgba(224,219,212,0.4);">Two sisters, one file —</span>
+        <sc-for list="{{ sisters }}" as="sis" hint-placeholder-count="2">
+          <button onClick="{{ sis.jump }}" style="font-family:inherit;font-size:14px;letter-spacing:.2em;text-transform:uppercase;background:none;border:none;border-bottom:1px solid rgba(72,198,168,0.55);padding:0 0 3px;cursor:pointer;color:#48C6A8;">{{ sis.label }}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <div style="display:flex;justify-content:center;align-items:stretch;gap:0.9rem;flex-wrap:nowrap;max-width:1100px;margin:0 auto;">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+        <button class="tl-tab" onClick="{{ t.select }}" style="{{ t.style }}">
+          <span style="font-size:14px;letter-spacing:.3em;display:block;opacity:0.65;">{{ t.num }}</span>
+          <span style="font-size:21px;letter-spacing:.08em;display:block;margin-top:7px;white-space:nowrap;">{{ t.name }}</span>
+          <span style="font-size:17px;letter-spacing:.14em;display:block;margin-top:7px;opacity:0.55;">{{ t.years }}</span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div id="pa-inner" style="{{ innerContainerStyle }}">
+
+    <div class="pa-spine" style="position:absolute;left:50%;top:0;bottom:0;width:1px;transform:translateX(-50%);background:rgba(255,255,255,0.18);"></div>
+
+    <sc-for list="{{ rulers }}" as="r" hint-placeholder-count="0">
+      <div style="{{ r.style }}">
+        <div style="position:absolute;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;">
+          <div style="width:28px;height:1px;background:rgba(255,255,255,0.09);"></div>
+          <div style="font-size:13px;letter-spacing:.2em;color:rgba(255,255,255,0.34);font-family:'JetBrains Mono',monospace;margin-top:5px;">{{ r.year }}</div>
+        </div>
+      </div>
+    </sc-for>
+
+    <sc-for list="{{ events }}" as="ev" hint-placeholder-count="4">
+      <div class="nd" data-ev-idx="{{ ev.idx }}" style="{{ ev.ndStyle }}">
+
+        <div class="pa-nd-dot" style="position:absolute;left:50%;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:5px;z-index:2;">
+          <div style="width:10px;height:10px;border-radius:50%;border:1px solid rgba(72,198,168,0.75);background:rgba(72,198,168,0.12);"></div>
+          <div class="nd-date" style="font-size:20px;font-weight:700;letter-spacing:.08em;color:rgba(58,168,190,0.8);font-family:'JetBrains Mono',monospace;white-space:nowrap;">{{ ev.date }}</div>
+        </div>
+
+        <sc-if value="{{ ev.isLeft }}" hint-placeholder-val="{{ false }}">
+          <div class="cd cdl" style="position:absolute;right:calc(50% + 112px);top:30px;will-change:opacity,transform;">
+            <div class="pa-conn" style="position:absolute;top:-26px;height:1px;right:-112px;width:112px;background:linear-gradient(to left, transparent, rgba(72,198,168,0.55));"></div>
+            <div style="padding:1px;border-radius:3px;background:linear-gradient(145deg, rgba(72,198,168,0.84) 0%, rgba(72,198,168,0) 48%), linear-gradient(325deg, #09443b 0%, #1c8470 52%, #48c6a8 100%);">
+              <div class="ci" style="background:rgba(20,17,25,0.97);border-radius:2px;padding:1.1rem 1.3rem;width:400px;max-width:calc(50vw - 150px);">
+                <sc-if value="{{ ev.hasTag }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;margin-bottom:.5rem;color:rgba(224,219,212,0.42);">{{ ev.tagLabel }}</div>
+                </sc-if>
+                <div style="font-size:15px;letter-spacing:.13em;text-transform:uppercase;margin-bottom:.6rem;color:#48C6A8;">{{ ev.eyebrow }}</div>
+                <div style="font-size:15px;color:rgba(224,219,212,0.82);line-height:1.8;text-wrap:pretty;">{{ ev.text }}</div>
+                <sc-if value="{{ ev.hasImg }}" hint-placeholder-val="{{ false }}">
+                  <div class="ph-wrap" style="margin-top:1rem;border:1px solid rgba(224,219,212,0.12);overflow:hidden;background:rgba(0,0,0,0.25);">
+                    {{ ev.imgEl }}
+                    <div style="font-size:12px;letter-spacing:.05em;color:rgba(224,219,212,0.62);padding:.5rem .65rem;">{{ ev.imgCaption }}</div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ ev.isRight }}" hint-placeholder-val="{{ false }}">
+          <div class="cd cdr" style="position:absolute;left:calc(50% + 112px);top:30px;will-change:opacity,transform;">
+            <div class="pa-conn" style="position:absolute;top:-26px;height:1px;left:-112px;width:112px;background:linear-gradient(to right, transparent, rgba(72,198,168,0.55));"></div>
+            <div style="padding:1px;border-radius:3px;background:linear-gradient(145deg, rgba(72,198,168,0.84) 0%, rgba(72,198,168,0) 48%), linear-gradient(325deg, #09443b 0%, #1c8470 52%, #48c6a8 100%);">
+              <div class="ci" style="background:rgba(20,17,25,0.97);border-radius:2px;padding:1.1rem 1.3rem;width:420px;max-width:calc(50vw - 150px);">
+                <sc-if value="{{ ev.hasTag }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;margin-bottom:.5rem;color:rgba(224,219,212,0.42);">{{ ev.tagLabel }}</div>
+                </sc-if>
+                <div style="font-size:15px;letter-spacing:.13em;text-transform:uppercase;margin-bottom:.6rem;color:#48C6A8;">{{ ev.eyebrow }}</div><div style="font-size:15px;color:rgba(224,219,212,0.82);line-height:1.8;text-wrap:pretty">{{ ev.text }}</div>
+                
+                <sc-if value="{{ ev.hasImg }}" hint-placeholder-val="{{ false }}">
+                  <div class="ph-wrap" style="margin-top:1rem;border:1px solid rgba(224,219,212,0.12);overflow:hidden;background:rgba(0,0,0,0.25);">
+                    {{ ev.imgEl }}
+                    <div style="font-size:12px;letter-spacing:.05em;color:rgba(224,219,212,0.62);padding:.5rem .65rem;">{{ ev.imgCaption }}</div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+    </sc-for>
+
+  </div>
+
+  <sc-if value="{{ lightbox }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeLightbox }}" style="position:fixed;inset:0;z-index:40;background:rgba(20,17,25,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;cursor:zoom-out;padding:2.5rem;">
+      {{ lightboxImgEl }}
+      <div style="font-size:14px;letter-spacing:.08em;color:rgba(224,219,212,0.65);text-align:center;max-width:720px;">{{ lightboxCap }}</div>
+      <div style="font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:rgba(72,198,168,0.45);">Click anywhere to close</div>
+    </div>
+  </sc-if>
+
+  <div id="yr-gauge" style="position:fixed;bottom:1.8rem;right:1.8rem;z-index:15;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.24em;color:rgba(72,198,168,0.4);">{{ yrMin }}</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { active: 0, lightbox: null };
+
+  componentDidMount() {
+    this.root = document.getElementById('pa-root');
+    if (!this.root) return;
+    this.buildBackground();
+    this._raf = null;
+    var h = (location.hash || '').replace('#', '');
+    var idx = ['dejong', 'engers', 'swaab'].indexOf(h);
+    if (idx > 0) this.setState({ active: idx });
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    window.addEventListener('resize', this.onResize, { passive: true });
+    window.addEventListener('mousemove', this.onMove, { passive: true });
+    window.addEventListener('hashchange', this.onHash);
+    // hide image frames whose file is not present yet
+    document.addEventListener('error', function(e) {
+      var t = e.target;
+      if (t && t.tagName === 'IMG' && t.closest && t.closest('.ph-wrap')) t.closest('.ph-wrap').style.display = 'none';
+    }, true);
+    this.kick();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.onScroll);
+    window.removeEventListener('resize', this.onResize);
+    window.removeEventListener('mousemove', this.onMove);
+    window.removeEventListener('hashchange', this.onHash);
+    if (this._raf) cancelAnimationFrame(this._raf);
+  }
+
+  kick() {
+    var self = this, t = 0;
+    var loop = function() { self.update(); if (++t < 15) requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  }
+
+  onHash = () => {
+    var h = (location.hash || '').replace('#', '');
+    var idx = ['dejong', 'engers', 'swaab'].indexOf(h);
+    if (idx >= 0 && idx !== this.state.active) this.switchTo(idx, true);
+  }
+
+  switchTo(i, fromHash) {
+    if (i === this.state.active) return;
+    if (!fromHash) { try { history.replaceState(null, '', '#' + ['dejong', 'engers', 'swaab'][i]); } catch (e) {} }
+    var self = this;
+    this.setState({ active: i }, function() {
+      window.scrollTo(0, 0);
+      self.kick();
+    });
+  }
+
+  jumpToSister(tag) {
+    var idx = this._tagIndex ? this._tagIndex[tag] : -1;
+    if (idx == null || idx < 0) return;
+    var el = document.querySelector('[data-ev-idx="' + idx + '"]');
+    if (!el) return;
+    var top = el.getBoundingClientRect().top + window.scrollY - (window.innerHeight * 0.34);
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    var ci = el.querySelector('.ci');
+    if (ci) {
+      ci.style.transition = 'box-shadow 600ms ease-out';
+      ci.style.boxShadow = '0 0 0 2px rgba(72,198,168,0.75)';
+      setTimeout(function() { ci.style.boxShadow = 'none'; }, 1100);
+    }
+  }
+
+  buildBackground() {
+    const bg = document.getElementById('pa-bg');
+    if (!bg) return;
+    bg.innerHTML = '';
+    var IMGS = [
+      { src:'uploads/IMG_3610.jpg', l:'-4%',  t:'-8%',  w:1160, rot:-3,  sy:260, sx:24, op:0.36 },
+      { src:'uploads/IMG_3603.jpg', l:'44%',  t:'-12%', w:1060, rot: 4,  sy:365, sx:38, op:0.32 },
+      { src:'uploads/IMG_3614.jpg', l:'65%',  t:'1%',   w: 760, rot:-7,  sy:195, sx:28, op:0.26 },
+      { src:'uploads/IMG_3604.jpg', l:'7%',   t:'28%',  w: 980, rot:-5,  sy:415, sx:18, op:0.30 },
+      { src:'uploads/IMG_3607.jpg', l:'52%',  t:'24%',  w: 880, rot: 6,  sy:312, sx:32, op:0.34 },
+      { src:'uploads/IMG_3609.jpg', l:'1%',   t:'60%',  w: 680, rot:-4,  sy:234, sx:14, op:0.28 },
+      { src:'uploads/IMG_3612.jpg', l:'47%',  t:'53%',  w: 940, rot:-2,  sy:455, sx:26, op:0.32 },
+      { src:'uploads/IMG_3613.jpg', l:'15%',  t:'66%',  w:1020, rot: 3,  sy:340, sx:20, op:0.36 },
+    ];
+    var arr = [];
+    IMGS.forEach(function(f) {
+      var el = document.createElement('div');
+      el.style.cssText = 'position:absolute;left:'+f.l+';top:'+f.t+';width:'+f.w+'px;transform-origin:center;will-change:transform;';
+      el.style.transform = 'rotate('+f.rot+'deg)';
+      var img = document.createElement('img');
+      img.src = f.src;
+      img.style.cssText = 'width:100%;display:block;opacity:'+f.op+';filter:saturate(0.55) brightness(0.78);';
+      el.appendChild(img);
+      bg.appendChild(el);
+      arr.push({ el:el, rot:f.rot, sy:f.sy, sx:f.sx });
+    });
+    this.bgFrames = arr;
+  }
+
+  ease(p) { return p * p * (3 - 2 * p); }
+
+  update = () => {
+    if (!this.root) { this._raf = null; return; }
+    const vh = window.innerHeight;
+    const fs = vh * 0.9, fe = vh * 0.38, span = fs - fe;
+    Array.from(this.root.querySelectorAll('.cd')).forEach(el => {
+      const isLeft = el.classList.contains('cdl');
+      const top = el.getBoundingClientRect().top;
+      let p = (fs - top) / span;
+      p = p < 0 ? 0 : p > 1 ? 1 : p;
+      const e = this.ease(p);
+      el.style.opacity = e;
+      el.style.transform = 'translate3d(' + ((isLeft ? 1 : -1) * (1 - e) * 14) + 'px,0,0) scale(' + (0.86 + 0.14 * e) + ')';
+    });
+    const gauge = document.getElementById('yr-gauge');
+    const inner = document.getElementById('pa-inner');
+    const totalH = inner ? inner.offsetHeight : 8000;
+    if (gauge) {
+      const scroll = window.scrollY;
+      const y0 = this._yrMin || 1919, y1 = this._yrMax || 1944;
+      const yr = Math.round(y0 + (Math.max(0, scroll - 200) / Math.max(1, totalH - 200)) * (y1 - y0));
+      gauge.textContent = String(Math.max(y0, Math.min(y1, yr)));
+    }
+    if (this.bgFrames) {
+      const scroll = window.scrollY;
+      const scrollFrac = scroll / Math.max(1, totalH);
+      const mx = this._mx || 0;
+      const my = this._my || 0;
+      this.bgFrames.forEach(function(f) {
+        var tx = -mx * f.sx;
+        var ty = -my * f.sx - scrollFrac * f.sy;
+        f.el.style.transform = 'translate3d('+tx+'px,'+ty+'px,0) rotate('+f.rot+'deg)';
+      });
+    }
+    this._raf = null;
+  }
+
+  schedule = () => { if (!this._raf) this._raf = requestAnimationFrame(this.update); }
+  onScroll = () => this.schedule();
+  onResize = () => this.schedule();
+  onMove = (e) => {
+    this._mx = e.clientX / window.innerWidth - 0.5;
+    this._my = e.clientY / window.innerHeight - 0.5;
+    this.schedule();
+  }
+
+  getTimelines() {
+    if (this._TL) return this._TL;
+    // ev: d = 'YYYY-MM-DD' or s = excel serial; l = display label override; e = eyebrow; t = text; img {src,cap,full}
+    var DEJONG = {
+      slug: 'dejong', num: 'I', name: 'Tilly de Jong', title: 'Alida (Tilly) Mathilda de Jong', years: '1919\u20141944',
+      events: [
+        { d:'1919-03-27', l:'27 Mar. 1919', e:'Tilly is born', t:'Alida Mathilda (Tilly) de Jong was born in Amsterdam at Transvaalstraat 9. She grew up in a financially comfortable socialist-Jewish family of diamond workers. Her parents had been forced to marry, which led to a very unhappy marriage and a difficult home environment for both themselves and their children.' },
+        { s:9502, e:'Huize Dina opens', t:'Huize Dina opens its doors at its first location in Santpoort \u2014 a home where Jewish girls from disadvantaged backgrounds could receive a safe and virtuous upbringing. It was named after Dina Sanson, founder of the \u201cAssociation for the Protection of Jewish Girls,\u201d and provided a home for Jewish working girls who, usually due to poverty, could no longer be cared for by their parents.' },
+        { s:10974, e:'New Huize Dina built', t:'A larger Huize Dina opens at Duinlustparkweg in Santpoort, replacing the older location at the Vinkenbaan. A large group had gathered for the official ceremony. In the main hall, the association\u2019s president Margo Roos-Jacobson (mother of the later well-known journalist Jeanne Roos) gave the welcoming speech.', img:{ src:'assets/huize_dina.png', cap:'Huize Dina, Duinlustparkweg, Santpoort, ca. 1930.' } },
+        { s:12730, e:'Report filed', t:'Neighbors and Tilly\u2019s parents file a report with the juvenile police. An official statement is drawn up.' },
+        { s:12754, e:'State supervision', t:'Tilly is placed under juvenile-court supervision. Amalia Rodrigues-Pereira-Stoppelman becomes her guardian and supervisor.' },
+        { d:'1936-03-23', l:'23 Mar. 1936', e:'Placed in a shelter', t:'Tilly is admitted to the Tehuis voor Werkende Meisjes (Home for Working Girls) at Olympiakade, Amsterdam \u2014 a modern shelter opened in 1926. Unlike closed institutions, it offered \u201csemi-freedom\u201d: girls could work or study, had their own rooms, wore normal clothes, and lived under supervision in a family-like setting.' },
+        { d:'1936-03-30', l:'30 Mar. 1936', e:'Tilly runs away', t:'Tilly runs away from the Tehuis (the working girls\u2019 home) and goes to her guardian Rodrigues Pereira. The directress describes her as difficult in the group but also \u201csweet and warm-hearted.\u201d' },
+        { s:13334, e:'Sent to Beth San', t:'Tilly is admitted to Beth San, a Protestant reformatory on Nieuwe Herengracht in Amsterdam \u2014 an observation home for girls with difficult backgrounds who had become caught up in an immoral and troubled life. Beth San sought to guide its girls toward a calm, modest, and respectable life in society.', img:{ src:'https://drive.google.com/thumbnail?id=16kaFfmDagvt6qoM8qOfHptiJIDICOLSS&sz=w1600', cap:'Beth San, home for girls, Nieuwe Herengracht, Amsterdam.' } },
+        { s:13361, e:'Sent to reformatory', t:'Tilly is transferred from Amsterdam to the State Reformatory Eikenstein in Zeist \u2014 since 1909 a disciplinary school where young delinquent girls served their sentences or received re-education. Here Tilly met her friend Lenie Beaujean from Limburg, with whom she stayed in contact even after her time in Zeist.', img:{ src:'https://drive.google.com/thumbnail?id=1mfglz-nAchmc3ijF0foEXCEoWA8m8J4r&sz=w1600', cap:'The state reformatory Eikenstein, Zeist.' } },
+        { s:13667, e:'Returns to Huize Dina', t:'Tilly enters Huize Dina in Santpoort. After her time in Zeist she was allowed to go to Huize Dina, near the dunes, where she had more freedom. However, she also experienced periods of depression there. Here too, she attempted suicide.', img:{ src:'assets/tilly_1939.png', cap:'Alida \u201cTilly\u201d de Jong, ca. 1939.', full:true } },
+        { s:14259, e:'Released, stays with sister', t:'Tilly is released from Huize Dina and stays with family at Tilanusstraat, the address of her sister Jet. Her family guardian and Hetta Prins, the directress of Huize Dina, did not yet consider it wise for Tilly to return directly to her parents, given the many arguments in the past.' },
+        { s:14570, e:'Serious accident', t:'Tilly is hit by a military car on the streets of Amsterdam. She spent several weeks in hospital with a skull fracture. The injury was serious enough to require prolonged medical care and kept her away from her usual surroundings for an extended period.' },
+        { d:'1940-03-01', l:'c. Mar. 1940', e:'Tilly is pregnant', t:'Tilly becomes pregnant. Alwin Jacob Garcia, a jazz musician from Paramaribo, Surinam, is identified as the father.', img:{ src:'assets/garcia_portrait.png', cap:'Alwin Jacob Garcia. Foto: Heron, Rotterdam.' } },
+        { d:'1940-03-27', l:'27 Mar. 1940', e:'Comes of age', t:'Tilly reached the age of majority at 21 \u2014 legally an adult, expected to stand on her own feet. As Huize Dina was intended for girls between 14 and 21, she no longer fell within the age group eligible to stay there.' },
+        { d:'1940-05-10', l:'10 May 1940', e:'Nazi occupation begins', t:'Germany occupies the Netherlands; World War II begins in Holland. Anti-Jewish measures soon followed: growing exclusion from public life, loss of rights, registration, dismissal from jobs, and increasing isolation. Step by step, Jewish citizens were separated from society, making persecution, deportation, and murder possible.' },
+        { d:'1940-10-22', l:'22 Oct. 1940', e:'Mirjam (Mieke) is born', t:'Tilly\u2019s daughter Mirjam \u201cMieke\u201d de Jong is born in the Wilhelmina Gasthuis, a large public hospital in Amsterdam. The support dossier names Alwin Jacob Garcia as the father. Not long after the pregnancy, Garcia broke off all contact with Tilly.', img:{ src:'https://drive.google.com/thumbnail?id=1My2VK9b8qJCV-76RGAj7llCi9yjvVoSx&sz=w1600', cap:'Archival fragment first naming Mieke\u2019s father. Amsterdam City Archives.' } },
+        { s:15164, e:'Sent to psychiatric ward', t:'Tilly is taken from Amsterdam to the Apeldoornsche Bosch, a Jewish psychiatric institution in Apeldoorn. During the occupation it became a place of great danger: in January 1943 the Nazis emptied the institution and deported its patients and staff to Auschwitz. Tilly was already dismissed at the end of 1942.' },
+        { s:15802, e:'Mirjam taken into hiding', t:'Tilly\u2019s daughter Mirjam \u201cMieke,\u201d who had been living in a children\u2019s home since 1941, is taken into hiding in Betondorp, Amsterdam. With the help of a kind nurse she was secretly smuggled out and taken to the nurse\u2019s house. In this way Tilly\u2019s daughter survived the war, growing up there until her marriage in 1970.' },
+        { s:15825, e:'Arrested by collaborator', t:'Tilly is arrested by police officer Pieter Schaap and taken to a police station in Amsterdam. Schaap was a Dutch employee of the SD \u2014 a fanatical persecutor of Jews who shot countless people dead. After the war he was sentenced to death and executed.', img:{ src:'https://drive.google.com/thumbnail?id=1ph0L8OOqc7lYVfNYFjhf51mj8cXXJRyP&sz=w1600', cap:'Pieter Schaap, the Dutch police officer who arrested Tilly.' } },
+        { d:'1944-01-25', l:'25 Jan. 1944', e:'Deported to Auschwitz', t:'Alida is deported in a cattle train from Westerbork to Auschwitz. Of the 949 people who were forced into the train wagons together with Tilly that day, only thirty would return after the war. Three days later, upon arrival, Tilly is murdered in the gas chamber.', img:{ src:'https://drive.google.com/thumbnail?id=1x5Hqt2j-XJbny-jFEmcuuC-a1jKlSmIN&sz=w1600', cap:'The train station of Auschwitz-Birkenau.' } }
+      ]
+    };
+    var SWAAB = {
+      slug: 'swaab', num: 'III', name: 'Henriette Swaab', title: 'Henriette (Jetje) Swaab', years: '1931—2010',
+      events: [
+        { d:'1931-01-28', l:'28 Jan. 1931', e:'Supervision requested', t:'Supervision for Mina Swaab (Jetje’s older sister) is requested, out of fear that the elder sisters might influence her. It is the first moment in the file where Henriette becomes a subject of formal child-protection concern. Around 1928 Mina had become mother of a daughter, Betje (“Bella”); her unknown father was Chinese.', img:{ src:'https://drive.google.com/thumbnail?id=19hCf4oez2pOUWiyS6EfrbrSMErACwscT&sz=w1600', cap:'Mina Swaab in the state reformatory in Zeist, ca. 1927.' } },
+        { d:'1931-02-09', l:'9 Feb. 1931', e:'“Remove Jetje from home”', t:'In a confidential conversation with guardian Clasina Kruimel-van Dijk, Mina urgently asked that Henriette (Jetje) be removed from the parental home. “The mother demanded money both before and after Mina’s stay” in the reformatory, the guardian noted; supervision alone, Mina argued, could not be enough to safeguard her. Service in Zandvoort was suggested as the safer alternative.', img:{ src:'https://drive.google.com/thumbnail?id=1i75hCRg_0YKt1BiVHjZsf_22s1CH250T&sz=w1600', cap:'Clasina Kruimel-van Dijk, family guardian of Mina and Henriette Swaab.' } },
+        { d:'1931-06-04', l:'4 Jun. 1931', e:'Guardian visits the family', t:'Guardian Clasina Kruimel-van Dijk visits the Swaab home in Amsterdam and informs the parents about the children’s situation — institutional oversight entering the family’s own rooms.', img:{ src:'https://drive.google.com/thumbnail?id=1_Qxyl7diFMsU_OXG62ZY2Ggw8teAuWuq&sz=w1600', cap:'Clasina Kruimel-van Dijk.' } },
+        { d:'1931-08-10', l:'10 Aug. 1931', e:'Jetje must leave home', t:'The family guardian found Jetje’s parental home far too dirty — no regularity or structure, and street prostitution besides, with the money going to Jetje’s mother. She reported that Jetje had to leave both her family home and her job in Amsterdam.' },
+        { d:'1931-08-24', l:'24 Aug. 1931', e:'Admitted to Huize Dina', t:'Henriette Swaab is admitted to Huize Dina. “I have the honour to inform you that Henriette Swaab was brought here yesterday afternoon by her family guardian, Mrs. Kruimel,” Hetta Prins, the directress of Huize Dina, wrote to the juvenile judge — the authorities’ attention now extended from Mina alone to a second Swaab daughter.', img:{ src:'https://drive.google.com/thumbnail?id=1aLear_6J_qrxn9AoFYD-y-HFrR838O7y&sz=w1600', cap:'Girls of Huize Dina doing laundry, ca. 1932.' } },
+        { d:'1931-08-27', l:'27 Aug. 1931', e:'Parents object', t:'Henriette’s parents were summoned and argued that she had previously been removed from home without reason. They explained her obstinacy in service and said they had reprimanded her sister Sofie. The juvenile judge promised a short stay followed by service near Amsterdam.' },
+        { s:11643, e:'Competing truths', t:'Henriette’s mother reported that Jetje was content and well dressed in Amsterdam. Hetta Prins, the directress of Huize Dina, disagreed, and reported to the juvenile judge: “She is a girl whom one does not easily come to know; I am not yet able to form a clear judgment of her character. It seems to me that she is somewhat sly. The girl herself finds it very pleasant here.”' },
+        { s:11658, e:'Conditional home visits', t:'Hetta Prins, the directress, decided that Jetje could visit her parents’ home in Amsterdam once every two months — but warned the judge and the guardian that visits would stop if matters did not proceed satisfactorily. Home contact was conditional, and monitored.' },
+        { s:11668, e:'Mina reprimanded', t:'Mina (Jetje’s older sister) was reprimanded for corresponding with their sister Sofie, spending a day in Haarlem without permission, and buying unnecessary clothing. Sofie (involved in prostitution) was treated as a risky influence on the younger Swaab sisters.', img:{ src:'https://drive.google.com/thumbnail?id=1FkEfOQA6Fkr3AM1AO4qTxOGl4ja4OI1D&sz=w1600', cap:'Mina Swaab, ca. 1927.' } },
+        { d:'1932-10-06', l:'6–7 Oct. 1932', e:'A letter about the mother', t:'Guardian Kruimel reported that a letter left by Mina suggested the girls’ mother had formerly compelled her daughters to engage in street solicitation. Around the same time, directress Hetta Prins reported that Henriette had begun to improve — but should remain in Santpoort.' },
+        { d:'1932-10-13', l:'13 Oct. 1932', e:'Stay extended', t:'Henriette’s detention in Huize Dina is extended for six months. Her parents would have preferred the extension and accepted the decision — a sign of how far institutional care had become the accepted solution.', img:{ src:'https://drive.google.com/thumbnail?id=1YwowrjUrvgQWmhJb-U6wIgFJY86-ERrq&sz=w1600', cap:'Henriette (Jetje) Swaab, Haarlem, after the war.', pos:'left center', zoom:1.6 } },
+        { d:'1933-05-08', l:'8 May 1933', e:'“More difficult than Mina”', t:'The family guardian reported that Jetje was much more difficult than her sister Mina and must therefore remain in Huize Dina. The same note recorded that Mina and her future husband were grateful for the care received, and would soon marry.' },
+        { d:'1933-05-20', l:'20 May 1933', e:'Extended again', t:'Henriette’s father approved the extension of her stay; her mother insisted that if Jetje married, she should become engaged only to a Jewish young man. On the same date, her stay was extended for six months.' },
+        { s:12361, e:'Home becomes forbidden', t:'After a visit to the Swaab family in Amsterdam, directress Hetta Prins decided she could no longer permit Jetje to visit her parental home — not even once every two months. It was too dangerous.' },
+        { d:'1934-06-06', l:'6 Jun. 1934', e:'Parents lose authority', t:'The parents were deprived of authority, and guardianship was officially assigned to the Association for the Protection of Jewish Girls — authority shifted from the family to welfare organizations, for Henriette and the wider sibling group.' },
+        { d:'1940-03-20', l:'1940 / 1943', e:'Marriage and loss', t:'Henriette married Emile Frank in Haarlem in March 1940. He was murdered in Sobibor on 26 March 1943. From Westerbork he wrote her a letter, kept today in the Jewish Museum’s collection — the interwar welfare story cut across by wartime persecution.' },
+        { d:'1943-12-05', l:'1943 — 2010', e:'Michele, and a life after', t:'Henriette’s daughter Michele Frank was born in Haarlem in December 1943 and survived the war. Henriette remarried James Haverschmidt in 1947; Michele later took his name. Henriette died in Haarlem in 2010.', img:{ src:'https://drive.google.com/thumbnail?id=1wqApud3o4B7b7Lh-I2VNW9tgrNrF-VQ6&sz=w1600', cap:'Henriette (Jetje) Swaab with her second husband, J. Haverschmidt, in Haarlem after the war.' } },
+        { d:'1945-05-05', l:'5 May 1945', e:'Liberation', t:'After five years, the war is over. Mina’s daughter Betje grows up permanently with the Kruimel family in Zandvoort; she never saw her biological mother (who survived the war in hiding) again. Henriette and her daughter Michele survive and begin a new life in Haarlem.', img:{ src:'https://drive.google.com/thumbnail?id=1RdA1DuETgRW8wJiLS0ECkVdvcydwzhLd&sz=w1600', cap:'Guardian Clasina Kruimel-van Dijk with Mina Swaab’s granddaughter Caroline.' } }
+      ]
+    };
+    var ENGERS = {
+      slug: 'engers', num: 'II', name: 'Mina & Sara Engers', title: 'Mina & Sara Engers', years: '1926—1945',
+      events: [
+        { d:'1926-08-22', l:'22 Aug. 1926', tag:'mina', e:'Mina is born', t:'Mina Engers is born in Amsterdam, eldest child of Salomon Engers and Klara Markus — married five months earlier, a union forced when Salomon cut his wrist to compel Klara’s consent. Mina is named after her paternal grandmother.', img:{ src:'https://drive.google.com/thumbnail?id=1xPjwSY5fXOE8IWnEqt02rROjKv8Ka0As&sz=w1600', cap:'The Engers children, ca. 1940 — Mina in the middle, holding the youngest.' } },
+        { d:'1927-06-01', l:'1926 — 1930', tag:'mina', e:'Years with the grandparents', t:'Mina spends her first four years with her grandparents at Waterlooplein 16 while her father sits in prison. In 1930 her mother Klara forcibly takes her back.', img:{ src:'https://drive.google.com/thumbnail?id=132x3zKMdC0NyTmns6-GDovDTLpNwX8TG&sz=w1600', cap:'Levy Engers, Mina\'s and Sara’s grandfather.' } },
+        { d:'1928-07-27', l:'27 Jul. 1928', tag:'sara', e:'Sara is born', t:'Sara (Lientje) is born in Amsterdam. As a baby she is boarded out for seven months in Naaldwijk; rickets and clinic treatment mark her earliest record.', img:{ src:'https://drive.google.com/thumbnail?id=1xPjwSY5fXOE8IWnEqt02rROjKv8Ka0As&sz=w1600', cap:'Sara, standing behind Mina on the right, ca. 1940.' } },
+        { d:'1930-09-16', l:'16 Sep. 1930', tag:'both', e:'The first police report', t:'Family and neighbours file the first child-police report; interim guardianship follows. One grandmother calls the household ‘bar smerig’ (‘utterly filthy’); the housing supervisor calls it ‘very neat’. The case opens on contradiction.' },
+        { d:'1933-01-01', l:'1918 — 1939', tag:'both', e:'A father’s record', t:'Their father Salomon’s record: thefts, embezzlement, stolen electricity, prison after prison. Deaf, called a ‘genius’ and a ‘madman’ by his own brother, Salomon buys sweets and cigarettes while the children go hungry.' },
+        { d:'1939-09-16', l:'16 Sep. 1939', tag:'both', e:'Their mother dies', t:'The girls’ mother Klara dies of an ectopic pregnancy, aged 31, and is buried at the Jewish cemetery in Diemen. Salomon drifts from address to address; six children are left without care.', img:{ src:'https://drive.google.com/thumbnail?id=1Af2bHIz0kr7IPdr7jNMthCmpGGNTcu5S&sz=w1600', cap:'Tombstone of Klara Engers-Markus, Jewish cemetery, Diemen.' } },
+        { d:'1940-01-15', l:'Jan. 1940', tag:'both', e:'‘Not safe’ with their father', t:'Neighbours declare the girls ‘not safe’ with their father, and report that he beat their brother Levy so badly the boy could not walk. Within the year, all six children are removed.' },
+        { d:'1940-12-08', l:'8 Dec. 1940', tag:'both', e:'Six siblings, four institutions', t:'Mina, Sara and Levy are placed in the Jewish orphanage in Utrecht; Marietje, Alexander and Jeannette elsewhere in Amsterdam. Six siblings, four institutions.', img:{ src:'https://drive.google.com/thumbnail?id=1A7SRJj1DYFuC01BrFj3hXJPseB2JjVqM&sz=w1600', cap:'The Jewish orphanage in Utrecht.' } },
+        { d:'1941-01-20', l:'Winter 1940–41', tag:'both', e:'Injuries, and unkind words', t:'Mina falls through a window pane; Sara breaks her leg. The orphanage director calls Mina ‘impertinent and untruthful’; the girls’ guardian calls twelve-year-old Sara ‘sexually cunning’.' },
+        { d:'1941-03-01', l:'1 Mar. 1941', tag:'mina', e:'Mina enters Huize Dina', t:'At fourteen, Mina is transferred to Huize Dina — her behaviour, the file says, ‘left much to be desired’. The same house in the dunes (and the same directress, Hetta Prins) as Tilly and Jetje before her.' },
+        { d:'1941-03-11', l:'11 Mar. 1941', tag:'sara', e:'Sara sent for observation', t:'Sara is sent for observation to Achisomog (‘Helper of Orphans’), an Apeldoorn institution for Jewish children considered ‘difficult to educate’.', img:{ src:'https://drive.google.com/thumbnail?id=1R7IWyR7W-LMEJ6gyR007ZNHjz886S8Aw&sz=w1600', cap:'The Jewish asylum Apeldoornsche Bosch, Apeldoorn.' } },
+        { d:'1941-05-15', l:'May 1941', tag:'both', e:'Two verdicts in one month', t:'Achisomog records Sara’s compulsive washing rituals; Hetta Prins, the directress of Huize Dina, calls Mina a spoiled ‘krengetje’ (a little brat). ' },
+        { d:'1941-09-01', l:'1 Sep. 1941', tag:'both', e:'Sara joins Mina', t:'Sara joins Mina at Huize Dina, arriving ‘like a frightened little bird’. Within months she is ‘razend brutaal’ (wildly cheeky) — testing whether the safety will hold.' },
+        { d:'1942-03-15', l:'Mar. 1942', tag:'both', e:'Huize Dina is seized', t:'The German occupier seizes Huize Dina. The girls, directress Hetta Prins and her staff are forced to leave Santpoort for Amsterdam.' },
+        { d:'1942-04-10', l:'Apr. 1942', tag:'both', e:'Separated again', t:'Mina goes to the working girls’ home on the Gijsbrecht van Aemstelstraat, Sara to the Portuguese Israelite orphanage on the Prinsengracht. In June: progress at Sara’s sewing class — and a violent quarrel with her father Salomon.' },
+        { d:'1942-05-16', l:'16 May 1942', tag:'both', e:'Reunited at Amstel 254', t:'The Huize Dina girls, the Engers sisters among them, are reunited in a new building at Amstel 254 — a temporary collective home, and a question of whether an institution can truly offer belonging.' },
+        { d:'1942-10-12', l:'12 Oct. 1942', tag:'both', e:'‘Both girls are doing well’', t:'Mina works in domestic service and starts a sewing course at the Van Detschool in Amsterdam. The file’s last hopeful entry.' },
+        { d:'1943-01-01', l:'1 Jan. 1943', tag:'both', e:'Transported to Westerbork', t:'Mina and Sara are transported to Westerbork, together with directress Hetta Prins and the other Huize Dina girls. Mina is sixteen; Sara, fourteen.', img:{ src:'https://drive.google.com/thumbnail?id=1xSbiNkn2PhJi2GhgCKwdUmTHdDyvPNjh&sz=w1600', cap:'Jewish Council index card of Mina Engers.' } },
+        { d:'1944-08-26', l:'26 Aug. 1944', tag:'both', e:'The judge asks after the girls', t:'The juvenile judge asks Hetta Prins, the directress — herself now in Westerbork — how the girls are doing. He does not yet know they were deported almost a year earlier.', img:{ src:'https://drive.google.com/thumbnail?id=1EPBD60kqOtz48-y7LAUEVIyG2A7BwUP1&sz=w1600', cap:'From the juvenile file of the Engers sisters.' } },
+        { d:'1945-05-05', l:'5 May 1945', tag:'both', e:'Liberation, and one survivor', t:'Liberation. Of the whole family only Jeannette (1938–2025), the youngest sister, survives, hidden in an Amsterdam children’s home. Stolpersteine (brass ‘stumbling stones’ commemorating victims of the Nazis) for Mina and Sara now lie at Duinlustparkweg 96, Huize Dina’s old address — Mina’s laid in 2018, Sara’s beside it in April 2026.', img:{ src:'https://drive.google.com/thumbnail?id=1Sbw601wOjlqr_yNZXUrnjuVviDd6BQ0D&sz=w1600', cap:'Jeannette Engers, the youngest and only surviving Engers child.' } }
+      ]
+    };
+    this._TL = [DEJONG, ENGERS, SWAAB];
+    return this._TL;
+  }
+
+  renderVals() {
+    var self = this;
+    var TL = this.getTimelines();
+    var active = this.state.active;
+    var T = TL[active];
+    var EPOCH = Date.UTC(1899, 11, 30);
+    var MON = ['Jan.','Feb.','Mar.','Apr.','May','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
+    function toSerial(ev) {
+      if (ev.s) return ev.s;
+      var p = ev.d.split('-');
+      return (Date.UTC(+p[0], +p[1] - 1, +p[2]) - EPOCH) / 864e5;
+    }
+    function toLabel(ev, serial) {
+      if (ev.l) return ev.l;
+      var dt = new Date(EPOCH + serial * 864e5);
+      return dt.getUTCDate() + ' ' + MON[dt.getUTCMonth()] + ' ' + dt.getUTCFullYear();
+    }
+    var serials = T.events.map(toSerial);
+    var MIN = Math.min.apply(null, serials);
+    var MAX = Math.max.apply(null, serials);
+    var span = Math.max(1, MAX - MIN);
+    var SCALE = Math.max(0.42, 4200 / span);
+    var PAD = 300, SEQ_GAP = 110, SIDE_GAP = 56;
+
+    function estH(ev) {
+      var h = 116;
+      h += Math.ceil(ev.t.length / 30) * 34;
+      if (ev.img) h += ev.img.full ? 640 : 430;
+      return h;
+    }
+
+    var lBot = PAD - 120, rBot = PAD - 120, prevPos = PAD - SEQ_GAP;
+    var positions = T.events.map(function(ev, i) {
+      var isLeft = (i % 2 === 1);
+      var base = PAD + (serials[i] - MIN) * SCALE;
+      var sideBot = isLeft ? lBot : rBot;
+      var pos = Math.max(base, sideBot + SIDE_GAP, prevPos + SEQ_GAP);
+      prevPos = pos;
+      var h = estH(ev);
+      if (isLeft) lBot = pos + h; else rBot = pos + h;
+      return Math.round(pos);
+    });
+    var totalH = Math.max(lBot, rBot) + 320;
+
+    var events = T.events.map(function(ev, i) {
+      return {
+        idx: i,
+        hasTag: !!ev.tag,
+        tagLabel: ev.tag === 'mina' ? 'Mina' : ev.tag === 'sara' ? 'Sara' : 'Mina & Sara',
+        date: toLabel(ev, serials[i]),
+        eyebrow: ev.e,
+        text: ev.t,
+        isLeft: i % 2 === 1,
+        isRight: i % 2 === 0,
+        hasImg: !!ev.img,
+        imgSrc: ev.img ? ev.img.src : '',
+        imgCaption: ev.img ? ev.img.cap : '',
+        imgEl: ev.img ? React.createElement('img', {
+          src: ev.img.src,
+          onClick: function() { self.setState({ lightbox: { src: ev.img.src.replace('sz=w1600', 'sz=w2400'), cap: ev.img.cap } }); },
+          style: ev.img.full
+            ? { maxWidth: '100%', display: 'block', cursor: 'zoom-in' }
+            : ev.img.zoom
+              ? { width: '100%', display: 'block', height: '320px', objectFit: 'cover', objectPosition: ev.img.pos || 'center', transform: 'scale(' + ev.img.zoom + ')', transformOrigin: ev.img.pos || 'center', cursor: 'zoom-in' }
+              : { maxWidth: '100%', maxHeight: '420px', width: 'auto', height: 'auto', display: 'block', margin: '0 auto', cursor: 'zoom-in' }
+        }) : null,
+        ndStyle: { position: 'absolute', left: 0, right: 0, top: positions[i] }
+      };
+    });
+
+    var yrMin = new Date(EPOCH + MIN * 864e5).getUTCFullYear();
+    var yrMax = new Date(EPOCH + MAX * 864e5).getUTCFullYear();
+    this._yrMin = yrMin; this._yrMax = yrMax;
+    var step = Math.max(1, Math.round((yrMax - yrMin) / 5));
+    var rulers = [];
+    for (var y = yrMin; y <= yrMax; y += step) {
+      var s = (Date.UTC(y, 0, 1) - EPOCH) / 864e5;
+      if (s < MIN) continue;
+      rulers.push({ year: String(y), style: { position: 'absolute', left: 0, right: 0, top: Math.round(PAD + (s - MIN) * SCALE) } });
+    }
+
+    var tabs = TL.map(function(tl, i) {
+      var on = i === active;
+      return {
+        num: 'Episode ' + tl.num, name: tl.name, years: tl.years,
+        select: function() { self.switchTo(i); },
+        style: {
+          fontFamily: 'inherit', cursor: 'pointer', textAlign: 'center',
+          padding: '1.2rem 1.5rem', borderRadius: '2px', flex: '1 1 0', minWidth: 0,
+          background: on ? 'rgba(72,198,168,0.07)' : 'rgba(20,17,25,0.55)',
+          border: '1px solid ' + (on ? 'rgba(72,198,168,0.55)' : 'rgba(255,255,255,0.13)'),
+          color: on ? '#48C6A8' : 'rgba(224,219,212,0.55)',
+          letterSpacing: '.05em', transition: 'border-color 120ms ease-out, color 120ms ease-out'
+        }
+      };
+    });
+
+    this._tagIndex = { mina: -1, sara: -1 };
+    for (var ti = 0; ti < T.events.length; ti++) {
+      var tg = T.events[ti].tag;
+      if (tg === 'mina' && this._tagIndex.mina < 0) this._tagIndex.mina = ti;
+      if (tg === 'sara' && this._tagIndex.sara < 0) this._tagIndex.sara = ti;
+    }
+    return {
+      events: events,
+      rulers: rulers,
+      tabs: tabs,
+      heroNum: T.num,
+      heroTitle: T.title,
+      heroShowSisters: T.slug === 'engers',
+      sisters: T.slug === 'engers' ? [
+        { label: 'Mina', jump: function() { self.jumpToSister('mina'); } },
+        { label: 'Sara', jump: function() { self.jumpToSister('sara'); } }
+      ] : [],
+      heroYears: T.years,
+      yrMin: String(yrMin),
+      lightbox: !!this.state.lightbox,
+      lightboxImgEl: this.state.lightbox ? React.createElement('img', { src: this.state.lightbox.src, style: { maxWidth: '92vw', maxHeight: '80vh', border: '1px solid rgba(224,219,212,0.22)', boxShadow: '0 24px 80px rgba(0,0,0,0.6)' } }) : null,
+      lightboxCap: this.state.lightbox ? this.state.lightbox.cap : '',
+      closeLightbox: () => this.setState({ lightbox: null }),
+      innerContainerStyle: { position: 'relative', zIndex: 5, maxWidth: '1120px', margin: '0 auto', height: totalH + 'px', padding: '0 1.5rem' }
+    };
+  }
+}
+</script>
+</body>
+</html>

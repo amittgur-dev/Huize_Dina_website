@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#2c2830;}
+a{color:#48C6A8;text-decoration:none;}
+a:hover{color:#e0dbd4;}
+@media(max-width:680px){
+  .hd-row{padding:0.7rem 1rem!important;}
+  .hd-nav{gap:0.9rem!important;}
+  .hd-hero{padding-top:8rem!important;padding-bottom:2rem!important;}
+  .hd-hero-title{font-size:1.6rem!important;}
+  .hd-inner{padding:0 1rem 4rem!important;}
+}
+</style>
+</helmet>
+
+<div id="hd-root" style="position:relative;min-height:100vh;background:#2c2830;color:#e0dbd4;font-family:'Courier Prime','Courier New',Courier,monospace;overflow-x:hidden;">
+
+  <div style="position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 40%, transparent 52%, rgba(0,0,0,0.13) 100%);"></div>
+
+  <div style="position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0.04;mix-blend-mode:overlay;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22220%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%222%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');"></div>
+
+  <div class="hd-header" style="position:fixed;top:0;left:0;right:0;z-index:20;background:rgba(44,40,48,0.97);border-bottom:1px solid rgba(255,255,255,0.07);">
+    <div class="hd-row" style="display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;padding:0.9rem 1.8rem 0.85rem;">
+    <div>
+      <a href="Home.dc.html" style="font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:rgba(224,219,212,0.92);text-decoration:none;display:inline-block;" style-hover="color:#48C6A8;">Huize Dina</a>
+      <nav class="hd-nav" style="display:flex;gap:1.35rem;margin-top:9px;flex-wrap:wrap;">
+        <a href="Home.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:#48C6A8;text-decoration:none;padding-bottom:3px;border-bottom:1px solid rgba(72,198,168,0.55);">Home</a>
+        <a href="Podcast.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Podcast</a>
+        <a href="Polyphonic Archive.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Timelines</a>
+        <a href="Making Of Map.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">The making of</a>
+        <a href="Team.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Team</a>
+        <a href="Contact.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Contact</a>
+      </nav>
+    </div>
+    </div>
+  </div>
+
+  <div class="hd-hero" data-screen-label="Home hero" style="position:relative;z-index:5;text-align:center;padding:9.5rem 1rem 3rem;border-bottom:1px solid rgba(255,255,255,0.05);margin-bottom:3rem;">
+    <div class="hd-hero-title" style="font-size:2.2rem;font-weight:400;letter-spacing:.03em;color:rgba(224,219,212,0.92);text-wrap:pretty;">Huize Dina</div>
+    <div style="font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:rgba(224,219,212,0.32);margin-top:.6rem;">Duinlustparkweg · Santpoort</div>
+  </div>
+
+  <div class="hd-inner" data-screen-label="Home text" style="position:relative;z-index:5;max-width:680px;margin:0 auto;padding:0 1.5rem 5rem;">
+
+    <div style="font-size:15px;line-height:1.85;color:rgba(224,219,212,0.68);text-wrap:pretty;">Huize Dina (also known as Beth Dina) was a residential home for Jewish girls from disadvantaged backgrounds in Santpoort, the Netherlands. Established in 1930 by the Association for the Protection of Jewish Girls (Vereeniging tot Bescherming van Joodsche Meisjes), the home was named after the association's founder, Dina Sanson. It provided accommodation and care for Jewish girls from age 14 to 21 whose families were no longer able to support them, often due to poverty and difficult social circumstances.</div>
+
+    <div style="margin:2.8rem 0;border:1px solid rgba(224,219,212,0.14);padding:6px;background:rgba(20,17,25,0.5);">
+      <img src="assets/album_bus_crop.jpg" alt="Girls of Huize Dina boarding a bus, from a photo album" style="width:100%;display:block;filter:saturate(0.55) brightness(0.9);">
+      <div style="font-size:10px;letter-spacing:.05em;color:rgba(224,219,212,0.32);padding:.45rem .3rem .2rem;">"De oudste meisjes zijn lid van 'Macabi', een zionistische vereeniging, en gaan per bus naar de landdag in Amersfoort." — album inscription.</div>
+    </div>
+
+    <div style="font-size:15px;line-height:1.85;color:rgba(224,219,212,0.68);margin-top:1.6rem;text-wrap:pretty;">During the Second World War, the home was directed by Harriët Martha Prins, who was living there with her son Ralph Prins. The fifteen girls living in Huize Dina around 1940 were all deported and murdered in the extermination camps of Sobibor and Auschwitz. In the immediate post-war period, the building served as a refuge for Jewish children and young people who had survived the war in hiding or returned from concentration camps.</div>
+
+    <div style="margin:2.8rem 0;border:1px solid rgba(224,219,212,0.14);padding:6px;background:rgba(20,17,25,0.5);">
+      <img src="uploads/huizedina_duinlustparkweg.jpg" alt="Huize Dina, Duinlustparkweg, Santpoort" style="width:100%;display:block;filter:saturate(0.55) brightness(0.85);">
+      <div style="font-size:10px;letter-spacing:.05em;color:rgba(224,219,212,0.32);padding:.45rem .3rem .2rem;">Huize Dina, Duinlustparkweg, Santpoort.</div>
+    </div>
+
+    <div style="font-size:15px;line-height:1.85;color:rgba(224,219,212,0.68);text-wrap:pretty;">The podcast <span style="font-style:italic;">Huize Dina</span> aims at telling the stories of some of the girls, whose archival material surfaced only recently, in 2025. The stories are told from the girls' perspective. In an imaginary, dream-like space the girls move through a hallway, opening doors that lead to memories and voices from the past.</div>
+
+    <div style="margin:2.8rem 0;border:1px solid rgba(224,219,212,0.14);padding:6px;background:rgba(20,17,25,0.5);">
+      <img src="assets/album_sea_crop.jpg" alt="Girls of Huize Dina at the sea, from a photo album" style="width:100%;display:block;filter:saturate(0.55) brightness(0.9);">
+      <div style="font-size:10px;letter-spacing:.05em;color:rgba(224,219,212,0.32);padding:.45rem .3rem .2rem;">"De jongsten blijven dan ook niet thuis en maken een wandeling naar de zee." — album inscription.</div>
+    </div>
+
+    <div style="font-size:15px;line-height:1.85;color:rgba(224,219,212,0.68);margin-top:1.6rem;text-wrap:pretty;">All the text derives from the archives — but the stories are given as lived experience: where the record falls silent, the podcast listens for the voices it left out.</div>
+
+    <div style="font-size:12px;line-height:1.7;color:rgba(224,219,212,0.38);margin-top:2.5rem;font-style:italic;">Source: Digitaal Joods Monument, "Oproep voor informatie over bewoners van Huize Dina" (24 January 2018).</div>
+
+    <div style="margin-top:3.2rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.07);display:flex;gap:2.5rem;flex-wrap:wrap;">
+      <a href="Podcast.dc.html" style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#48C6A8;text-decoration:none;" style-hover="color:#e0dbd4;">Listen to the podcast →</a>
+      <a href="Polyphonic Archive.dc.html" style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:rgba(224,219,212,0.55);text-decoration:none;" style-hover="color:#48C6A8;">Explore the timelines →</a>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

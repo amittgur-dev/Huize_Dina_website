@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  html,body{height:100%;margin:0;background:#0C0A11;}
+  #mk-viewport{cursor:grab;}
+  #mk-lines g{transition:opacity .28s ease;}
+  .mk-node{will-change:transform;}
+  .mk-node:hover .mk-node-title{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;}
+  .mk-goto:hover .mk-goto-t{color:#48C6A8;}
+  .mk-eyebrow{font-family:'Courier Prime',monospace;text-transform:uppercase;letter-spacing:.16em;font-weight:400;}
+  @keyframes mkpulse{0%,100%{box-shadow:0 18px 44px rgba(0,0,0,0.42),0 0 0 0 rgba(244,203,122,0);}50%{box-shadow:0 18px 44px rgba(0,0,0,0.42),0 0 0 16px rgba(244,203,122,0.17);}}
+  .mk-pulse{animation:mkpulse 2.4s ease-in-out infinite;}
+  @keyframes mkfadein{from{opacity:0;}to{opacity:1;}}
+</style>
+</helmet>
+
+<div id="mk-root" style="position:fixed;inset:0;background:#120F18;color:#E6E1D9;font-family:'Courier Prime','Courier New',monospace;">
+
+  <div style="position:fixed;top:0;left:0;right:0;z-index:40;background:rgba(44,40,48,0.97);border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:flex-end;justify-content:space-between;padding:0.9rem 1.8rem 0.85rem;gap:16px;">
+    <div style="min-width:0;">
+      <a href="Home.dc.html" style="font-size:16px;letter-spacing:.22em;text-transform:uppercase;color:rgba(224,219,212,0.92);text-decoration:none;display:inline-block;" style-hover="color:#48C6A8;">Huize Dina</a>
+      <nav class="hd-nav" style="display:flex;gap:1.35rem;margin-top:9px;flex-wrap:wrap;">
+        <a href="Home.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Home</a>
+        <a href="Podcast.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Podcast</a>
+        <a href="Polyphonic Archive.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Timelines</a>
+        <a href="Making Of Map.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:#48C6A8;text-decoration:none;padding-bottom:3px;border-bottom:1px solid rgba(72,198,168,0.55);">The making of</a>
+        <a href="Team.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Team</a>
+        <a href="Contact.dc.html" style="font-size:14px;letter-spacing:.15em;text-transform:uppercase;color:rgba(224,219,212,0.62);text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent;" style-hover="color:#48C6A8;">Contact</a>
+      </nav>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex:none;">
+      <button data-act="overview" style="font-family:'Courier Prime',monospace;font-size:12px;letter-spacing:.06em;line-height:1;padding:8px 13px;border:1px solid rgba(230,225,217,0.5);background:transparent;color:#E6E1D9;cursor:pointer;" style-hover="border-color:#48C6A8;color:#48C6A8;">Overview</button>
+      <button data-act="zoom-out" style="font-family:'Courier Prime',monospace;font-size:16px;line-height:1;width:33px;height:33px;border:1px solid rgba(230,225,217,0.5);background:transparent;color:#E6E1D9;cursor:pointer;" style-hover="border-color:#48C6A8;color:#48C6A8;">−</button>
+      <button data-act="zoom-in" style="font-family:'Courier Prime',monospace;font-size:16px;line-height:1;width:33px;height:33px;border:1px solid rgba(230,225,217,0.5);background:transparent;color:#E6E1D9;cursor:pointer;" style-hover="border-color:#48C6A8;color:#48C6A8;">+</button>
+    </div>
+  </div>
+
+  <div id="mk-viewport" style="position:fixed;left:0;right:0;top:72px;bottom:0;overflow:hidden;background:#120F18;touch-action:none;">
+
+    <div id="mk-bg" style="position:absolute;left:0;top:0;width:3500px;height:2500px;transform-origin:0 0;will-change:transform;pointer-events:none;"></div>
+
+    <div id="mk-world" style="position:absolute;left:0;top:0;width:3500px;height:2500px;transform-origin:0 0;will-change:transform;z-index:1;">
+
+      <div id="mk-cloud" style="position:absolute;left:0;top:0;width:3500px;height:2500px;pointer-events:none;z-index:0;background:radial-gradient(ellipse 40% 44% at 28% 42%, rgba(86,80,102,0.3), transparent 70%),radial-gradient(ellipse 42% 46% at 72% 42%, rgba(86,80,102,0.3), transparent 70%),radial-gradient(ellipse 40% 44% at 30% 78%, rgba(80,74,96,0.28), transparent 70%),radial-gradient(ellipse 42% 46% at 72% 78%, rgba(80,74,96,0.28), transparent 70%),radial-gradient(ellipse 52% 54% at 50% 60%, rgba(72,66,88,0.26), transparent 74%);"></div>
+
+      <div id="mk-tints" style="position:absolute;left:0;top:0;width:3500px;height:2500px;pointer-events:none;z-index:1;background:radial-gradient(circle 430px at 1815px 1505px, rgba(18,15,24,0.9), rgba(18,15,24,0) 76%),radial-gradient(circle 1420px at 660px 740px, rgba(122,152,214,0.26), transparent 64%),radial-gradient(circle 1420px at 2960px 740px, rgba(214,170,88,0.26), transparent 64%),radial-gradient(circle 1420px at 660px 2260px, rgba(76,202,172,0.26), transparent 64%),radial-gradient(circle 1420px at 2960px 2260px, rgba(210,130,136,0.24), transparent 64%);"></div>
+
+      <div id="mk-terr" style="position:absolute;left:0;top:0;width:3500px;height:2500px;pointer-events:none;z-index:3;"></div>
+
+    </div>
+
+    <svg id="mk-lines" xmlns="http://www.w3.org/2000/svg" style="position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:5;"></svg>
+
+    <div id="mk-nodes" style="position:absolute;inset:0;pointer-events:none;z-index:10;">
+
+      <div id="mk-intro" style="position:absolute;left:0;top:0;width:860px;box-sizing:border-box;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center;z-index:15;opacity:0;will-change:transform;">
+        <div class="mk-eyebrow" style="font-size:13px;color:#F4CB7A;">Polyphonic Archive · the making-of</div>
+        <div style="font-weight:700;font-size:44px;line-height:1.15;letter-spacing:-0.01em;color:#F2EEE6;">A map of the themes behind the podcast</div>
+        <div style="font-size:17px;line-height:1.75;color:#B9B2A7;max-width:600px;">Four regions grow from one centre — <span style="color:#7E9AD0;">Absence</span>, <span style="color:#D7A957;">Storybuilding</span>, <span style="color:#4FC2A4;">Translation</span> and <span style="color:#D08A8E;">Ethics</span>. Themes light up as you move through them; threads show what belongs where, and what connects across.</div>
+        <div class="mk-eyebrow" style="font-size:12px;color:#9A938A;">drag to pan · scroll to zoom · press a theme to read</div>
+        <button data-act="intro-close" aria-label="Enter the map" style="font-family:'Courier Prime',monospace;margin-top:6px;width:58px;height:58px;border:1.5px solid #F4CB7A;background:transparent;color:#F4CB7A;font-size:24px;line-height:1;cursor:pointer;" style-hover="background:rgba(244,203,122,0.14);">↓</button>
+        <div class="mk-eyebrow" style="font-size:11px;color:#655E55;">the map lies below ↓ · you can always drag your way back up here</div>
+      </div>
+
+
+      <sc-for list="{{ rootNodes }}" as="n" hint-placeholder-count="1">
+        <div class="mk-node" data-node-id="{{ n.id }}" data-lvl="-1" data-wx="{{ n.wx }}" data-wy="{{ n.wy }}" style="position:absolute;left:0;top:0;width:1400px;box-sizing:border-box;background:rgba(40,36,48,0.72);border:4px solid #48C6A8;border-radius:332px 21px 293px 21px/21px 293px 21px 332px;padding:46px 60px;cursor:pointer;z-index:30;text-align:center;box-shadow:0 18px 44px rgba(0,0,0,0.42);">
+          <div class="mk-node-title" style="font-weight:700;font-size:124px;line-height:1.08;letter-spacing:-0.01em;color:#F2EEE6;">{{ n.label }}</div>
+          <div style="margin-top:26px;font-size:24px;letter-spacing:.06em;color:#9A938A;">Everything below belongs to this · start here ↓</div>
+        </div>
+      </sc-for>
+
+      <sc-for list="{{ regions }}" as="n" hint-placeholder-count="4">
+        <div class="mk-node" data-node-id="{{ n.id }}" data-lvl="0" data-wx="{{ n.wx }}" data-wy="{{ n.wy }}" style="position:absolute;left:0;top:0;width:760px;box-sizing:border-box;background:rgba(38,34,46,0.6);border:3.5px solid {{ n.col }};border-radius:332px 20px 293px 20px/20px 293px 20px 332px;padding:30px 36px;cursor:pointer;z-index:24;box-shadow:0 14px 32px rgba(0,0,0,0.4);">
+          <div class="mk-node-title" style="font-weight:400;font-size:84px;line-height:1.1;letter-spacing:-0.01em;color:#F2EEE6;">{{ n.label }}</div>
+          <div style="margin-top:16px;font-size:20px;letter-spacing:.05em;color:#9A938A;">{{ n.kidLabel }}</div>
+        </div>
+      </sc-for>
+
+      <sc-for list="{{ l1 }}" as="n" hint-placeholder-count="0">
+        <div class="mk-node" data-node-id="{{ n.id }}" data-lvl="1" data-wx="{{ n.wx }}" data-wy="{{ n.wy }}" style="position:absolute;left:0;top:0;width:440px;box-sizing:border-box;background:rgba(34,30,42,0.58);border:2.5px solid {{ n.col }};border-radius:18px 306px 18px 319px/306px 18px 319px 18px;padding:18px 22px;cursor:pointer;z-index:23;box-shadow:0 9px 22px rgba(0,0,0,0.36);">
+          <div class="mk-eyebrow" style="font-size:21px;font-weight:400;color:{{ n.col }};margin-bottom:8px;">{{ n.num }}</div>
+          <div class="mk-node-title" style="font-weight:400;font-size:44px;line-height:1.2;letter-spacing:0;color:#EAE5DD;">{{ n.label }}</div>
+          <sc-if value="{{ n.kids }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:12px;font-size:18px;letter-spacing:.05em;color:#8A8379;">{{ n.kidLabel }}</div>
+          </sc-if>
+        </div>
+      </sc-for>
+
+      <sc-for list="{{ l2 }}" as="n" hint-placeholder-count="0">
+        <div class="mk-node" data-node-id="{{ n.id }}" data-lvl="2" data-wx="{{ n.wx }}" data-wy="{{ n.wy }}" style="position:absolute;left:0;top:0;width:380px;box-sizing:border-box;background:rgba(30,27,38,0.56);border:2.5px solid {{ n.col }}DD;border-radius:332px 20px 293px 20px/20px 293px 20px 332px;padding:14px 18px;cursor:pointer;z-index:22;box-shadow:0 6px 15px rgba(0,0,0,0.32);">
+          <div class="mk-eyebrow" style="font-size:18px;font-weight:400;color:{{ n.col }};margin-bottom:6px;">{{ n.num }}</div>
+          <div class="mk-node-title" style="font-weight:400;font-size:36px;line-height:1.2;color:#E0DBD3;">{{ n.label }}</div>
+        </div>
+      </sc-for>
+
+      <sc-for list="{{ l3 }}" as="n" hint-placeholder-count="0">
+        <div class="mk-node" data-node-id="{{ n.id }}" data-lvl="3" data-wx="{{ n.wx }}" data-wy="{{ n.wy }}" style="position:absolute;left:0;top:0;width:330px;box-sizing:border-box;background:rgba(26,23,33,0.54);border:2.5px solid {{ n.col }}BB;border-radius:18px 306px 18px 319px/306px 18px 319px 18px;padding:12px 16px;cursor:pointer;z-index:21;box-shadow:0 4px 11px rgba(0,0,0,0.28);">
+          <div style="font-size:17px;letter-spacing:.06em;color:#8A8379;margin-bottom:4px;">{{ n.num }}</div>
+          <div class="mk-node-title" style="font-weight:400;font-size:31px;line-height:1.2;color:#D8D3CB;">{{ n.label }}</div>
+        </div>
+      </sc-for>
+
+    </div>
+  </div>
+
+  <sc-if value="{{ introBtnOpen }}" hint-placeholder-val="{{ false }}">
+    <button data-act="to-intro" title="Back to the intro" style="position:fixed;top:62px;left:50%;transform:translateX(-50%);z-index:40;font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;line-height:1;padding:7px 12px;border:1px solid rgba(230,225,217,0.35);background:rgba(26,23,32,0.85);color:#9A938A;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="border-color:#F4CB7A;color:#F4CB7A;"><span style="font-size:13px;">↑</span><span>Intro</span></button>
+  </sc-if>
+
+  <div id="mk-tooltip" style="position:fixed;z-index:60;pointer-events:none;max-width:268px;background:#2A2632;border:1px solid rgba(230,225,217,0.3);box-shadow:0 1px 0 rgba(0,0,0,0.2),0 10px 28px rgba(0,0,0,0.4);padding:11px 14px;font-family:'Courier Prime',monospace;font-size:13px;line-height:1.5;color:#E6E1D9;display:none;"></div>
+
+  <div style="position:fixed;left:20px;bottom:20px;z-index:42;">
+    <sc-if value="{{ legendOpen }}" hint-placeholder-val="{{ true }}">
+      <div style="width:266px;box-sizing:border-box;background:#2A2632;border:1px solid rgba(230,225,217,0.28);box-shadow:0 1px 0 rgba(0,0,0,0.2),0 10px 28px rgba(0,0,0,0.4);padding:15px 16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;">
+          <div class="mk-eyebrow" style="font-size:12px;color:#48C6A8;">How to read the map</div>
+          <button data-act="legend-close" style="font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:.05em;line-height:1;padding:6px 10px;border:1px solid rgba(230,225,217,0.4);background:transparent;color:#9A938A;cursor:pointer;" style-hover="border-color:#48C6A8;color:#48C6A8;">Hide</button>
+        </div>
+        <div class="mk-eyebrow" style="font-size:10px;letter-spacing:.18em;color:#9A938A;margin-bottom:9px;">Regions</div>
+        <sc-for list="{{ regions }}" as="r" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px;">
+            <span style="width:10px;height:10px;border-radius:50%;flex:none;background:{{ r.col }};"></span>
+            <span style="font-size:13px;line-height:1.35;color:#D8D3CB;">{{ r.label }}</span>
+          </div>
+        </sc-for>
+        <div style="height:1px;background:rgba(230,225,217,0.14);margin:13px 0;"></div>
+        <div class="mk-eyebrow" style="font-size:10px;letter-spacing:.18em;color:#9A938A;margin-bottom:10px;">Threads</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;">
+          <span style="width:28px;border-top:2px solid #FFFFFF;flex:none;"></span>
+          <span style="font-size:13px;color:#D8D3CB;">belongs to — sub-theme</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="width:28px;border-top:2px solid #3FD8C4;flex:none;"></span>
+          <span style="font-size:13px;color:#D8D3CB;">connects across regions</span>
+        </div>
+        <div style="height:1px;background:rgba(230,225,217,0.14);margin:13px 0;"></div>
+        <div style="font-size:12px;line-height:1.5;color:#9A938A;">Drag to pan · scroll to zoom · zoom in for more sub-themes</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ legendClosed }}" hint-placeholder-val="{{ false }}">
+      <button data-act="legend-open" style="font-family:'Courier Prime',monospace;font-size:12px;letter-spacing:.06em;line-height:1;padding:9px 14px;border:1px solid rgba(230,225,217,0.5);background:#2A2632;color:#E6E1D9;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.4);" style-hover="border-color:#48C6A8;color:#48C6A8;">Map guide</button>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ nudgeOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;top:100px;left:50%;transform:translateX(-50%);z-index:41;pointer-events:none;font-family:'Courier Prime',monospace;font-size:13px;letter-spacing:.06em;color:#48C6A8;animation:mkfadein .5s ease;">Press a lit theme to read more</div>
+  </sc-if>
+
+  <sc-if value="{{ selOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;top:72px;right:0;bottom:0;width:min(452px,42vw);z-index:45;background:#262230;border-left:1px solid rgba(230,225,217,0.2);padding:26px 28px 44px;overflow-y:auto;box-sizing:border-box;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+        <div style="display:flex;flex-wrap:wrap;align-items:baseline;row-gap:5px;min-width:0;padding-top:4px;">
+          <sc-for list="{{ selPath }}" as="p" hint-placeholder-count="0">
+            <span class="mk-goto" data-goto="{{ p.id }}" style="display:inline-flex;align-items:baseline;cursor:pointer;">
+              <span class="mk-goto-t mk-eyebrow" style="font-size:11px;color:#9A938A;">{{ p.label }}</span>
+              <span class="mk-eyebrow" style="font-size:11px;color:#655E55;padding:0 6px;">/</span>
+            </span>
+          </sc-for>
+          <span class="mk-eyebrow" style="font-size:11px;color:{{ selColor }};">{{ selCrumb }}</span>
+        </div>
+        <button data-act="close" style="font-family:'Courier Prime',monospace;font-size:12px;letter-spacing:.05em;line-height:1;padding:7px 11px;border:1px solid rgba(230,225,217,0.5);background:transparent;color:#E6E1D9;cursor:pointer;flex:none;" style-hover="border-color:#48C6A8;color:#48C6A8;">Close ×</button>
+      </div>
+      <sc-if value="{{ panelHintOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:12.5px;line-height:1.55;color:#F4CB7A;margin-top:10px;">The path above shows where you are — press a step to go back out, or a sub-theme below to go deeper.</div>
+      </sc-if>
+      <h2 style="font-weight:700;font-size:30px;line-height:1.14;letter-spacing:-0.02em;margin:13px 0 0;color:#F2EEE6;">{{ selLabel }}</h2>
+
+      <sc-if value="{{ selHasAuthors }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:12px;letter-spacing:.03em;color:#9A938A;margin-top:12px;">DRAFT · {{ selAuthors }}</div>
+      </sc-if>
+
+      <div style="height:1px;background:{{ selColor }};opacity:0.45;margin:18px 0;"></div>
+
+      <div style="font-size:17px;line-height:1.7;color:#E6E1D9;">{{ selBlurb }}</div>
+
+      <sc-if value="{{ selHasQuestions }}" hint-placeholder-val="{{ false }}">
+        <div class="mk-eyebrow" style="font-size:12px;color:#9A938A;margin:26px 0 10px;">Open questions</div>
+        <sc-for list="{{ selQuestions }}" as="q" hint-placeholder-count="0">
+          <div style="font-style:italic;font-size:16px;line-height:1.5;color:#E6E1D9;border-left:2px solid {{ selColor }};padding-left:14px;margin:11px 0;">{{ q }}</div>
+        </sc-for>
+      </sc-if>
+
+      <sc-if value="{{ selHasChildren }}" hint-placeholder-val="{{ false }}">
+        <div class="mk-eyebrow" style="font-size:12px;color:#9A938A;margin:26px 0 6px;">Sub-themes</div>
+        <sc-for list="{{ selChildren }}" as="c" hint-placeholder-count="0">
+          <div class="mk-goto" data-goto="{{ c.id }}" style="display:flex;gap:10px;align-items:baseline;padding:10px 0;border-bottom:1px solid rgba(230,225,217,0.12);cursor:pointer;">
+            <span style="font-size:12px;color:#9A938A;flex:none;">{{ c.num }}</span>
+            <span class="mk-goto-t" style="font-size:16px;line-height:1.3;color:#E6E1D9;">{{ c.label }}</span>
+          </div>
+        </sc-for>
+      </sc-if>
+
+      <sc-if value="{{ selHasConnections }}" hint-placeholder-val="{{ false }}">
+        <div class="mk-eyebrow" style="font-size:12px;color:#48C6A8;margin:28px 0 10px;">Connections</div>
+        <sc-for list="{{ selConnections }}" as="k" hint-placeholder-count="0">
+          <div class="mk-goto" data-goto="{{ k.id }}" style="border:1px solid rgba(230,225,217,0.3);padding:12px 14px;margin-bottom:10px;cursor:pointer;background:#211D27;">
+            <div style="display:flex;gap:8px;align-items:baseline;flex-wrap:nowrap;">
+              <span style="font-size:12px;color:#48C6A8;flex:none;white-space:nowrap;">{{ k.num }} →</span>
+              <span class="mk-goto-t" style="font-weight:700;font-size:16px;line-height:1.3;color:#E6E1D9;flex:1;">{{ k.label }}</span>
+            </div>
+            <div style="font-size:13px;line-height:1.5;color:#9A938A;margin-top:7px;">{{ k.text }}</div>
+          </div>
+        </sc-for>
+      </sc-if>
+
+      <sc-if value="{{ selHasParent }}" hint-placeholder-val="{{ false }}">
+        <div style="height:1px;background:rgba(230,225,217,0.12);margin:22px 0 13px;"></div>
+        <div class="mk-goto" data-goto="{{ selParent.id }}" style="cursor:pointer;"><span class="mk-goto-t" style="font-size:13px;color:#9A938A;">← Part of {{ selParent.num }} · {{ selParent.label }}</span></div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <template id="__bundler_thumbnail">
+    <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+      <rect width="800" height="600" fill="#1F1B26"/>
+      <ellipse cx="400" cy="320" rx="320" ry="200" fill="#564F62" opacity="0.4"/>
+      <circle cx="260" cy="250" r="60" fill="#7E9AD0" opacity="0.3"/>
+      <circle cx="540" cy="250" r="60" fill="#D7A957" opacity="0.32"/>
+      <circle cx="260" cy="400" r="60" fill="#4FC2A4" opacity="0.3"/>
+      <circle cx="540" cy="400" r="60" fill="#D08A8E" opacity="0.3"/>
+      <line x1="400" y1="150" x2="260" y2="250" stroke="#9A938A" stroke-width="1.5"/>
+      <line x1="400" y1="150" x2="540" y2="250" stroke="#9A938A" stroke-width="1.5"/>
+      <rect x="320" y="120" width="160" height="56" fill="#322D3A" stroke="#48C6A8"/>
+      <text x="400" y="500" text-anchor="middle" font-family="Courier,monospace" font-size="30" fill="#E6E1D9">The making-of map</text>
+    </svg>
+  </template>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;},&quot;showCrossLinks&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;showHelp&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  RC = { root:'#48C6A8', t1:'#7E9AD0', t2:'#D7A957', t3:'#4FC2A4', t4:'#D08A8E' };
+
+  rawNodes = [
+    {id:'root', num:'0', label:'The Making of Polyphonic Archive', lvl:-1, parent:null, wx:1815, wy:1500,
+     blurb:'The map of how Polyphonic Archive was made \u2014 the questions, tensions and craft behind turning a near-silent archive into a podcast. Four regions branch from here: what was absent, how the story was built, how it was translated between media, and the ethics beneath it all.',
+     questions:['What does it take to give voice to those the archive left silent?','When the record runs out, what may we honestly add?']},
+
+    {id:'t1', num:'1', label:'Absence', lvl:0, parent:'root', wx:950, wy:1020,
+     blurb:'The founding problem. The girls of Huize Dina barely speak in the surviving record. This region maps every kind of silence we worked against \u2014 and what the gaps themselves can be made to say.',
+     questions:['How can we tell the story of the girls when they are absent from the archive?','Which opportunities come with the public making of archives?']},
+    {id:'t1-1', num:'1.1', label:'Absence of the girls\u2019 voices', lvl:1, parent:'t1', wx:590, wy:730,
+     blurb:'They were written about, but rarely heard. How do you build a story around voices the archive never kept?'},
+    {id:'t1-1-1', num:'1.1.1', label:'Privacy of the individual', lvl:2, parent:'t1-1', wx:360, wy:560,
+     blurb:'What the record withholds out of care \u2014 the privacy of the individual, even within an opened archive.'},
+    {id:'t1-1-2', num:'1.1.2', label:'The girls\u2019 letters', lvl:2, parent:'t1-1', wx:640, wy:520,
+     blurb:'The rare moments their own words survive. Reading the letters \u2014 and deciding how to use them.', authors:'Jair (text) \u00b7 Amit (review)'},
+    {id:'t1-2', num:'1.2', label:'The implicit listener', lvl:1, parent:'t1', wx:1290, wy:710,
+     blurb:'From the implicit looker to the implicit listener \u2014 the figure the podcast is built to address.', authors:'Amit (text) \u00b7 Ari (review)'},
+    {id:'t1-3', num:'1.3', label:'Absence of records', lvl:1, parent:'t1', wx:710, wy:1330,
+     blurb:'Not only voices are missing. Whole bodies of record are gone, sealed, or were never made.'},
+    {id:'t1-3-1', num:'1.3.1', label:'Censorship & the 2025 opening', lvl:2, parent:'t1-3', wx:380, wy:1440,
+     blurb:'The archive sat closed under a censorship period and only opened in 2025. What that timing did to the work.', authors:'Naomi (text) \u00b7 Elena (review)'},
+    {id:'t1-3-2', num:'1.3.2', label:'Huize Dina\u2019s lost archive', lvl:2, parent:'t1-3', wx:560, wy:1620,
+     blurb:'What the home kept of itself did not survive.', authors:'Jair (text) \u00b7 Naomi (review)'},
+    {id:'t1-3-2-1', num:'1.3.2.1', label:'Lost in the war', lvl:3, parent:'t1-3-2', wx:360, wy:1780,
+     blurb:'The original Huize Dina archive was lost in the war. We work around an absence at the source.'},
+    {id:'t1-3-3', num:'1.3.3', label:'Known unknowns \u2014 filling the void', lvl:2, parent:'t1-3', wx:1000, wy:1560,
+     blurb:'Things we know of but cannot read \u2014 Mina\u2019s letter to her grandparents among them. Where the record stops, we speculate, carefully.'},
+    {id:'t1-4', num:'1.4', label:'The absence of home', lvl:1, parent:'t1', wx:1320, wy:1270,
+     blurb:'Home is the missing center of these lives \u2014 as place, as mother, as belonging.', authors:'Tzlil, Elena (text) \u00b7 Ari (review)'},
+    {id:'t1-4-1', num:'1.4.1', label:'Is Huize Dina a home?', lvl:2, parent:'t1-4', wx:1580, wy:1150,
+     blurb:'An institution that housed girls \u2014 but was it ever a home?', authors:'Jair (text) \u00b7 Ari (review)'},
+    {id:'t1-4-2', num:'1.4.2', label:'The absence of mothers', lvl:2, parent:'t1-4', wx:1330, wy:1660,
+     blurb:'Mothers absent; girls becoming mothers themselves; motherhood without a husband. The Swaab and Tilly cases.', authors:'Jair'},
+
+    {id:'t2', num:'2', label:'Storybuilding', lvl:0, parent:'root', wx:2680, wy:1020,
+     blurb:'How the material becomes a story you can be inside \u2014 dramaturgy, emphasis, sound, and the figure who carries the telling.',
+     questions:['How do you distil a narrative form from archival material?','Can the historian be the protagonist of the story?']},
+    {id:'t2-1', num:'2.1', label:'An immersive story from the archive', lvl:1, parent:'t2', wx:2370, wy:730,
+     blurb:'How do you build an immersive story out of archival fragments?'},
+    {id:'t2-1-1', num:'2.1.1', label:'Distilling dramatic structure', lvl:2, parent:'t2-1', wx:2130, wy:570,
+     blurb:'Finding dramatic and narrative structure latent in the documents.', authors:'Ari, Tzlil (text) \u00b7 Amit (review)'},
+    {id:'t2-2', num:'2.2', label:'Emphasis \u2014 what stays in frame', lvl:1, parent:'t2', wx:2940, wy:720,
+     blurb:'Every inclusion is an exclusion. What we used, what we left outside the frame, and why.'},
+    {id:'t2-3', num:'2.3', label:'Enacting the implicit listener', lvl:1, parent:'t2', wx:2360, wy:1330,
+     blurb:'Turning the implicit listener from concept into something the audience performs.', authors:'Ari, Amit (text) \u00b7 Tzlil (review)'},
+    {id:'t2-3-1', num:'2.3.1', label:'Virtual auditory space & binaural design', lvl:2, parent:'t2-3', wx:2560, wy:1560,
+     blurb:'Designing a believable auditory space \u2014 binaural sound as the room the story happens in.', authors:'Amit (text) \u00b7 Bartek (review)'},
+    {id:'t2-4', num:'2.4', label:'The role of music', lvl:1, parent:'t2', wx:2950, wy:1340,
+     blurb:'What music does in the podcast \u2014 and where it must stay silent.'},
+    {id:'t2-5', num:'2.5', label:'The historian as protagonist', lvl:1, parent:'t2', wx:3130, wy:1020,
+     blurb:'Letting the researcher carry the story \u2014 the historian as the protagonist of the telling.', authors:'Ari (text) \u00b7 Jair (review)'},
+
+    {id:'t3', num:'3', label:'Translation between media', lvl:0, parent:'root', wx:950, wy:1980,
+     blurb:'Everything here crosses a boundary \u2014 between space and sound, language and language, document and drama. What survives the crossing, and what changes?'},
+    {id:'t3-1', num:'3.1', label:'Physical space \u2192 auditory space', lvl:1, parent:'t3', wx:1300, wy:1800,
+     blurb:'Building the virtual room where the podcast happens, and the psychoacoustics that make it intuitive.', authors:'Amit'},
+    {id:'t3-2', num:'3.2', label:'Between languages & times', lvl:1, parent:'t3', wx:610, wy:1790,
+     blurb:'Translating across languages and across decades \u2014 and what that asks of us.', authors:'Tzlil, Elena, Naomi'},
+    {id:'t3-3', num:'3.3', label:'Archive \u2192 podcast', lvl:1, parent:'t3', wx:660, wy:2200,
+     blurb:'What is gained and lost when a historical archive becomes a podcast?', authors:'Naomi (text) \u00b7 Tzlil, Ari, Amit (review)'},
+    {id:'t3-4', num:'3.4', label:'Giving voice to the written text', lvl:1, parent:'t3', wx:1300, wy:2200,
+     blurb:'Giving spoken voice to written text \u2014 casting, directing, and the choices that implies.', authors:'Tzlil, Ari'},
+
+    {id:'t4', num:'4', label:'Ethics', lvl:0, parent:'root', wx:2680, wy:1980,
+     blurb:'The questions that sit under every other decision \u2014 truth, accuracy, AI, and the rights of people who cannot consent.'},
+    {id:'t4-1', num:'4.1', label:'Art & truth', lvl:1, parent:'t4', wx:2370, wy:1780,
+     blurb:'Where the documentary obligation meets the freedom of art.'},
+    {id:'t4-1-1', num:'4.1.1', label:'Accuracy vs. art-making', lvl:2, parent:'t4-1', wx:2130, wy:1610,
+     blurb:'The central tension: historical accuracy versus the making of art.'},
+    {id:'t4-1-2', num:'4.1.2', label:'Is accurate representation possible?', lvl:2, parent:'t4-1', wx:2300, wy:1990,
+     blurb:'Is an accurate representation of the past even possible \u2014 and where do we draw the line?', authors:'Tzlil, Naomi (text) \u00b7 Amit, Ari (review)'},
+    {id:'t4-2', num:'4.2', label:'Our use of AI', lvl:1, parent:'t4', wx:2870, wy:2200,
+     blurb:'AI for historically stylized translation \u2014 and the ethics of doing so.', authors:'Elena (text) \u00b7 Tzlil, Naomi (review)'},
+    {id:'t4-3', num:'4.3', label:'Privacy & the rights of the dead', lvl:1, parent:'t4', wx:3030, wy:1820,
+     blurb:'Private archival material, now public. What are the rights of the deceased? How does it touch living relatives \u2014 and can you simply contact them?', authors:'Naomi, Jair (text) \u00b7 Elena (review)'},
+  ];
+
+  links = [
+    {a:'t1-1-2', b:'t4-3',   text:'The girls\u2019 letters are private documents \u2014 using them raises the rights of the deceased and their living relatives.'},
+    {a:'t1-2',   b:'t3-1',   text:'The implicit listener is the figure the auditory space is designed to address.'},
+    {a:'t1-2',   b:'t2-3',   text:'Defined under Absence, enacted under Storybuilding \u2014 the same listener, concept and craft.'},
+    {a:'t1-3-3', b:'t4-1',   text:'Filling the void with speculation forces the ethical question of accuracy versus narrative.'},
+    {a:'t1-3-3', b:'t4-1-2', text:'Where the record stops, can what we add still be \u201Caccurate\u201D? The known unknowns test the limit.'},
+    {a:'t3-4',   b:'t1-3-3', text:'Giving voice to the text means voicing the known unknowns \u2014 what we know of but never heard.'},
+    {a:'t2-1-1', b:'t4-1-1', text:'Distilling dramatic structure from documents runs straight into the accuracy-versus-art tension.'},
+    {a:'t2-2',   b:'t4-1-1', text:'Choosing what stays in frame is the accuracy-versus-art tension, seen from the edit.'},
+    {a:'t3-2',   b:'t4-2',   text:'Translating across languages and times leans on AI \u2014 and on the ethics of using it.'},
+    {a:'t4-1-2', b:'t4-2',   text:'Whether accurate representation is possible bears on whether AI translation is defensible.'},
+    {a:'t3-3',   b:'t2-1',   text:'What is gained and lost in translation shapes how immersive the story can honestly be.'},
+    {a:'t3-3',   b:'t1-3',   text:'Translating the archive depends on what records survive to translate.'},
+    {a:'t3-3',   b:'t4-1',   text:'Gain and loss in translation is, finally, an ethical question.'},
+  ];
+
+  bgImages = [];
+
+  state = { selId: null, nudge: true, legendOpen: true, intro: true, panelHint: true };
+
+  componentDidMount() {
+    this.root = document.getElementById('mk-root');
+    if (!this.root) return;
+    this.nodes = this.buildNodes();
+    this.byId = {}; this.nodes.forEach(n => this.byId[n.id] = n);
+    if (this.props.showHelp === false) this.setState({ nudge: false });
+    try {
+      if (localStorage.getItem('pa-mk-hint-panel')) this.setState({ panelHint: false });
+    } catch (e) {}
+    this.vp = this.root.querySelector('#mk-viewport');
+    this.introEl = this.root.querySelector('#mk-intro');
+    this.INTRO = { x: 1815, y: -1480 };   // world position — above the map
+    this._atIntro = true;
+    this.world = this.root.querySelector('#mk-world');
+    this.bg = this.root.querySelector('#mk-bg');
+    this.F = 1300; this.NEAR = 240; this.FAR = 5400;
+    this.Zlevel = { '-1': 40, '0': 340, '1': 660, '2': 980, '3': 1300 };
+    this.refZ = 340;
+    this.buildBgImages();
+    this.buildTerritories();
+    this.cam = { x: 1815, y: -1480, z: -2400 };
+    this._panelW = 0; this._lod = -9; this._userMoved = false; this._focusLvl = 0;
+    this.buildLines();
+    this.bindEvents();
+    this.scheduleBreeze();
+    let tries = 0;
+    const initFit = () => {
+      if (this._userMoved) return;
+      this.fitIntroInstant();
+      if (++tries < 22) setTimeout(initFit, 90);
+    };
+    setTimeout(initFit, 30);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps && prevProps.showCrossLinks !== this.props.showCrossLinks) { this._lod = -9; this.buildLines(); }
+    this.applyCam();
+    this.applyHighlight();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._onResize);
+
+    this.cancelFly();
+    if (this._focusRaf) cancelAnimationFrame(this._focusRaf);
+    if (this._vibRaf) cancelAnimationFrame(this._vibRaf);
+    if (this._vibTimer) clearInterval(this._vibTimer);
+    if (this._breezeTimer) clearTimeout(this._breezeTimer);
+    if (this._fxT) clearTimeout(this._fxT);
+  }
+
+  buildNodes() {
+    if (this._nodesCache) return this._nodesCache;
+    const QOFF = { t1: [-380, -270], t2: [380, -270], t3: [-380, 270], t4: [380, 270] };
+    const cnt = {};
+    this.rawNodes.forEach(n => { if (n.parent) cnt[n.parent] = (cnt[n.parent] || 0) + 1; });
+    // spread each generation further from its parent (cascading) so parent
+    // and child boxes never crowd each other on screen
+    const SPREAD = { 1: 1.35, 2: 1.32, 3: 1.32 };
+    const MINDIST = { 1: 780, 2: 560, 3: 500 };   // world px, parent-to-child
+    const raw = {}, fin = {};
+    this._nodesCache = this.rawNodes.map(n => {
+      const reg = n.id.split('-')[0], o = QOFF[reg] || [0, 0], kids = cnt[n.id] || 0;
+      const rx = n.wx + o[0], ry = n.wy + o[1];
+      let fx = rx, fy = ry;
+      let k = SPREAD[n.lvl];
+      if (k && n.parent && fin[n.parent]) {
+        const dx = rx - raw[n.parent][0], dy = ry - raw[n.parent][1];
+        const len = Math.hypot(dx, dy) || 1;
+        k = Math.max(k, (MINDIST[n.lvl] || 0) / len);
+        fx = fin[n.parent][0] + dx * k;
+        fy = fin[n.parent][1] + dy * k;
+      }
+      raw[n.id] = [rx, ry]; fin[n.id] = [fx, fy];
+      return Object.assign({}, n, { col: this.RC[reg], wx: fx, wy: fy, kids: kids,
+        kidLabel: kids ? (kids + (kids > 1 ? ' sub-themes' : ' sub-theme') + ' →') : '' });
+    });
+    return this._nodesCache;
+  }
+
+  buildTerritories() {
+    const layer = this.el('#mk-terr'); if (!layer) return;
+    layer.innerHTML = '';
+    const names = { t1: 'Absence', t2: 'Storybuilding', t3: 'Translation', t4: 'Ethics' };
+    const grp = {};
+    this.nodes.forEach(n => { const r = n.id.split('-')[0]; if (names[r]) (grp[r] = grp[r] || []).push(n); });
+    this.terrEls = [];
+    Object.keys(names).forEach(r => {
+      const arr = grp[r]; if (!arr || !arr.length) return;
+      let sx = 0, sy = 0; arr.forEach(n => { sx += n.wx; sy += n.wy; });
+      const cx = sx / arr.length, cy = sy / arr.length;
+      const el = document.createElement('div');
+      el.textContent = names[r].toUpperCase();
+      el.style.cssText = 'position:absolute;left:0;top:0;transform-origin:50% 50%;white-space:nowrap;font-family:\'Courier Prime\',monospace;font-weight:700;font-size:118px;letter-spacing:0.1em;color:' + this.RC[r] + ';opacity:0;will-change:transform,opacity;';
+      layer.appendChild(el);
+      this.terrEls.push({ el: el, ix: cx, iy: cy, wz: this.zForLvl(0) });
+    });
+  }
+
+  el(sel) { return this.root.querySelector(sel); }
+  hexA(hex, a) { const v = Math.max(0, Math.min(1, a)); return hex.slice(0, 7) + Math.round(v * 255).toString(16).padStart(2, '0'); }
+  nodeEl(id) { return this.root.querySelector('[data-node-id="' + id + '"]'); }
+  lvlOf(id) { const n = this.byId[id]; return n ? n.lvl : 0; }
+
+  regionBBox() {
+    let minx = 1e9, miny = 1e9, maxx = -1e9, maxy = -1e9;
+    this.nodes.forEach(n => { if (n.lvl <= 0) { minx = Math.min(minx, n.wx); miny = Math.min(miny, n.wy); maxx = Math.max(maxx, n.wx); maxy = Math.max(maxy, n.wy); } });
+    return { minx, miny, maxx, maxy };
+  }
+
+  zForLvl(l) { return this.Zlevel[String(l)] != null ? this.Zlevel[String(l)] : 0; }
+
+  // Theatrical spotlight: relative to the selected theme, light TWO hierarchy
+  // levels (the theme itself + its sub-themes) and push the sub-sub-themes and
+  // other branches into shadow — without ever letting them disappear.
+  focusMul(id) {
+    const sel = this.state.selId;
+    if (!sel) {
+      // overview: the root and the four regions carry the light;
+      // deeper shelves sit unlit until you zoom or step in
+      const n0 = this.byId ? this.byId[id] : null;
+      if (!n0 || n0.lvl <= 0) return 1;
+      const s = this.F / Math.max(1, this.refZ - this.cam.z);
+      const k = Math.max(0, Math.min(1, (s - 0.42) / 0.33));
+      const base = n0.lvl === 1 ? 0.3 : n0.lvl === 2 ? 0.16 : 0.1;
+      return base + (1 - base) * k;
+    }
+    if (id === sel) return 1;                 // the lit stage
+    const n = this.byId[id]; if (!n) return 0.18;
+    // descendant of the selected theme?
+    let cur = n, steps = 0;
+    while (cur && cur.parent) { steps++; if (cur.parent === sel) break; cur = this.byId[cur.parent]; }
+    if (cur && cur.parent === sel) {
+      if (steps === 1) return 1;              // sub-themes — full in the beam
+      if (steps === 2) return 0.1;            // sub-sub-themes — deep shadow
+      return 0.05;
+    }
+    // ancestor of the selected theme (gives context)
+    let s = this.byId[sel];
+    while (s && s.parent) { if (s.parent === id) return 0.26; s = this.byId[s.parent]; }
+    return 0.05;                              // unrelated branches — near-dark backdrop
+  }
+
+  fitRegionsInstant() {
+    if (!this.vp) return;
+    const vpW = this.vp.clientWidth, vpH = this.vp.clientHeight;
+    if (!vpW || !vpH) return;
+    const b = this.regionBBox(), pad = 460;
+    const bw = (b.maxx - b.minx) + pad * 2, bh = (b.maxy - b.miny) + pad * 2;
+    let s = Math.min((vpW - this.legendInset()) * 0.97 / bw, vpH * 0.97 / bh); s = Math.max(0.1, Math.min(1.2, s));
+    this._panelW = 0;
+    this.refZ = this.zForLvl(0);
+    this.cam = { x: (b.minx + b.maxx) / 2, y: (b.miny + b.maxy) / 2, z: this.refZ - this.F / s };
+    this.applyCam();
+  }
+
+  fitIntroInstant() {
+    if (!this.vp || !this.vp.clientWidth) return;
+    this._panelW = 0;
+    this.refZ = this.zForLvl(0);
+    this.cam = { x: this.INTRO.x, y: this.INTRO.y, z: this.refZ - this.overviewDz() };
+    this.applyCam();
+  }
+
+  // fly back up to the intro block that floats above the map
+  flyToIntro() {
+    this._atIntro = true;
+    this._userMoved = true;
+    this.hideTip();
+    this._panelW = 0; this._focusLvl = 0;
+    this.refZ = this.zForLvl(0); this._fitZ = this.zForLvl(0);
+    const upd = { intro: true };
+    if (this.state.selId) upd.selId = null;
+    this.setState(upd);
+    this.startFocus();
+    this.animateTo({ x: this.INTRO.x, y: this.INTRO.y, z: this.zForLvl(0) - this.overviewDz() }, 1400);
+  }
+
+  buildBgImages() {
+    if (!this.bg) return;
+    this.bg.innerHTML = '';
+    this.bg.style.transform = 'none';
+    this.bgEls = [];
+    this.bgImages.forEach((b, i) => {
+      const img = document.createElement('img');
+      img.src = encodeURI(b.src);
+      img.style.cssText = 'position:absolute;left:0;top:0;width:' + b.w + 'px;transform-origin:0 0;will-change:transform,opacity;opacity:0;filter:brightness(0.66) contrast(1.06) saturate(1.08);pointer-events:none;';
+      this.bg.appendChild(img);
+      this.bgEls.push({ el: img, ix: b.x, iy: b.y, wz: b.wz != null ? b.wz : (1600 + i * 160), baseOp: b.op != null ? b.op : 0.3, rot: b.rot || 0 });
+    });
+  }
+
+  buildLines() {
+    const svg = this.el('#mk-lines');
+    if (!svg) return;
+    const NS = 'http://www.w3.org/2000/svg';
+    svg.innerHTML = '';
+    const defs = document.createElementNS(NS, 'defs');
+    defs.innerHTML = '<filter id="mk-thread"><feTurbulence type="fractalNoise" baseFrequency="0.011 0.018" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter>';
+    svg.appendChild(defs);
+    const fx = document.createElementNS(NS, 'g'); fx.setAttribute('filter', 'url(#mk-thread)');
+    this._fxEl = fx; this._fxHold = false;
+    const haloLayer = document.createElementNS(NS, 'g');
+    const coreLayer = document.createElementNS(NS, 'g');
+    fx.appendChild(haloLayer); fx.appendChild(coreLayer); svg.appendChild(fx);
+    const hitLayer = document.createElementNS(NS, 'g'); svg.appendChild(hitLayer);
+    this.lineGroups = [];
+    this.adj = {};
+    const addAdj = (x, y) => { (this.adj[x] = this.adj[x] || []).push(y); (this.adj[y] = this.adj[y] || []).push(x); };
+    this.nodes.forEach(n => { if (n.parent) addAdj(n.parent, n.id); });
+    this.links.forEach(k => addAdj(k.a, k.b));
+    const showCross = this.props.showCrossLinks !== false;
+    const HIER = '#FFFFFF', CROSS = '#3FD8C4', HALOC = '#8fb6be';
+    const mk = (a, b, type, text, need) => {
+      const halo = document.createElementNS(NS, 'path');
+      halo.setAttribute('fill', 'none'); halo.setAttribute('stroke-linecap', 'round'); halo.setAttribute('pointer-events', 'none');
+      halo.setAttribute('stroke', type === 'cross' ? '#7fe0d2' : '#cbd2d4');
+      const vis = document.createElementNS(NS, 'path');
+      vis.setAttribute('fill', 'none'); vis.setAttribute('stroke-linecap', 'round'); vis.setAttribute('pointer-events', 'none');
+      vis.setAttribute('stroke', type === 'cross' ? CROSS : HIER);
+      const hit = document.createElementNS(NS, 'line');
+      hit.setAttribute('stroke', '#000'); hit.setAttribute('stroke-opacity', '0');
+      hit.setAttribute('stroke-width', '16');
+      hit.setAttribute('pointer-events', 'stroke'); hit.setAttribute('data-link', '1');
+      hit.style.cursor = type === 'cross' ? 'pointer' : 'default';
+      const wlen = Math.hypot(b.wx - a.wx, b.wy - a.wy);
+      const nK = 3 + Math.floor(Math.random() * 2);
+      const knots = [];
+      for (let q = 1; q <= nK; q++) {
+        let f = q / (nK + 1) + (Math.random() * 2 - 1) * 0.04;
+        f = Math.max(0.06, Math.min(0.94, f));
+        knots.push({ f: f, off: (Math.random() * 2 - 1) * 0.05 });
+      }
+      knots.sort((p, q2) => p.f - q2.f);
+      const o = { halo: halo, vis: vis, hit: hit, need: need, a: a.id, b: b.id, type: type, knots: knots,
+        freq: Math.max(1.0, Math.min(2.6, 820 / wlen)), phase: Math.random() * 6.283,
+        ampBase: 0.045 + Math.random() * 0.025, amp: 0, t0: 0, delay: 0, dur: 3.4, decay: 1.45, hover: false };
+      hit.addEventListener('mouseenter', (ev) => { o.hover = true; this.showTip(text, ev); this.renderStrings(); });
+      hit.addEventListener('mousemove', (ev) => this.moveTip(ev));
+      hit.addEventListener('mouseleave', () => { o.hover = false; this.hideTip(); this.renderStrings(); });
+      if (type === 'cross') hit.addEventListener('click', (ev) => { ev.stopPropagation(); this.select(b.id); });
+      haloLayer.appendChild(halo); coreLayer.appendChild(vis); hitLayer.appendChild(hit);
+      this.lineGroups.push(o);
+    };
+    this.nodes.forEach(n => { if (n.parent) mk(this.byId[n.parent], n, 'hier', n.label + ' — sub-theme of ' + this.byId[n.parent].label, Math.max(0, n.lvl)); });
+    if (showCross) this.links.forEach(k => mk(this.byId[k.a], this.byId[k.b], 'cross', k.text, Math.max(this.lvlOf(k.a), this.lvlOf(k.b))));
+  }
+
+  // during pans/zooms/flights, drop the SVG displacement filter on the
+  // threads (the most expensive repaint) and restore it once movement rests
+  motion() {
+    if (!this._fxHold) { this._fxHold = true; if (this._fxEl) this._fxEl.removeAttribute('filter'); }
+    clearTimeout(this._fxT);
+    this._fxT = setTimeout(() => {
+      this._fxHold = false;
+      if (this._fxEl) this._fxEl.setAttribute('filter', 'url(#mk-thread)');
+    }, 180);
+  }
+
+  bindEvents() {
+    const vp = this.vp;
+    vp.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      this._drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false, t: e.target };
+      try { vp.setPointerCapture(e.pointerId); } catch (err) {}
+      vp.style.cursor = 'grabbing';
+    });
+    vp.addEventListener('pointermove', (e) => {
+      if (!this._drag) return;
+      const dx = e.clientX - this._drag.x, dy = e.clientY - this._drag.y;
+      if (Math.abs(e.clientX - this._drag.sx) + Math.abs(e.clientY - this._drag.sy) > 5) { this._drag.moved = true; this._userMoved = true; }
+      const mRef = this.F / Math.max(1, this.refZ - this.cam.z);
+      this.cam.x -= dx / mRef; this.cam.y -= dy / mRef;
+      this._drag.x = e.clientX; this._drag.y = e.clientY;
+      this._manual = true;
+      this.motion(); this.cancelFly(); this.applyCam();
+    });
+    const endDrag = (e) => {
+      const d = this._drag; this._drag = null; vp.style.cursor = 'grab';
+      if (!d) return;
+      if (!d.moved) {
+        if (d.t && d.t.closest && d.t.closest('[data-link]')) return;
+        const nodeEl = d.t && d.t.closest ? d.t.closest('[data-node-id]') : null;
+        if (nodeEl) this.select(nodeEl.getAttribute('data-node-id'));
+        else this.deselect();
+      }
+    };
+    vp.addEventListener('pointerup', endDrag);
+    vp.addEventListener('pointercancel', () => { this._drag = null; vp.style.cursor = 'grab'; });
+    vp.addEventListener('wheel', (e) => this.onWheel(e), { passive: false });
+
+    this.root.addEventListener('click', (e) => {
+      const act = e.target.closest('[data-act]');
+      if (act) { this.onAct(act.getAttribute('data-act')); return; }
+      const go = e.target.closest('[data-goto]');
+      if (go) { this.select(go.getAttribute('data-goto')); return; }
+    });
+
+    this._onResize = () => this.applyCam();
+    window.addEventListener('resize', this._onResize);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.deselect(); });
+  }
+
+  onAct(a) {
+    if (a === 'overview' || a === 'close') this.deselect();
+    else if (a === 'intro-close') this.deselect();
+    else if (a === 'to-intro') this.flyToIntro();
+    else if (a === 'legend-open') this.setState({ legendOpen: true });
+    else if (a === 'legend-close') this.setState({ legendOpen: false });
+    else if (a === 'zoom-in') this.zoomBy(1.35);
+    else if (a === 'zoom-out') this.zoomBy(0.74);
+  }
+
+  applyCam() {
+    if (!this.world || !this.vp) return;
+    const vpW = this.vp.clientWidth, vpH = this.vp.clientHeight;
+    const li = this.legendInset();
+    const cx = li + (vpW - li - (this._panelW || 0)) / 2, cy = vpH / 2;
+    const F = this.F, camZ = this.cam.z, NEAR = this.NEAR;
+    const refDz = Math.max(NEAR + 1, this.refZ - camZ);
+    if (this.bgEls) {
+      this.bgEls.forEach(o => {
+        const dz = o.wz - camZ;
+        if (dz <= NEAR) { o.el.style.opacity = '0'; return; }
+        const m = F / dz;
+        const sx = cx + (o.ix - this.cam.x) * m, sy = cy + (o.iy - this.cam.y) * m;
+        o.el.style.transform = 'translate(' + sx.toFixed(1) + 'px,' + sy.toFixed(1) + 'px) scale(' + m.toFixed(4) + ') rotate(' + o.rot + 'deg)';
+        const ratio = dz / refDz;
+        const fade = ratio <= 1 ? 1 : Math.max(0, 1 - (ratio - 1) / 1.9);
+        o.el.style.opacity = (o.baseOp * (0.16 + 0.84 * fade)).toFixed(3);
+      });
+    }
+    if (this.terrEls) {
+      this.terrEls.forEach(o => {
+        const dz = o.wz - camZ;
+        if (dz <= NEAR) { o.el.style.opacity = '0'; return; }
+        const m = F / dz;
+        const sx = cx + (o.ix - this.cam.x) * m, sy = cy + (o.iy - this.cam.y) * m;
+        o.el.style.transform = 'translate(' + sx.toFixed(1) + 'px,' + sy.toFixed(1) + 'px) translate(-50%,-50%) scale(' + m.toFixed(4) + ')';
+        let op = 0.11;
+        if (m > 0.5) op *= Math.max(0, 1 - (m - 0.5) / 0.45);
+        o.el.style.opacity = op.toFixed(3);
+      });
+    }
+    if (this.introEl && this.INTRO) {
+      const dzI = this.zForLvl(0) - camZ;
+      if (dzI <= NEAR) { this.introEl.style.opacity = '0'; this.introEl.style.pointerEvents = 'none'; }
+      else {
+        const mI = F / dzI;
+        const sxI = cx + (this.INTRO.x - this.cam.x) * mI, syI = cy + (this.INTRO.y - this.cam.y) * mI;
+        this.introEl.style.transform = 'translate(' + sxI.toFixed(1) + 'px,' + syI.toFixed(1) + 'px) translate(-50%,-50%) scale(' + (mI * 3.2).toFixed(4) + ')';
+        this.introEl.style.opacity = '1';
+        this.introEl.style.pointerEvents = 'auto';
+      }
+    }
+    this.nodePos = {};
+    // Theatrical lighting cue: a fixed-duration eased tween from the focus state
+    // captured when the selection changed (this._fmFrom) to the current target,
+    // dipping the whole field through near-darkness at the midpoint.
+    if (!this._fm) this._fm = {};
+    let focusK = 1, focusActive = false;
+    if (this._focusT0 != null) {
+      const tt = Math.min(1, (performance.now() - this._focusT0) / (this._focusDur || 1500));
+      focusK = tt < 0.5 ? 4 * tt * tt * tt : 1 - Math.pow(-2 * tt + 2, 3) / 2;
+      if (tt >= 1) { this._focusT0 = null; } else { focusActive = true; this._fmSettling = true; }
+    }
+    this.root.querySelectorAll('[data-node-id]').forEach(el => {
+      const wx = +el.getAttribute('data-wx'), wy = +el.getAttribute('data-wy');
+      const wz = this.zForLvl(el.getAttribute('data-lvl'));
+      const dz = wz - camZ;
+      if (dz <= NEAR) { el.style.opacity = '0'; el.style.pointerEvents = 'none'; return; }
+      const m = F / dz;
+      const sx = cx + (wx - this.cam.x) * m, sy = cy + (wy - this.cam.y) * m;
+      el.style.transform = 'translate(' + sx.toFixed(1) + 'px,' + sy.toFixed(1) + 'px) translate(-50%,-50%) scale(' + m.toFixed(4) + ')';
+      const ratio = dz / refDz;
+      const fade = ratio <= 1 ? 1 : Math.max(0.05, 1 - (ratio - 1) / 1.7);
+      let blur = ratio <= 1.05 ? 0 : Math.min(2.4, (ratio - 1.05) * 2.2);
+      const nid = el.getAttribute('data-node-id');
+      const tgtFm = this.focusMul(nid);
+      const fromFm = (this._fmFrom && this._fmFrom[nid] != null) ? this._fmFrom[nid] : tgtFm;
+      const fm = fromFm + (tgtFm - fromFm) * focusK;
+      this._fm[nid] = fm;
+      // lamps: opacity stays high enough that unlit nodes keep visible contours;
+      // darkness comes from brightness, light from a warm LED glow
+      let op = fade * (0.5 + 0.5 * fm);
+      if (fm >= 0.985) op = Math.max(op, 0.94);     // full inside the beam
+      else { blur = Math.max(blur, (1 - fm) * 1.2); }   // unlit lamps soften back
+      op = Math.max(op, 0.05);
+      const nearFade = Math.min(1, Math.max(0, (dz - NEAR) / (NEAR * 1.2)));
+      op *= nearFade;                     // planes you fly past dissolve smoothly
+      // quantized, cached style writes: only touch opacity/filter/z-index when
+      // the value meaningfully changes — keeps pan/zoom repaints cheap
+      const st = el._mk || (el._mk = {});
+      const ops = op.toFixed(2);
+      if (st.o !== ops) { el.style.opacity = ops; st.o = ops; }
+      const nd = this.byId[nid];
+      const fmq = Math.round(fm * 16) / 16, blq = Math.round(blur * 3) / 3;
+      let filt = (blq > 0.1 ? 'blur(' + blq.toFixed(2) + 'px) ' : '') + 'brightness(' + Math.min(1.08, 0.5 + 0.58 * fmq).toFixed(2) + ')';
+      if (nd && nd.col) filt += ' drop-shadow(0 0 ' + (8 + 14 * fmq).toFixed(0) + 'px ' + this.hexA(nd.col, 0.18 + 0.42 * fmq) + ')';
+      const lit = fmq >= 0.985 && (this.state.selId || focusActive || (nd && nd.lvl <= 0));
+      if (lit) filt += ' drop-shadow(0 0 24px rgba(255,209,130,0.45)) drop-shadow(0 0 58px rgba(255,196,110,0.22))';
+      if (st.f !== filt) { el.style.filter = filt; st.f = filt; }
+      const zq = String(4000 - Math.round(dz / 40) * 20 + (fm >= 0.985 ? 500 : 0));
+      if (st.z !== zq) { el.style.zIndex = zq; st.z = zq; }
+      const pe = (op > 0.12 && nearFade > 0.5) ? 'auto' : 'none';
+      if (st.p !== pe) { el.style.pointerEvents = pe; st.p = pe; }
+      this.nodePos[el.getAttribute('data-node-id')] = { sx: sx, sy: sy, m: m, dz: dz, op: op };
+    });
+    // are we over the intro or the map? (manual moves only — flights set it themselves)
+    if (this._manual && !this._flyRaf) {
+      const inIntro = this.cam.y < -420 && !this.state.selId;
+      if (inIntro !== this._atIntro) { this._atIntro = inIntro; this.setState({ intro: inIntro }); }
+    }
+    this.renderStrings();
+  }
+
+  updateLOD(s) {
+    const scaleLvl = s < 0.42 ? 0 : s < 0.72 ? 1 : s < 1.06 ? 2 : 3;
+    const maxLvl = Math.max(scaleLvl, this._focusLvl || 0);
+    this._lod = maxLvl;
+    if (!this.root) return;
+    this.root.querySelectorAll('[data-node-id]').forEach(el => {
+      const L = +el.getAttribute('data-lvl');
+      const vis = (L === -1) || (L <= maxLvl);
+      const want = vis ? '1' : '0';
+      if (el.style.opacity !== want) { el.style.opacity = want; el.style.pointerEvents = vis ? 'auto' : 'none'; }
+    });
+    if (this.lineGroups) this.lineGroups.forEach(o => {
+      const vis = o.need <= maxLvl;
+      o.g.style.opacity = vis ? '1' : '0';
+      o.g.style.pointerEvents = vis ? '' : 'none';
+    });
+  }
+
+  applyHighlight() {
+    if (!this.root) return;
+    const sel = this.state.selId;
+    const rEl = this.nodeEl('root');
+    if (rEl) rEl.classList.toggle('mk-pulse', !sel && this.state.nudge);
+    this.root.querySelectorAll('[data-node-id]').forEach(e => {
+      const on = sel && e.getAttribute('data-node-id') === sel;
+      e.style.outline = on ? '2px solid #F4CB7A' : '';
+      e.style.outlineOffset = on ? '3px' : '';
+    });
+  }
+
+  fitBox(minx, miny, maxx, maxy, dur) {
+    const vpW = this.vp.clientWidth, vpH = this.vp.clientHeight;
+    const availW = (vpW - this.legendInset() - (this._panelW || 0)) * 0.86, availH = vpH * 0.9;
+    const bw = Math.max(1, maxx - minx), bh = Math.max(1, maxy - miny);
+    let s = Math.min(availW / bw, availH / bh);
+    s = Math.max(0.1, Math.min(3.6, s));
+    const planeZ = this._fitZ != null ? this._fitZ : this.refZ;
+    this.animateTo({ x: (minx + maxx) / 2, y: (miny + maxy) / 2, z: planeZ - this.F / s }, dur);
+  }
+
+  deselect() {
+    this._atIntro = false;
+    if (this.state.intro) this.setState({ intro: false });
+    if (this._panelHintShown && this.state.panelHint) {
+      try { localStorage.setItem('pa-mk-hint-panel', '1'); } catch (e) {}
+      this.setState({ panelHint: false });
+    }
+    if (this.state.selId) this.setState({ selId: null });
+    this._panelW = 0;
+    this._focusLvl = 0;
+    this.refZ = this.zForLvl(0); this._fitZ = this.zForLvl(0);
+    this.applyCam();
+    this.startFocus();
+    const b = this.regionBBox(), pad = 480;
+    this.fitBox(b.minx - pad, b.miny - pad, b.maxx + pad, b.maxy + pad, 1500);
+  }
+
+  panelWidthFor() { return Math.min(452, this.vp.clientWidth * 0.42); }
+  // left inset so the open Key legend never covers fitted content
+  legendInset() { return this.state.legendOpen && !this._atIntro && !this._panelW && this.vp ? Math.min(300, this.vp.clientWidth * 0.3) : 0; }
+
+  select(id) {
+    const n = this.byId[id]; if (!n) return;
+    this._userMoved = true;
+    this.hideTip();
+    this._panelW = this.panelWidthFor();
+    this.setState({ selId: id, nudge: false });
+    this._panelHintShown = true;
+    this._focusLvl = Math.min(3, (n.lvl < 0 ? 0 : n.lvl) + 1);
+    this.refZ = this.zForLvl(n.lvl); this._fitZ = this.zForLvl(n.lvl);
+    this.applyCam();
+    this.startFocus();
+    this.pluck(id);
+    const kids = this.nodes.filter(c => c.parent === id);
+    const pts = [n].concat(kids);
+    let minx = 1e9, miny = 1e9, maxx = -1e9, maxy = -1e9;
+    pts.forEach(p => { minx = Math.min(minx, p.wx); miny = Math.min(miny, p.wy); maxx = Math.max(maxx, p.wx); maxy = Math.max(maxy, p.wy); });
+    const pad = kids.length ? 360 : 300;
+    this.fitBox(minx - pad, miny - pad, maxx + pad, maxy + pad, 1700);
+  }
+
+  // camera distance that fits the overview — the zoom-out wall
+  overviewDz() {
+    if (!this.vp) return this.F * 6;
+    const vpW = this.vp.clientWidth, vpH = this.vp.clientHeight;
+    if (!vpW || !vpH) return this.F * 6;
+    const b = this.regionBBox(), pad = 460;
+    const bw = (b.maxx - b.minx) + pad * 2, bh = (b.maxy - b.miny) + pad * 2;
+    let s = Math.min((vpW - this.legendInset()) * 0.97 / bw, vpH * 0.97 / bh);
+    s = Math.max(0.1, Math.min(1.2, s));
+    return this.F / s;
+  }
+
+  zoomBy(f) {
+    this._userMoved = true;
+    let dz = (this.refZ - this.cam.z) / f;
+    dz = Math.max(this.NEAR + 60, Math.min(this.overviewDz() * 1.3, dz));
+    this.animateTo({ x: this.cam.x, y: this.cam.y, z: this.refZ - dz }, 300);
+  }
+
+  onWheel(e) {
+    e.preventDefault();
+    this._userMoved = true;
+    this._manual = true;
+    const rect = this.vp.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const li = this.legendInset();
+    const cx = li + (this.vp.clientWidth - li - (this._panelW || 0)) / 2, cy = this.vp.clientHeight / 2;
+    const F = this.F;
+    const dz0 = Math.max(this.NEAR + 1, this.refZ - this.cam.z);
+    const maxDz = this.overviewDz() * 1.3;
+    // pulling back past the overview edge scrolls the page up to the intro
+    if (e.deltaY > 0 && !this.state.selId && !this._atIntro && dz0 >= maxDz * 0.98) {
+      const now = performance.now();
+      if (!this._exitT || now - this._exitT > 900) this._exitAcc = 0;
+      this._exitT = now;
+      this._exitAcc = (this._exitAcc || 0) + e.deltaY;
+      if (this._exitAcc > 260) { this._exitAcc = 0; this.flyToIntro(); }
+      return;
+    }
+    const m0 = F / dz0;
+    const worldX = this.cam.x + (mx - cx) / m0, worldY = this.cam.y + (my - cy) / m0;
+    const f = e.deltaY < 0 ? 1.07 : 0.934;
+    let dz1 = dz0 / f; dz1 = Math.max(this.NEAR + 60, Math.min(maxDz, dz1));
+    const m1 = F / dz1;
+    this.cam.z = this.refZ - dz1;
+    this.cam.x = worldX - (mx - cx) / m1;
+    this.cam.y = worldY - (my - cy) / m1;
+    this.motion(); this.cancelFly(); this.applyCam();
+  }
+
+  animateTo(target, dur) {
+    dur = dur || 700;
+    this._manual = false;
+    const start = { x: this.cam.x, y: this.cam.y, z: this.cam.z };
+    const t0 = performance.now();
+    const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const step = (now) => {
+      let k = Math.min(1, (now - t0) / dur); const e = ease(k);
+      this.motion();
+      this.cam.x = start.x + (target.x - start.x) * e;
+      this.cam.y = start.y + (target.y - start.y) * e;
+      this.cam.z = start.z + (target.z - start.z) * e;
+      this.applyCam();
+      if (k < 1) this._flyRaf = requestAnimationFrame(step);
+    };
+    this.cancelFly(); this._flyRaf = requestAnimationFrame(step);
+    this._flyTimer = setTimeout(() => { this.cam.x = target.x; this.cam.y = target.y; this.cam.z = target.z; this.applyCam(); }, dur + 60);
+  }
+  cancelFly() { if (this._flyRaf) cancelAnimationFrame(this._flyRaf); this._flyRaf = null; if (this._flyTimer) clearTimeout(this._flyTimer); this._flyTimer = null; }
+
+  // Ease the spotlight when the selection changes so lights visibly fade up/down.
+  tickFocus = () => {
+    this._fmSettling = false;
+    this.applyCam();
+    this._focusRaf = this._fmSettling ? requestAnimationFrame(this.tickFocus) : null;
+  };
+  startFocus() {
+    this._fmFrom = Object.assign({}, this._fm || {});
+    this._focusT0 = performance.now();
+    this._focusDur = 1600;
+    if (!this._focusRaf) this._focusRaf = requestAnimationFrame(this.tickFocus);
+  }
+
+  bfs(start) {
+    const dist = {}; dist[start] = 0; const q = [start];
+    while (q.length) { const u = q.shift(); (this.adj[u] || []).forEach(v => { if (dist[v] == null) { dist[v] = dist[u] + 1; q.push(v); } }); }
+    return dist;
+  }
+
+  pluck(id, strength) {
+    if (!this.lineGroups) return;
+    strength = strength == null ? 1 : strength;
+    const dist = this.bfs(id), now = performance.now();
+    this.lineGroups.forEach(o => {
+      const da = dist[o.a] == null ? 99 : dist[o.a], db = dist[o.b] == null ? 99 : dist[o.b];
+      const d = Math.min(da, db);
+      o.amp = strength * o.ampBase * Math.exp(-0.5 * d);
+      o.delay = d * 60; o.t0 = now; o.dur = 3.8; o.decay = 1.25;
+    });
+    if (!this._vibTimer) this._vibTimer = setInterval(this.vibStep, 16);
+  }
+
+  vibStep = () => {
+    this.renderStrings();
+    if (!this._anyVib && this._vibTimer) { clearInterval(this._vibTimer); this._vibTimer = null; }
+  }
+
+  renderStrings() {
+    if (!this.lineGroups || !this.nodePos) return;
+    const now = performance.now();
+    let anyVib = false;
+    this.lineGroups.forEach(o => {
+      const A = this.nodePos[o.a], B = this.nodePos[o.b];
+      if (!A || !B) { o.vis.style.display = 'none'; o.halo.style.display = 'none'; o.hit.style.display = 'none'; return; }
+      o.vis.style.display = ''; o.halo.style.display = ''; o.hit.style.display = '';
+      let decayAmp = 0, tt = 0;
+      if (o.amp >= 0.001) {
+        const t = (now - o.t0 - o.delay) / 1000;
+        if (t < 0) { anyVib = true; }
+        else if (t < o.dur) { anyVib = true; tt = t; decayAmp = o.amp * Math.exp(-o.decay * t); }
+        else { o.amp = 0; }
+      }
+      const ax = A.sx, ay = A.sy, bx = B.sx, by = B.sy;
+      const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy) || 1;
+      const px = -dy / len, py = dx / len;
+      const pts = [[ax, ay]];
+      for (let qi = 0; qi < o.knots.length; qi++) {
+        const k = o.knots[qi];
+        const f = k.f, env = Math.sin(Math.PI * f);
+        const vibOff = decayAmp * env * Math.sin(2 * Math.PI * o.freq * tt + o.phase);
+        const amt = (k.off * 0.07 + vibOff) * len;
+        const sagY = len * 0.010 * env;
+        pts.push([ax + dx * f + px * amt, ay + dy * f + py * amt + sagY]);
+      }
+      pts.push([bx, by]);
+      let dpath = 'M' + ax.toFixed(1) + ' ' + ay.toFixed(1);
+      for (let p = 0; p < pts.length - 1; p++) {
+        const p0 = pts[p - 1] || pts[p], p1 = pts[p], p2 = pts[p + 1], p3 = pts[p + 2] || pts[p + 1];
+        const c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = p1[1] + (p2[1] - p0[1]) / 6;
+        const c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = p2[1] - (p3[1] - p1[1]) / 6;
+        dpath += ' C' + c1x.toFixed(1) + ' ' + c1y.toFixed(1) + ' ' + c2x.toFixed(1) + ' ' + c2y.toFixed(1) + ' ' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1);
+      }
+      o.vis.setAttribute('d', dpath); o.halo.setAttribute('d', dpath);
+      o.hit.setAttribute('x1', ax.toFixed(1)); o.hit.setAttribute('y1', ay.toFixed(1)); o.hit.setAttribute('x2', bx.toFixed(1)); o.hit.setAttribute('y2', by.toFixed(1));
+      const mAvg = (A.m + B.m) / 2;
+      let w = Math.max(0.5, mAvg * (o.type === 'cross' ? 2.1 : 2.0));
+      let op = (o.type === 'cross' ? 0.68 : 0.6) * Math.min(A.op, B.op);
+      const sel = this.state.selId;
+      const fmA = (this._fm && this._fm[o.a] != null) ? this._fm[o.a] : this.focusMul(o.a);
+      const fmB = (this._fm && this._fm[o.b] != null) ? this._fm[o.b] : this.focusMul(o.b);
+      const fmMin = Math.min(fmA, fmB);
+      op *= Math.max(sel ? 0.04 : 0.25, fmMin);
+      if (!sel && o.type === 'cross') { op *= 0.5; }
+      let haloK = 0.22;
+      if (sel && fmMin > 0.9) { w *= 1.3; op = Math.min(1, op + 0.22); haloK = 0.5; }  // threads shine under the light
+      if (o.hover) { w *= 1.7; op = Math.min(1, op + 0.4); haloK = 0.55; }
+      o.vis.setAttribute('stroke-width', w.toFixed(2));
+      o.vis.setAttribute('stroke-opacity', op.toFixed(2));
+      o.halo.setAttribute('stroke-width', (w * 3.0).toFixed(2));
+      o.halo.setAttribute('stroke-opacity', (op * haloK).toFixed(3));
+    });
+    this._anyVib = anyVib;
+    if (anyVib && !this._vibTimer) this._vibTimer = setInterval(this.vibStep, 16);
+  }
+
+  scheduleBreeze() {
+    const next = 2400 + Math.random() * 6800;
+    this._breezeTimer = setTimeout(() => { this.breeze(); this.scheduleBreeze(); }, next);
+  }
+
+  breeze() {
+    if (!this.lineGroups || !this.lineGroups.length || !this.nodes) return;
+    const strength = 0.05 + Math.random() * 0.13;
+    const origin = this.nodes[Math.floor(Math.random() * this.nodes.length)].id;
+    const dist = this.bfs(origin), now = performance.now();
+    this.lineGroups.forEach(o => {
+      const da = dist[o.a] == null ? 99 : dist[o.a], db = dist[o.b] == null ? 99 : dist[o.b];
+      const d = Math.min(da, db);
+      const a = strength * o.ampBase * 0.32 * Math.exp(-0.4 * d) * (0.4 + Math.random() * 0.7);
+      if (a > 0.0015) { o.amp = Math.max(o.amp, a); o.t0 = now; o.delay = d * 110 + Math.random() * 240; o.dur = 6.5; o.decay = 0.62; }
+    });
+    if (!this._vibTimer) this._vibTimer = setInterval(this.vibStep, 16);
+  }
+
+  showTip(text, ev) { const t = this.el('#mk-tooltip'); if (!t) return; t.textContent = text; t.style.display = 'block'; this.moveTip(ev); }
+  moveTip(ev) {
+    const t = this.el('#mk-tooltip'); if (!t) return;
+    const pad = 14; let x = ev.clientX + pad, y = ev.clientY + pad;
+    const w = t.offsetWidth, h = t.offsetHeight;
+    if (x + w > window.innerWidth - 8) x = ev.clientX - w - pad;
+    if (y + h > window.innerHeight - 8) y = ev.clientY - h - pad;
+    t.style.left = x + 'px'; t.style.top = y + 'px';
+  }
+  hideTip() { const t = this.el('#mk-tooltip'); if (t) t.style.display = 'none'; }
+
+  regionName(id) { return ({ root: 'The making-of', t1: 'Absence', t2: 'Storybuilding', t3: 'Translation', t4: 'Ethics' })[id.split('-')[0]] || ''; }
+
+  renderVals() {
+    const all = this.buildNodes();
+    const lvl = (l) => all.filter(n => n.lvl === l);
+    const byId = this.byId || (() => { const m = {}; all.forEach(n => m[n.id] = n); return m; })();
+    const sel = this.state.selId ? byId[this.state.selId] : null;
+    let selConnections = [], selChildren = [], selParent = null;
+    if (sel) {
+      this.links.forEach(k => {
+        if (k.a === sel.id || k.b === sel.id) {
+          const o = byId[k.a === sel.id ? k.b : k.a];
+          selConnections.push({ id: o.id, num: o.num, label: o.label, text: k.text });
+        }
+      });
+      selChildren = all.filter(n => n.parent === sel.id).map(n => ({ id: n.id, num: n.num, label: n.label }));
+      if (sel.parent) { const p = byId[sel.parent]; selParent = { id: p.id, num: p.num, label: p.label }; }
+    }
+    let selPath = [];
+    if (sel) {
+      let p = sel.parent ? byId[sel.parent] : null;
+      while (p) { selPath.unshift({ id: p.id, label: p.id === 'root' ? 'The making of' : p.label }); p = p.parent ? byId[p.parent] : null; }
+    }
+    return {
+      rootNodes: lvl(-1), regions: lvl(0), l1: lvl(1), l2: lvl(2), l3: lvl(3),
+      legendOpen: this.state.legendOpen && !sel && !this.state.intro,
+      legendClosed: !this.state.legendOpen && !sel && !this.state.intro,
+      introBtnOpen: !this.state.intro,
+      nudgeOpen: !this.state.selId && this.state.nudge && !this.state.intro,
+      selPath,
+      selCrumb: sel ? (sel.id === 'root' ? 'The making of' : sel.label) : '',
+      panelHintOpen: !!sel && this.state.panelHint,
+      selOpen: !!sel,
+      selColor: sel ? sel.col : '#48C6A8',
+      selRegion: sel ? this.regionName(sel.id) : '',
+      selNum: sel ? sel.num : '', selLabel: sel ? sel.label : '', selBlurb: sel ? (sel.blurb || '') : '',
+      selAuthors: sel ? (sel.authors || '') : '', selHasAuthors: !!(sel && sel.authors),
+      selQuestions: sel && sel.questions ? sel.questions : [], selHasQuestions: !!(sel && sel.questions && sel.questions.length),
+      selConnections, selHasConnections: selConnections.length > 0,
+      selChildren, selHasChildren: selChildren.length > 0,
+      selParent: selParent || { id: '', num: '', label: '' }, selHasParent: !!selParent,
+    };
+  }
+}
+</script>
+</body>
+</html>
