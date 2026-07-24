@@ -117,23 +117,14 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     cursor: grabbing;
   }
 
-  /* A static backdrop, isolated on its own compositing layer (translateZ
-     forces this) so the constantly-repositioned nodes/lines/territories
-     above it never force the browser to re-rasterize this background — an
-     un-isolated multi-layer gradient here was expensive enough to visibly
-     stutter the whole map on every repaint. Kept to two soft glows rather
-     than four for the same reason: less to recomposite per frame. */
-  /* `contain: paint` (not just a translateZ/will-change hint) gives each of
-     these its own paint boundary — the browser can repaint one without
-     needing to touch the others, so a :hover style change on a single node
-     title, or the SVG wires re-rendering, can no longer force the static
-     gradient background to re-rasterize itself too. */
+  /* A static backdrop, kept to two soft glows rather than four so there's
+     less for the browser to recomposite behind the constantly-repositioned
+     nodes/lines/territories on every repaint. */
   #mk-bg {
     position: absolute;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    contain: paint;
     background-image:
       radial-gradient(ellipse 1100px 750px at 30% 28%, rgba(122, 152, 214, 0.07), transparent 68%),
       radial-gradient(ellipse 1100px 750px at 70% 78%, rgba(210, 130, 136, 0.07), transparent 68%);
@@ -148,7 +139,6 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     overflow: visible;
     pointer-events: none;
     z-index: 5;
-    contain: paint;
   }
 
   #mk-terr {
@@ -156,7 +146,6 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     inset: 0;
     pointer-events: none;
     z-index: 3;
-    contain: paint;
   }
 
   #mk-nodes {
@@ -164,7 +153,6 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     inset: 0;
     pointer-events: none;
     z-index: 10;
-    contain: paint;
   }
 
   :global(.mk-node) {
@@ -1149,11 +1137,22 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
       op *= nearFade;
       el.style.opacity = op.toFixed(2);
       const fmq = Math.round(nfm * 16) / 16;
-      const blq = Math.round(blur * 3) / 3;
-      let filt = (blq > 0.1 ? `blur(${blq.toFixed(2)}px) ` : '') + `brightness(${Math.min(1.08, 0.5 + 0.58 * fmq).toFixed(2)})`;
-      filt += ` drop-shadow(0 0 ${(8 + 14 * fmq).toFixed(0)}px ${hexA(n.color, 0.18 + 0.42 * fmq)})`;
-      const lit = fmq >= 0.985 && (!!selId || focusActive || n.level <= 0);
-      if (lit) filt += ' drop-shadow(0 0 24px rgba(255,209,130,0.45)) drop-shadow(0 0 58px rgba(255,196,110,0.22))';
+      // Blur + multiple stacked drop-shadows, recomputed on every node every
+      // frame, is expensive enough on some GPUs to visibly stutter or even
+      // corrupt a frame during an active camera flight — so during motion
+      // (see motion() below, same flag the SVG thread filter uses) fall back
+      // to a single cheap brightness filter, and restore the full glow once
+      // the camera actually settles.
+      let filt: string;
+      if (fxHeld) {
+        filt = `brightness(${Math.min(1.08, 0.5 + 0.58 * fmq).toFixed(2)})`;
+      } else {
+        const blq = Math.round(blur * 3) / 3;
+        filt = (blq > 0.1 ? `blur(${blq.toFixed(2)}px) ` : '') + `brightness(${Math.min(1.08, 0.5 + 0.58 * fmq).toFixed(2)})`;
+        filt += ` drop-shadow(0 0 ${(8 + 14 * fmq).toFixed(0)}px ${hexA(n.color, 0.18 + 0.42 * fmq)})`;
+        const lit = fmq >= 0.985 && (!!selId || focusActive || n.level <= 0);
+        if (lit) filt += ' drop-shadow(0 0 24px rgba(255,209,130,0.45)) drop-shadow(0 0 58px rgba(255,196,110,0.22))';
+      }
       el.style.filter = filt;
       el.style.zIndex = String(4000 - Math.round(dz / 40) * 20 + (nfm >= 0.985 ? 500 : 0));
       el.style.pointerEvents = op > 0.12 && nearFade > 0.5 ? 'auto' : 'none';
