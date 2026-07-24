@@ -69,16 +69,7 @@ export interface ThemeMap {
 }
 
 const RADIUS = [950, 780, 560, 500];
-// Half-diagonal of each level's on-screen box (measured from the rendered
-// LEVEL_CFG sizes in making-of.astro, worst case across wrapped labels) —
-// the safe clearance radius regardless of which direction a box sits from
-// another, since boxes stay axis-aligned rather than rotating to face their
-// neighbor. Index 0 is the root; 1-4 are regions through level-3 leaves.
-const CLEARANCE = [760, 410, 255, 225, 175];
-
-function clearanceFor(level: number): number {
-  return CLEARANCE[Math.min(level + 1, CLEARANCE.length - 1)];
-}
+const ARC = [160, 130, 100];
 
 function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '');
@@ -100,45 +91,20 @@ export function buildThemeMap(raw: RawThemesData): ThemeMap {
     [root.id]: { x: 0, y: 0, angle: -90 },
   };
 
-  const MARGIN = 1.12;
-  // Parent and child sit at different camera z-depths (see ZLEVEL in
-  // making-of.astro), so under the perspective camera their on-screen gap
-  // isn't just their world-space distance times some shared scale — a
-  // branch that's off-center from wherever the camera happens to be looking
-  // gets extra parallax compression between its own depth layers. A flat
-  // world-space clearance check (accurate for same-depth siblings) isn't
-  // enough for cross-depth parent/child pairs, so they get a larger margin.
-  const PARENT_MARGIN = 2.5;
-
-  // Minimum angle (in degrees) between two points at `radius` so two boxes
-  // needing `combinedClearance` between their centers don't touch.
-  function minGapDeg(radius: number, combinedClearance: number): number {
-    const ratio = Math.min(0.98, (combinedClearance * MARGIN) / radius);
-    return (2 * Math.asin(ratio) * 180) / Math.PI;
-  }
-
-  // Radius that puts n points, evenly spread across `arcSpan` degrees
-  // (or the full circle when arcSpan is 360), far enough apart that
-  // `combinedClearance` fits between any two adjacent ones.
-  function radiusForGap(arcSpan: number, n: number, combinedClearance: number): number {
-    const halfGapDeg = arcSpan / n / 2;
-    return (combinedClearance * MARGIN) / Math.sin(halfGapDeg * (Math.PI / 180));
-  }
-
-  // `angularBudget` is how much of the circle this branch is allowed to fan
-  // across without risking crossing into a sibling branch's territory — it
-  // shrinks every generation so deep fans can't bleed sideways into a
-  // neighboring cousin branch.
-  function layoutChildren(parentId: string, angularBudget: number) {
+  // Nodes are allowed to sit close together, even overlap a little at the
+  // edges — the reading panel's theatrical spotlight (see focusMul in
+  // making-of.astro) is what keeps things legible: whatever isn't part of
+  // the selected branch fades into the background, so a dim box behind a
+  // lit one reads as depth, not clutter. Only the root needs a hard rule —
+  // it's a single very wide, short box that stays lit at all times, so a
+  // same-brightness region sitting behind it would genuinely disappear.
+  function layoutChildren(parentId: string) {
     const kids = childrenOf[parentId] || [];
-    const n = kids.length;
-    if (!n) return;
+    if (!kids.length) return;
     const parent = pos[parentId];
     const parentNode = byId[parentId];
     const level = parentNode.level + 1;
-    const baseRadius = RADIUS[Math.min(level, RADIUS.length - 1)];
-    const clearance = clearanceFor(level);
-    const parentClearance = clearanceFor(parentNode.level);
+    const radius = RADIUS[Math.min(level, RADIUS.length - 1)];
 
     if (parentId === root.id) {
       // Regions: spread evenly around the full circle, starting off-axis
@@ -147,55 +113,24 @@ export function buildThemeMap(raw: RawThemesData): ThemeMap {
       // is tall, so an axis-aligned region can sit inside its horizontal
       // extent even at a generous radius, while a diagonal placement clears
       // it using the root's (much smaller) vertical extent instead.
-      const slice = 360 / n;
-      let radius = baseRadius;
-      if (minGapDeg(radius, clearance * 2) > slice) radius = radiusForGap(360, n, clearance * 2);
-      // Regions also need to individually clear the root's own box —
-      // required distance depends on the region's angle relative to root's
-      // (wide, short) box, so use the conservative half-diagonal bound.
-      radius = Math.max(radius, (parentClearance + clearance) * PARENT_MARGIN);
       kids.forEach((id, i) => {
-        const angle = -45 + slice * i;
+        const angle = -45 + (360 / kids.length) * i;
         const rad = (angle * Math.PI) / 180;
         pos[id] = { x: parent.x + radius * Math.cos(rad), y: parent.y + radius * Math.sin(rad), angle };
-        layoutChildren(id, slice * 0.82);
       });
     } else {
       // Deeper generations: fan across an arc centered on the parent's own
       // outward direction, so the tree keeps growing away from the center.
-      // The arc widens with sibling count (so a lone child doesn't fan at
-      // all, and a crowded parent spreads further) but never past its
-      // angular budget; if even the budget isn't enough room at the default
-      // radius, push this branch further out instead so siblings still
-      // clear each other.
-      let arc = 0;
-      let radius = baseRadius;
-      if (n > 1) {
-        const needed = minGapDeg(baseRadius, clearance * 2) * (n - 1);
-        if (needed <= angularBudget) {
-          arc = needed;
-        } else {
-          arc = angularBudget;
-          radius = Math.max(baseRadius, radiusForGap(arc, n - 1, clearance * 2));
-        }
-      }
-      // A lone child fans at zero degrees — sitting directly on the same ray
-      // as its parent — so sibling spacing alone doesn't guarantee it clears
-      // the parent's own box. Require the radius to cover both boxes'
-      // clearance radii regardless of sibling count; this is conservative
-      // (it doesn't know the actual angle relative to each box's width vs.
-      // height) but guarantees no parent/child overlap at any orientation.
-      radius = Math.max(radius, (parentClearance + clearance) * PARENT_MARGIN);
+      const arc = ARC[Math.min(level - 1, ARC.length - 1)];
       kids.forEach((id, i) => {
-        const angle = n === 1 ? parent.angle : parent.angle - arc / 2 + (arc * i) / (n - 1);
+        const angle = kids.length === 1 ? parent.angle : parent.angle - arc / 2 + (arc * i) / (kids.length - 1);
         const rad = (angle * Math.PI) / 180;
         pos[id] = { x: parent.x + radius * Math.cos(rad), y: parent.y + radius * Math.sin(rad), angle };
-        const childBudget = n > 1 ? Math.max(24, (arc / (n - 1)) * 0.82) : angularBudget * 0.82;
-        layoutChildren(id, childBudget);
       });
     }
+    kids.forEach((id) => layoutChildren(id));
   }
-  layoutChildren(root.id, 360);
+  layoutChildren(root.id);
 
   function topRegionLabel(n: RawThemeNode): string | null {
     let cur: RawThemeNode | undefined = n;

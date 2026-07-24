@@ -123,12 +123,17 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
      un-isolated multi-layer gradient here was expensive enough to visibly
      stutter the whole map on every repaint. Kept to two soft glows rather
      than four for the same reason: less to recomposite per frame. */
+  /* `contain: paint` (not just a translateZ/will-change hint) gives each of
+     these its own paint boundary — the browser can repaint one without
+     needing to touch the others, so a :hover style change on a single node
+     title, or the SVG wires re-rendering, can no longer force the static
+     gradient background to re-rasterize itself too. */
   #mk-bg {
     position: absolute;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    transform: translateZ(0);
+    contain: paint;
     background-image:
       radial-gradient(ellipse 1100px 750px at 30% 28%, rgba(122, 152, 214, 0.07), transparent 68%),
       radial-gradient(ellipse 1100px 750px at 70% 78%, rgba(210, 130, 136, 0.07), transparent 68%);
@@ -143,6 +148,7 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     overflow: visible;
     pointer-events: none;
     z-index: 5;
+    contain: paint;
   }
 
   #mk-terr {
@@ -150,6 +156,7 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     inset: 0;
     pointer-events: none;
     z-index: 3;
+    contain: paint;
   }
 
   #mk-nodes {
@@ -157,6 +164,7 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     inset: 0;
     pointer-events: none;
     z-index: 10;
+    contain: paint;
   }
 
   :global(.mk-node) {
