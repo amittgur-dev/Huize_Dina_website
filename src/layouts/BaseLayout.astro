@@ -58,7 +58,13 @@ const {
          CMS. -->
     <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <script is:inline>
-      if (window.netlifyIdentity) {
+      // The widget fires 'login' both for a fresh invite/recovery/
+      // confirmation completion AND for silently restoring an already-
+      // logged-in session on any later page load — only the former should
+      // send someone to the CMS, or every visit while logged in would
+      // hijack normal site browsing. Only redirect when this page load's
+      // URL actually carries one of those one-time tokens.
+      if (window.netlifyIdentity && /(invite_token|recovery_token|confirmation_token|email_change_token)=/.test(window.location.hash)) {
         window.netlifyIdentity.on('login', () => {
           document.location.href = '/admin/';
         });
