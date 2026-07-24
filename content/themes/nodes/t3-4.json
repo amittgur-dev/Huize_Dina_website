@@ -1,0 +1,17 @@
+{
+  "id": "t3-4",
+  "number": "3.4",
+  "label": "Giving voice to the written text",
+  "level": 1,
+  "parent": "t3",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "Giving spoken voice to written text — casting, directing, and the choices that implies.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": "Tzlil, Ari"
+}

@@ -1,0 +1,20 @@
+{
+  "id": "root",
+  "number": "0",
+  "label": "The Making of Polyphonic Archive",
+  "level": -1,
+  "parent": null,
+  "blocks": [
+    {
+      "type": "text",
+      "text": "The map of how Polyphonic Archive was made — the questions, tensions and craft behind turning a near-silent archive into a podcast. Four regions branch from here: what was absent, how the story was built, how it was translated between media, and the ethics beneath it all.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": [
+    "What does it take to give voice to those the archive left silent?",
+    "When the record runs out, what may we honestly add?"
+  ],
+  "authors": null
+}

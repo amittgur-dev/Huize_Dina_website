@@ -137,3 +137,24 @@ Rights note: these are archival/family photographs used for a memorial project. 
 2. Timelines page from `content/timelines.json` (episode switcher, alternating spine, lightbox, Engers sister tags/jumps, responsive rail).
 3. Making Of map from `content/themes.json` with **auto-layout** (pan/zoom, reading panel, cross-links).
 4. Wire the Git-based CMS (`/admin`) collections mirroring the two JSON shapes + page text; connect Netlify deploy.
+
+## Implementation notes
+
+Built with Astro (static output) + Decap CMS. The two JSON shapes above are
+still the source of truth, but split into one file per entry so the CMS can
+offer them as separate, editable records:
+- `content/timelines/{slug}.json` — one file per timeline (was `content/timelines.json`).
+- `content/themes/nodes/{id}.json` — one file per theme node (was the `nodes` array in `content/themes.json`); `content/themes/cross-links.json` and `content/themes/region-colors.json` hold the rest.
+- `content/pages/*.json` and `content/team.json` are unchanged — object-rooted, so they map 1:1 to a Decap "file" collection.
+
+**Run locally:** `npm install`, `npm run dev` (site) — `/admin` needs a build
+first (`npm run build && npm run preview`) since the CMS bundle is vendored
+into `public/admin/decap/` by a `prebuild`/`postinstall` script, not fetched
+from a CDN.
+
+**Deploy to Netlify:** connect the repo (build command `npm run build`,
+publish `dist`, already set in `netlify.toml`), then in the Netlify
+dashboard enable **Identity** and, under Identity settings, **Git Gateway**
+— this is what `/admin`'s `git-gateway` backend logs editors in through, and
+can only be turned on from Netlify's UI, not from this repo. Invite editors
+under Identity → Invite users.

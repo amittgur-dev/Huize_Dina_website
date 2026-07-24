@@ -1,0 +1,20 @@
+{
+  "id": "t1",
+  "number": "1",
+  "label": "Absence",
+  "level": 0,
+  "parent": "root",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "The founding problem. The girls of Huize Dina barely speak in the surviving record. This region maps every kind of silence we worked against — and what the gaps themselves can be made to say.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": [
+    "How can we tell the story of the girls when they are absent from the archive?",
+    "Which opportunities come with the public making of archives?"
+  ],
+  "authors": null
+}

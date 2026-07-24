@@ -1,0 +1,17 @@
+{
+  "id": "t2-1-1",
+  "number": "2.1.1",
+  "label": "Distilling dramatic structure",
+  "level": 2,
+  "parent": "t2-1",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "Finding dramatic and narrative structure latent in the documents.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": "Ari, Tzlil (text) · Amit (review)"
+}

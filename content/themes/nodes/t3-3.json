@@ -1,0 +1,17 @@
+{
+  "id": "t3-3",
+  "number": "3.3",
+  "label": "Archive → podcast",
+  "level": 1,
+  "parent": "t3",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "What is gained and lost when a historical archive becomes a podcast?",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": "Naomi (text) · Tzlil, Ari, Amit (review)"
+}

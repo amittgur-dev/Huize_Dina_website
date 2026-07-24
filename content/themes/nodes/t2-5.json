@@ -1,0 +1,17 @@
+{
+  "id": "t2-5",
+  "number": "2.5",
+  "label": "The historian as protagonist",
+  "level": 1,
+  "parent": "t2",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "Letting the researcher carry the story — the historian as the protagonist of the telling.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": "Ari (text) · Jair (review)"
+}

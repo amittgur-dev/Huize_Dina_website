@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Content Manager · Huize Dina</title>
+    <!-- Absolute path so config loads correctly regardless of whether the
+         host serves /admin with or without a trailing slash. -->
+    <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  </head>
+  <body>
+    <!-- Vendored from decap-cms (package.json) by scripts/vendor-decap-cms.mjs
+         so this page doesn't depend on a third-party CDN at runtime. -->
+    <script src="/admin/decap/decap-cms.js"></script>
+    <script>
+      // Netlify Identity sends invite/recovery links to the site root with a
+      // #token in the hash; redirect those into the CMS's own auth flow.
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.on('init', (user) => {
+          if (!user) {
+            window.netlifyIdentity.on('login', () => {
+              document.location.href = '/admin/';
+            });
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

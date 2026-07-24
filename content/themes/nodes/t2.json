@@ -1,0 +1,20 @@
+{
+  "id": "t2",
+  "number": "2",
+  "label": "Storybuilding",
+  "level": 0,
+  "parent": "root",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "How the material becomes a story you can be inside — dramaturgy, emphasis, sound, and the figure who carries the telling.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": [
+    "How do you distil a narrative form from archival material?",
+    "Can the historian be the protagonist of the story?"
+  ],
+  "authors": null
+}

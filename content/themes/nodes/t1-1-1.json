@@ -1,0 +1,17 @@
+{
+  "id": "t1-1-1",
+  "number": "1.1.1",
+  "label": "Privacy of the individual",
+  "level": 2,
+  "parent": "t1-1",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "What the record withholds out of care — the privacy of the individual, even within an opened archive.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": null
+}

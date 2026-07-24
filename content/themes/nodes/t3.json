@@ -1,0 +1,17 @@
+{
+  "id": "t3",
+  "number": "3",
+  "label": "Translation between media",
+  "level": 0,
+  "parent": "root",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "Everything here crosses a boundary — between space and sound, language and language, document and drama. What survives the crossing, and what changes?",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": null
+}

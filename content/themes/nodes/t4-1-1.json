@@ -1,0 +1,17 @@
+{
+  "id": "t4-1-1",
+  "number": "4.1.1",
+  "label": "Accuracy vs. art-making",
+  "level": 2,
+  "parent": "t4-1",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "The central tension: historical accuracy versus the making of art.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": null
+}

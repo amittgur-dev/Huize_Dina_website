@@ -1,10 +1,21 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import themesRaw from '../../content/themes.json';
+import regionColors from '../../content/themes/region-colors.json';
+import crossLinksFile from '../../content/themes/cross-links.json';
 import { buildThemeMap } from '../lib/themes';
-import type { RawThemesData } from '../lib/themes';
+import type { RawThemeNode, RawThemesData } from '../lib/themes';
 
-const themeMap = buildThemeMap(themesRaw as RawThemesData);
+// One file per theme node (content/themes/nodes/*.json) so editors can add,
+// rename, and re-nest themes as independent CMS entries — the tree shape
+// comes entirely from each node's own `parent` field, not file order.
+const nodeFiles = import.meta.glob<RawThemeNode>('../../content/themes/nodes/*.json', { eager: true, import: 'default' });
+const themesRaw: RawThemesData = {
+  regionColors,
+  nodes: Object.values(nodeFiles),
+  crossLinks: crossLinksFile.links,
+};
+
+const themeMap = buildThemeMap(themesRaw);
 const regions = themeMap.nodes.filter((n) => n.level === 0);
 ---
 
@@ -94,7 +105,7 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     <h2 id="mk-panel-title" class="mk-panel-title"></h2>
     <div id="mk-panel-authors" class="mk-panel-authors" hidden></div>
     <div id="mk-panel-rule" class="mk-panel-rule"></div>
-    <div id="mk-panel-blurb" class="mk-panel-blurb"></div>
+    <div id="mk-panel-blocks" class="mk-panel-blocks"></div>
     <div id="mk-panel-questions" class="mk-panel-questions" hidden>
       <div class="mk-eyebrow mk-panel-label">Open questions</div>
       <div id="mk-panel-questions-list"></div>
@@ -570,10 +581,46 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     margin: 18px 0;
   }
 
-  .mk-panel-blurb {
+  .mk-panel-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  :global(.mk-block-text) {
     font-size: 17px;
     line-height: 1.7;
     color: #e6e1d9;
+  }
+
+  :global(.mk-block-media) {
+    border: 1px solid rgba(230, 225, 217, 0.16);
+    background: rgba(0, 0, 0, 0.22);
+  }
+
+  :global(.mk-block-media img),
+  :global(.mk-block-media video) {
+    display: block;
+    width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+  }
+
+  :global(.mk-block-media audio) {
+    display: block;
+    width: 100%;
+  }
+
+  :global(.mk-block-media .mk-block-audio-wrap) {
+    padding: 14px;
+  }
+
+  :global(.mk-block-caption) {
+    font-size: 12px;
+    font-style: italic;
+    line-height: 1.5;
+    color: #9a938a;
+    padding: 8px 10px;
   }
 
   .mk-panel-label {
@@ -698,13 +745,19 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
 </style>
 
 <script>
+  interface ContentBlock {
+    type: 'text' | 'image' | 'audio' | 'video';
+    text: string | null;
+    file: string | null;
+    caption: string | null;
+  }
   interface ThemeNode {
     id: string;
     number: string;
     label: string;
     level: number;
     parent: string | null;
-    blurb: string;
+    blocks: ContentBlock[];
     questions: string[];
     authors: string | null;
     color: string;
@@ -1030,7 +1083,7 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     }
 
     (document.getElementById('mk-panel-rule') as HTMLElement).style.background = n.color;
-    (document.getElementById('mk-panel-blurb') as HTMLElement).textContent = n.blurb;
+    renderBlocks(n.blocks);
 
     const qWrap = document.getElementById('mk-panel-questions')!;
     const qList = document.getElementById('mk-panel-questions-list')!;
@@ -1126,6 +1179,53 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     const d = document.createElement('div');
     d.textContent = s;
     return d.innerHTML;
+  }
+
+  // Renders each node's content blocks in the exact order an editor set in
+  // the CMS, so text and media interleave however they chose — not a fixed
+  // "text then media" layout.
+  const blocksWrap = document.getElementById('mk-panel-blocks')!;
+  function renderBlocks(blocks: ContentBlock[]) {
+    blocksWrap.innerHTML = '';
+    blocks.forEach((b) => {
+      if (b.type === 'text') {
+        const p = document.createElement('div');
+        p.className = 'mk-block-text';
+        p.textContent = b.text || '';
+        blocksWrap.appendChild(p);
+        return;
+      }
+      const wrap = document.createElement('div');
+      wrap.className = 'mk-block-media';
+      const src = b.file ? `/${b.file}` : '';
+      if (b.type === 'image') {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = b.caption || '';
+        img.loading = 'lazy';
+        wrap.appendChild(img);
+      } else if (b.type === 'video') {
+        const video = document.createElement('video');
+        video.src = src;
+        video.controls = true;
+        wrap.appendChild(video);
+      } else if (b.type === 'audio') {
+        const audioWrap = document.createElement('div');
+        audioWrap.className = 'mk-block-audio-wrap';
+        const audio = document.createElement('audio');
+        audio.src = src;
+        audio.controls = true;
+        audioWrap.appendChild(audio);
+        wrap.appendChild(audioWrap);
+      }
+      if (b.caption) {
+        const cap = document.createElement('div');
+        cap.className = 'mk-block-caption';
+        cap.textContent = b.caption;
+        wrap.appendChild(cap);
+      }
+      blocksWrap.appendChild(wrap);
+    });
   }
 
   // --- Tooltip ---

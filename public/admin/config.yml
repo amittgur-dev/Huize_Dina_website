@@ -1,0 +1,258 @@
+backend:
+  name: git-gateway
+  branch: main
+
+# Netlify Identity + Git Gateway must be enabled in the Netlify site's
+# dashboard (Site configuration → Identity) before this works — see
+# README.md's "Editing the site" section.
+
+site_url: https://huizedina.netlify.app
+display_url: https://huizedina.netlify.app
+
+media_folder: assets/site
+public_folder: /assets/site
+
+collections:
+  # --- Page text (Home / Podcast / Contact) ---------------------------
+  - name: pages
+    label: Page Text
+    files:
+      - name: home
+        label: Home page
+        file: content/pages/home.json
+        fields:
+          - { label: Eyebrow, name: eyebrow, widget: string }
+          - { label: Title, name: title, widget: string }
+          - label: Content blocks
+            name: blocks
+            widget: list
+            types:
+              - label: Paragraph
+                name: text
+                widget: object
+                fields:
+                  - { label: Type, name: type, widget: hidden, default: text }
+                  - { label: Text, name: text, widget: text, hint: "Wrap a word in *asterisks* for italics." }
+              - label: Image
+                name: image
+                widget: object
+                fields:
+                  - { label: Type, name: type, widget: hidden, default: image }
+                  - { label: Image, name: file, widget: image, media_folder: "assets/site", public_folder: "/assets/site" }
+                  - { label: Alt text, name: alt, widget: string }
+                  - { label: Caption, name: caption, widget: string, required: false }
+          - { label: Source note, name: sourceNote, widget: text, required: false }
+          - label: Footer links
+            name: links
+            widget: list
+            fields:
+              - { label: Label, name: label, widget: string }
+              - { label: Link (e.g. /podcast), name: href, widget: string }
+
+      - name: podcast
+        label: Podcast page
+        file: content/pages/podcast.json
+        fields:
+          - { label: Eyebrow, name: eyebrow, widget: string }
+          - { label: Title, name: title, widget: string }
+          - label: Episodes
+            name: episodes
+            widget: list
+            summary: "{{title}}"
+            fields:
+              - { label: Side label, name: sideLabel, widget: string }
+              - { label: Title, name: title, widget: string }
+              - { label: Numeral (I / II / III), name: numeral, widget: string }
+              - label: Acts
+                name: acts
+                widget: list
+                summary: "{{title}}"
+                fields:
+                  - { label: Key (unique, no spaces), name: key, widget: string }
+                  - { label: Title, name: title, widget: string }
+                  - label: Audio file
+                    name: audio
+                    widget: file
+                    required: false
+                    media_folder: "assets/audio"
+                    public_folder: "/assets/audio"
+                    hint: "Leave empty to show \"Recording to follow\"."
+          - { label: Footer note, name: footerNote, widget: string }
+
+      - name: contact
+        label: Contact page
+        file: content/pages/contact.json
+        fields:
+          - { label: Eyebrow, name: eyebrow, widget: string }
+          - { label: Title, name: title, widget: string }
+          - { label: Intro, name: intro, widget: text }
+          - label: Fields
+            name: fields
+            widget: list
+            summary: "{{label}}"
+            fields:
+              - { label: Label, name: label, widget: string }
+              - { label: Value, name: value, widget: text }
+          - label: Footer link
+            name: link
+            widget: object
+            fields:
+              - { label: Label, name: label, widget: string }
+              - { label: Link (e.g. /team), name: href, widget: string }
+
+  # --- Team --------------------------------------------------------------
+  - name: team
+    label: Team
+    files:
+      - name: team
+        label: Team page
+        file: content/team.json
+        fields:
+          - { label: Eyebrow, name: eyebrow, widget: string }
+          - { label: Title, name: title, widget: string }
+          - label: Members
+            name: members
+            widget: list
+            summary: "{{name}}"
+            fields:
+              - { label: Name, name: name, widget: string }
+              - { label: Role, name: role, widget: string }
+              - { label: Bio, name: bio, widget: text, hint: "Wrap a word in *asterisks* for italics." }
+              - { label: Photo, name: photo, widget: image, media_folder: "assets/site", public_folder: "/assets/site" }
+
+  # --- Timelines -----------------------------------------------------------
+  - name: timelines
+    label: Timelines
+    folder: content/timelines
+    create: false
+    delete: false
+    slug: "{{fields.slug}}"
+    summary: "{{episode}} — {{name}}"
+    fields:
+      - { label: Slug (matches the filename — do not change), name: slug, widget: string }
+      - { label: Episode, name: episode, widget: select, options: ["I", "II", "III"] }
+      - { label: Name (short), name: name, widget: string }
+      - { label: Title (full name), name: title, widget: string }
+      - { label: Years, name: years, widget: string, hint: "e.g. 1919—1944" }
+      - label: Events
+        name: events
+        widget: list
+        summary: "{{heading}}"
+        fields:
+          - { label: Date (ISO), name: date_iso, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, hint: "Leave empty for undated-but-ordered events (use Serial order instead)." }
+          - { label: "Date label (display text)", name: date_label, widget: string, required: false, hint: "Shown as-is when set, e.g. \"23 Mar. 1936\". Leave empty to auto-format from the ISO date." }
+          - { label: Serial order, name: serial, widget: number, required: false, hint: "Only for undated events — a legacy sequence number that places the event in order." }
+          - { label: Heading, name: heading, widget: string }
+          - { label: Text, name: text, widget: text }
+          - { label: Sister (Engers timeline only), name: sister, widget: select, options: ["mina", "sara", "both"], required: false }
+          - label: Image
+            name: image
+            widget: object
+            required: false
+            fields:
+              - { label: Image file, name: file, widget: image, media_folder: "assets/timeline", public_folder: "/assets/timeline" }
+              - { label: Caption, name: caption, widget: string }
+              - { label: Show at full size (portrait scans), name: full, widget: boolean, required: false, default: false }
+              - { label: Focus point (CSS object-position), name: focus, widget: string, required: false, hint: "e.g. \"left center\" — only for tightly-cropped scans." }
+              - { label: Zoom, name: zoom, widget: number, required: false, hint: "CSS scale factor, e.g. 1.6 — pairs with Focus point." }
+
+  # --- Making Of theme tree ------------------------------------------------
+  - name: themes
+    label: "Making Of: Themes"
+    folder: content/themes/nodes
+    create: true
+    slug: "{{fields.id}}"
+    summary: "{{number}} — {{label}}"
+    fields:
+      - { label: "ID (unique, no spaces — e.g. t1-2)", name: id, widget: string }
+      - { label: "Number (e.g. 1.2)", name: number, widget: string }
+      - { label: Label, name: label, widget: string }
+      - { label: Level (-1 = root, 0 = region, 1-3 = sub-themes), name: level, widget: number, value_type: int, min: -1, max: 3 }
+      - label: Parent theme
+        name: parent
+        widget: relation
+        collection: themes
+        search_fields: [label, id]
+        value_field: id
+        display_fields: [number, label]
+        required: false
+        hint: "Leave empty only for the single root theme."
+      - label: Content
+        name: blocks
+        widget: list
+        hint: "Add, remove, and reorder text and media freely — they render in exactly this order, so this controls how images/audio/video interleave with the text."
+        types:
+          - label: Paragraph
+            name: text
+            widget: object
+            fields:
+              - { label: Type, name: type, widget: hidden, default: text }
+              - { label: Text, name: text, widget: text }
+          - label: Image
+            name: image
+            widget: object
+            fields:
+              - { label: Type, name: type, widget: hidden, default: image }
+              - { label: Image, name: file, widget: image, media_folder: "assets/themes", public_folder: "/assets/themes" }
+              - { label: Caption, name: caption, widget: string, required: false }
+          - label: Audio
+            name: audio
+            widget: object
+            fields:
+              - { label: Type, name: type, widget: hidden, default: audio }
+              - { label: Audio file, name: file, widget: file, media_folder: "assets/audio", public_folder: "/assets/audio" }
+              - { label: Caption, name: caption, widget: string, required: false }
+          - label: Video
+            name: video
+            widget: object
+            fields:
+              - { label: Type, name: type, widget: hidden, default: video }
+              - { label: Video file, name: file, widget: file, media_folder: "assets/video", public_folder: "/assets/video" }
+              - { label: Caption, name: caption, widget: string, required: false }
+      - label: Open questions
+        name: questions
+        widget: list
+        field: { label: Question, name: question, widget: string }
+        required: false
+      - { label: Authors, name: authors, widget: string, required: false, hint: "e.g. \"Jair (text) · Amit (review)\"" }
+
+  - name: theme_links
+    label: "Making Of: Cross-links"
+    files:
+      - name: cross-links
+        label: Cross-links between themes
+        file: content/themes/cross-links.json
+        fields:
+          - label: Links
+            name: links
+            widget: list
+            summary: "{{from}} → {{to}}"
+            fields:
+              - label: From theme
+                name: from
+                widget: relation
+                collection: themes
+                search_fields: [label, id]
+                value_field: id
+                display_fields: [number, label]
+              - label: To theme
+                name: to
+                widget: relation
+                collection: themes
+                search_fields: [label, id]
+                value_field: id
+                display_fields: [number, label]
+              - { label: Note (explains the connection), name: note, widget: text }
+
+  - name: theme_colors
+    label: "Making Of: Region Colors"
+    files:
+      - name: region-colors
+        label: Region colors
+        file: content/themes/region-colors.json
+        fields:
+          - { label: Root, name: root, widget: color }
+          - { label: Absence, name: absence, widget: color }
+          - { label: Storybuilding, name: storybuilding, widget: color }
+          - { label: Translation, name: translation, widget: color }
+          - { label: Ethics, name: ethics, widget: color }

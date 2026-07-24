@@ -6,13 +6,24 @@
 // tree visibly "grows" outward from the center. Re-nesting a theme in the
 // CMS just changes which parent it fans out from; nothing needs re-placing.
 
+// Node content is an ordered list of blocks, not a fixed blurb+media split —
+// editors choose exactly where each image/audio/video clip sits relative to
+// the surrounding text by reordering blocks, the same pattern used for the
+// Home page (content/pages/home.json).
+export interface RawContentBlock {
+  type: 'text' | 'image' | 'audio' | 'video';
+  text: string | null;
+  file: string | null;
+  caption: string | null;
+}
+
 export interface RawThemeNode {
   id: string;
   number: string;
   label: string;
   level: number;
   parent: string | null;
-  blurb: string;
+  blocks: RawContentBlock[] | null;
   questions: string[] | null;
   authors: string | null;
 }
@@ -35,7 +46,7 @@ export interface LayoutNode {
   label: string;
   level: number;
   parent: string | null;
-  blurb: string;
+  blocks: RawContentBlock[];
   questions: string[];
   authors: string | null;
   color: string;
@@ -132,7 +143,7 @@ export function buildThemeMap(raw: RawThemesData): ThemeMap {
       label: n.label,
       level: n.level,
       parent: n.parent,
-      blurb: n.blurb,
+      blocks: n.blocks || [],
       questions: n.questions || [],
       authors: n.authors,
       color,

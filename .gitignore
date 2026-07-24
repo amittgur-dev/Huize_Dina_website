@@ -5,6 +5,9 @@ dist/
 # dependencies
 node_modules/
 
+# vendored at build/install time by scripts/vendor-decap-cms.mjs
+public/admin/decap/
+
 # logs
 npm-debug.log*
 

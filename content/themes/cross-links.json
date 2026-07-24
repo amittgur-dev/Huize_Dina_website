@@ -1,0 +1,69 @@
+{
+  "links": [
+    {
+      "from": "t1-1-2",
+      "to": "t4-3",
+      "note": "The girls’ letters are private documents — using them raises the rights of the deceased and their living relatives."
+    },
+    {
+      "from": "t1-2",
+      "to": "t3-1",
+      "note": "The implicit listener is the figure the auditory space is designed to address."
+    },
+    {
+      "from": "t1-2",
+      "to": "t2-3",
+      "note": "Defined under Absence, enacted under Storybuilding — the same listener, concept and craft."
+    },
+    {
+      "from": "t1-3-3",
+      "to": "t4-1",
+      "note": "Filling the void with speculation forces the ethical question of accuracy versus narrative."
+    },
+    {
+      "from": "t1-3-3",
+      "to": "t4-1-2",
+      "note": "Where the record stops, can what we add still be “accurate”? The known unknowns test the limit."
+    },
+    {
+      "from": "t3-4",
+      "to": "t1-3-3",
+      "note": "Giving voice to the text means voicing the known unknowns — what we know of but never heard."
+    },
+    {
+      "from": "t2-1-1",
+      "to": "t4-1-1",
+      "note": "Distilling dramatic structure from documents runs straight into the accuracy-versus-art tension."
+    },
+    {
+      "from": "t2-2",
+      "to": "t4-1-1",
+      "note": "Choosing what stays in frame is the accuracy-versus-art tension, seen from the edit."
+    },
+    {
+      "from": "t3-2",
+      "to": "t4-2",
+      "note": "Translating across languages and times leans on AI — and on the ethics of using it."
+    },
+    {
+      "from": "t4-1-2",
+      "to": "t4-2",
+      "note": "Whether accurate representation is possible bears on whether AI translation is defensible."
+    },
+    {
+      "from": "t3-3",
+      "to": "t2-1",
+      "note": "What is gained and lost in translation shapes how immersive the story can honestly be."
+    },
+    {
+      "from": "t3-3",
+      "to": "t1-3",
+      "note": "Translating the archive depends on what records survive to translate."
+    },
+    {
+      "from": "t3-3",
+      "to": "t4-1",
+      "note": "Gain and loss in translation is, finally, an ethical question."
+    }
+  ]
+}

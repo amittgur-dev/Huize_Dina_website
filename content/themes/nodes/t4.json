@@ -1,0 +1,17 @@
+{
+  "id": "t4",
+  "number": "4",
+  "label": "Ethics",
+  "level": 0,
+  "parent": "root",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "The questions that sit under every other decision — truth, accuracy, AI, and the rights of people who cannot consent.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": null
+}

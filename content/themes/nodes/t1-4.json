@@ -1,0 +1,17 @@
+{
+  "id": "t1-4",
+  "number": "1.4",
+  "label": "The absence of home",
+  "level": 1,
+  "parent": "t1",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "Home is the missing center of these lives — as place, as mother, as belonging.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": "Tzlil, Elena (text) · Ari (review)"
+}

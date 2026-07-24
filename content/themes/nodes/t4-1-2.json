@@ -1,0 +1,17 @@
+{
+  "id": "t4-1-2",
+  "number": "4.1.2",
+  "label": "Is accurate representation possible?",
+  "level": 2,
+  "parent": "t4-1",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "Is an accurate representation of the past even possible — and where do we draw the line?",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": "Tzlil, Naomi (text) · Amit, Ari (review)"
+}

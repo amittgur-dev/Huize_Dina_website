@@ -1,0 +1,17 @@
+{
+  "id": "t3-2",
+  "number": "3.2",
+  "label": "Between languages & times",
+  "level": 1,
+  "parent": "t3",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "Translating across languages and across decades — and what that asks of us.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": "Tzlil, Elena, Naomi"
+}

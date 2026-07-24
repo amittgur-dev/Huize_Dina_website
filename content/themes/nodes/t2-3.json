@@ -1,0 +1,17 @@
+{
+  "id": "t2-3",
+  "number": "2.3",
+  "label": "Enacting the implicit listener",
+  "level": 1,
+  "parent": "t2",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "Turning the implicit listener from concept into something the audience performs.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": "Ari, Amit (text) · Tzlil (review)"
+}

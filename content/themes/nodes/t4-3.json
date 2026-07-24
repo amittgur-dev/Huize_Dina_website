@@ -1,0 +1,17 @@
+{
+  "id": "t4-3",
+  "number": "4.3",
+  "label": "Privacy & the rights of the dead",
+  "level": 1,
+  "parent": "t4",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "Private archival material, now public. What are the rights of the deceased? How does it touch living relatives — and can you simply contact them?",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": "Naomi, Jair (text) · Elena (review)"
+}

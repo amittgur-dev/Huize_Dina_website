@@ -1,0 +1,17 @@
+{
+  "id": "t4-2",
+  "number": "4.2",
+  "label": "Our use of AI",
+  "level": 1,
+  "parent": "t4",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "AI for historically stylized translation — and the ethics of doing so.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": "Elena (text) · Tzlil, Naomi (review)"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "t2-4",
+  "number": "2.4",
+  "label": "The role of music",
+  "level": 1,
+  "parent": "t2",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "What music does in the podcast — and where it must stay silent.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": null
+}

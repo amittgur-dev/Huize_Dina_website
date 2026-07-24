@@ -1,0 +1,17 @@
+{
+  "id": "t1-1-2",
+  "number": "1.1.2",
+  "label": "The girls’ letters",
+  "level": 2,
+  "parent": "t1-1",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "The rare moments their own words survive. Reading the letters — and deciding how to use them.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": "Jair (text) · Amit (review)"
+}

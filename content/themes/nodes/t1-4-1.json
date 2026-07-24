@@ -1,0 +1,17 @@
+{
+  "id": "t1-4-1",
+  "number": "1.4.1",
+  "label": "Is Huize Dina a home?",
+  "level": 2,
+  "parent": "t1-4",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "An institution that housed girls — but was it ever a home?",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": "Jair (text) · Ari (review)"
+}

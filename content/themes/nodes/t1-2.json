@@ -1,0 +1,17 @@
+{
+  "id": "t1-2",
+  "number": "1.2",
+  "label": "The implicit listener",
+  "level": 1,
+  "parent": "t1",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "From the implicit looker to the implicit listener — the figure the podcast is built to address.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": "Amit (text) · Ari (review)"
+}

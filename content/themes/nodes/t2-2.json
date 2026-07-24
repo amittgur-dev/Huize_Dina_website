@@ -1,0 +1,17 @@
+{
+  "id": "t2-2",
+  "number": "2.2",
+  "label": "Emphasis — what stays in frame",
+  "level": 1,
+  "parent": "t2",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "Every inclusion is an exclusion. What we used, what we left outside the frame, and why.",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": null,
+  "authors": null
+}
