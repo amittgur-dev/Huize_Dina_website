@@ -34,6 +34,7 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
   </Fragment>
 
   <div id="mk-viewport">
+    <div id="mk-bg"></div>
     <svg id="mk-lines" xmlns="http://www.w3.org/2000/svg"></svg>
     <div id="mk-terr"></div>
     <div id="mk-nodes">
@@ -108,17 +109,29 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     bottom: 0;
     overflow: hidden;
     background: #120f18;
-    background-image:
-      radial-gradient(ellipse 900px 600px at 30% 30%, rgba(122, 152, 214, 0.08), transparent 70%),
-      radial-gradient(ellipse 900px 600px at 70% 30%, rgba(214, 170, 88, 0.08), transparent 70%),
-      radial-gradient(ellipse 900px 600px at 30% 75%, rgba(76, 202, 172, 0.08), transparent 70%),
-      radial-gradient(ellipse 900px 600px at 70% 75%, rgba(210, 130, 136, 0.08), transparent 70%);
     touch-action: none;
     cursor: grab;
   }
 
   #mk-viewport.is-dragging {
     cursor: grabbing;
+  }
+
+  /* A static backdrop, isolated on its own compositing layer (translateZ
+     forces this) so the constantly-repositioned nodes/lines/territories
+     above it never force the browser to re-rasterize this background — an
+     un-isolated multi-layer gradient here was expensive enough to visibly
+     stutter the whole map on every repaint. Kept to two soft glows rather
+     than four for the same reason: less to recomposite per frame. */
+  #mk-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    transform: translateZ(0);
+    background-image:
+      radial-gradient(ellipse 1100px 750px at 30% 28%, rgba(122, 152, 214, 0.07), transparent 68%),
+      radial-gradient(ellipse 1100px 750px at 70% 78%, rgba(210, 130, 136, 0.07), transparent 68%);
   }
 
   #mk-lines {
@@ -1240,7 +1253,7 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
   let vibTimer: number | undefined;
   let anyVib = false;
   function vibStep() {
-    renderStrings();
+    renderStrings(false);
     if (!anyVib && vibTimer) {
       window.clearInterval(vibTimer);
       vibTimer = undefined;
@@ -1292,10 +1305,16 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     if (!vibTimer) vibTimer = window.setInterval(vibStep, 16);
   }
 
-  function renderStrings() {
+  // `force=false` (used by the ambient breeze/pluck ticker, which fires every
+  // 16ms without the camera having moved) skips every line that isn't
+  // currently vibrating — its geometry is unchanged since the last render,
+  // so re-walking its knots and rewriting its path/attributes would just be
+  // wasted work repeated dozens of times a second.
+  function renderStrings(force = true) {
     const now = performance.now();
     let vib = false;
     lines.forEach((o) => {
+      if (!force && o.amp < 0.001) return;
       const A = nodePos[o.a];
       const B = nodePos[o.b];
       if (!A || !B) {
@@ -1751,16 +1770,28 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
   scheduleBreeze();
 
   // Camera starts on the intro; a short settle loop re-fits it as the
-  // viewport's real size becomes available (fonts/layout can shift it late).
+  // viewport's real size becomes available (fonts/layout can shift it late,
+  // e.g. once web fonts finish loading and the header re-wraps). Each tick
+  // only actually repaints (33 nodes plus the SVG-filtered wires) when the
+  // computed camera target has genuinely changed from last time — otherwise
+  // this would repaint the whole scene on a fixed timer regardless of
+  // whether anything moved, which is expensive enough (the turbulence
+  // filter especially) to visibly stutter for the ~2s this loop runs.
   let fitTries = 0;
+  let lastFitZ: number | null = null;
   function initFit() {
     if (userMoved) return;
-    refZ = zForLvl(0);
-    fitZ = zForLvl(0);
-    cam.x = INTRO.x;
-    cam.y = INTRO.y;
-    cam.z = zForLvl(0) - overviewDz();
-    applyCam();
+    const z = zForLvl(0) - overviewDz();
+    if (z !== lastFitZ) {
+      lastFitZ = z;
+      motion();
+      refZ = zForLvl(0);
+      fitZ = zForLvl(0);
+      cam.x = INTRO.x;
+      cam.y = INTRO.y;
+      cam.z = z;
+      applyCam();
+    }
     if (++fitTries < 22) window.setTimeout(initFit, 90);
   }
   window.setTimeout(initFit, 30);
