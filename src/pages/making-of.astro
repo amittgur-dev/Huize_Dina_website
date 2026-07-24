@@ -44,39 +44,6 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     <span class="mk-pill-arrow">↑</span><span>Intro</span>
   </button>
 
-  <div id="mk-tooltip" class="mk-tooltip" hidden></div>
-
-  <div class="mk-legend-wrap">
-    <div id="mk-legend" class="mk-legend">
-      <div class="mk-legend-head">
-        <div class="mk-eyebrow mk-legend-title">How to read the map</div>
-        <button type="button" class="mk-btn mk-btn-sm" data-act="legend-close">Hide</button>
-      </div>
-      <div class="mk-eyebrow mk-legend-sub">Regions</div>
-      {
-        regions.map((r) => (
-          <div class="mk-legend-row">
-            <span class="mk-legend-dot" style={`background:${r.color};`} />
-            <span class="mk-legend-label">{r.label}</span>
-          </div>
-        ))
-      }
-      <div class="mk-legend-divider" />
-      <div class="mk-eyebrow mk-legend-sub">Threads</div>
-      <div class="mk-legend-row">
-        <span class="mk-legend-line" style="border-top-color:#ffffff;" />
-        <span class="mk-legend-label">belongs to — sub-theme</span>
-      </div>
-      <div class="mk-legend-row">
-        <span class="mk-legend-line" style="border-top-color:#3fd8c4;" />
-        <span class="mk-legend-label">connects across regions</span>
-      </div>
-      <div class="mk-legend-divider" />
-      <div class="mk-legend-hint">Drag to pan · scroll to zoom · zoom in for more sub-themes</div>
-    </div>
-    <button type="button" id="mk-legend-open" class="mk-btn mk-legend-toggle" hidden data-act="legend-open">Map guide</button>
-  </div>
-
   <div id="mk-intro" class="mk-intro">
     <div class="mk-eyebrow mk-intro-eyebrow">Polyphonic Archive · the making-of</div>
     <div class="mk-intro-title">A map of the themes behind the podcast</div>
@@ -90,7 +57,7 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
           </>
         ))
       }
-      . Themes light up as you move through them; threads show what belongs where, and what connects across.
+      . Themes light up as you move through them; wires show what belongs where, and each theme's reading panel surfaces what it connects across.
     </div>
     <div class="mk-eyebrow mk-intro-hint">drag to pan · scroll to zoom · press a theme to read</div>
     <button type="button" id="mk-intro-close" class="mk-intro-enter" aria-label="Enter the map">↓</button>
@@ -235,17 +202,6 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     opacity: 0 !important;
   }
 
-  :global(.mk-link-hit) {
-    fill: none;
-    stroke: #000;
-    stroke-opacity: 0;
-    pointer-events: stroke;
-  }
-
-  :global(.mk-link-hit.is-cross) {
-    cursor: pointer;
-  }
-
   .mk-header-controls {
     display: flex;
     align-items: center;
@@ -316,112 +272,11 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     font-size: 13px;
   }
 
-  .mk-tooltip {
-    position: fixed;
-    z-index: 60;
-    pointer-events: none;
-    max-width: 268px;
-    background: #2a2632;
-    border: 1px solid rgba(230, 225, 217, 0.3);
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 10px 28px rgba(0, 0, 0, 0.4);
-    padding: 11px 14px;
-    font-family: 'Courier Prime', monospace;
-    font-size: 13px;
-    line-height: 1.5;
-    color: #e6e1d9;
-  }
-
-  .mk-legend-wrap {
-    position: fixed;
-    left: 20px;
-    bottom: 20px;
-    z-index: 42;
-  }
-
-  .mk-legend {
-    width: 266px;
-    box-sizing: border-box;
-    background: #2a2632;
-    border: 1px solid rgba(230, 225, 217, 0.28);
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 10px 28px rgba(0, 0, 0, 0.4);
-    padding: 15px 16px;
-  }
-
-  .mk-legend[hidden] {
-    display: none;
-  }
-
   .mk-eyebrow {
     font-family: 'Courier Prime', monospace;
     text-transform: uppercase;
     letter-spacing: 0.16em;
     font-weight: 400;
-  }
-
-  .mk-legend-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 13px;
-  }
-
-  .mk-legend-title {
-    font-size: 12px;
-    color: #48c6a8;
-  }
-
-  .mk-legend-sub {
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    color: #9a938a;
-    margin-bottom: 9px;
-  }
-
-  .mk-legend-row {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    margin-bottom: 9px;
-  }
-
-  .mk-legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex: none;
-  }
-
-  .mk-legend-line {
-    width: 28px;
-    border-top: 2px solid;
-    flex: none;
-  }
-
-  .mk-legend-label {
-    font-size: 13px;
-    line-height: 1.35;
-    color: #d8d3cb;
-  }
-
-  .mk-legend-divider {
-    height: 1px;
-    background: rgba(230, 225, 217, 0.14);
-    margin: 13px 0;
-  }
-
-  .mk-legend-hint {
-    font-size: 12px;
-    line-height: 1.5;
-    color: #9a938a;
-  }
-
-  .mk-legend-toggle {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    background: #2a2632;
-  }
-
-  .mk-legend-toggle[hidden] {
-    display: none;
   }
 
   .mk-intro {
@@ -734,13 +589,6 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     .mk-panel {
       width: 100%;
     }
-    .mk-legend-wrap {
-      left: 12px;
-      bottom: 12px;
-    }
-    .mk-legend {
-      width: 230px;
-    }
   }
 </style>
 
@@ -799,11 +647,8 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
   const linesSvg = document.getElementById('mk-lines') as unknown as SVGSVGElement;
   const nodesLayer = document.getElementById('mk-nodes')!;
   const panel = document.getElementById('mk-panel')!;
-  const tooltip = document.getElementById('mk-tooltip')!;
   const introEl = document.getElementById('mk-intro')!;
   const toIntroBtn = document.getElementById('mk-to-intro')!;
-  const legend = document.getElementById('mk-legend')!;
-  const legendOpenBtn = document.getElementById('mk-legend-open')!;
 
   // --- Build node DOM ---
   const nodeEls: Record<string, HTMLElement> = {};
@@ -859,11 +704,8 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
   interface LineRec {
     a: string;
     b: string;
-    type: 'hier' | 'cross';
     need: number;
     vis: SVGPathElement;
-    hit: SVGPathElement;
-    note?: string;
   }
   const lines: LineRec[] = [];
 
@@ -883,39 +725,25 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     return `M ${ax} ${ay} Q ${cx} ${cy} ${bx} ${by}`;
   }
 
-  function addLine(a: ThemeNode, b: ThemeNode, type: 'hier' | 'cross', need: number, note?: string) {
-    const d = curvePath(a, b);
+  // Only the tree's hierarchy ("belongs to — sub-theme") wires are drawn on
+  // the map canvas — they're purely decorative (never hovered or clicked),
+  // so each is a single visible path with no separate hit-testing element.
+  // Cross-region relationships (content/themes/cross-links.json) stay fully
+  // intact as data and still surface as clickable cards in the reading
+  // panel's "Connections" section — they're just not drawn as wires here.
+  function addLine(a: ThemeNode, b: ThemeNode, need: number) {
     const vis = document.createElementNS(NS, 'path');
-    vis.setAttribute('d', d);
+    vis.setAttribute('d', curvePath(a, b));
     vis.setAttribute('class', 'mk-link');
-    vis.setAttribute('stroke', type === 'cross' ? '#3fd8c4' : 'rgba(255,255,255,0.55)');
-    vis.setAttribute('stroke-width', type === 'cross' ? '5' : '4');
-    if (type === 'cross') vis.setAttribute('stroke-dasharray', '2 14');
+    vis.setAttribute('stroke', 'rgba(255,255,255,0.55)');
+    vis.setAttribute('stroke-width', '4');
     linesSvg.appendChild(vis);
 
-    const hit = document.createElementNS(NS, 'path');
-    hit.setAttribute('d', d);
-    hit.setAttribute('class', `mk-link-hit${type === 'cross' ? ' is-cross' : ''}`);
-    hit.setAttribute('stroke-width', '40');
-    linesSvg.appendChild(hit);
-
-    if (type === 'cross') {
-      hit.dataset.gotoId = b.id;
-      hit.addEventListener('mouseenter', (e) => showTip(note || '', e as MouseEvent));
-      hit.addEventListener('mousemove', (e) => moveTip(e as MouseEvent));
-      hit.addEventListener('mouseleave', hideTip);
-    }
-
-    lines.push({ a: a.id, b: b.id, type, need, vis, hit, note });
+    lines.push({ a: a.id, b: b.id, need, vis });
   }
 
   DATA.nodes.forEach((n) => {
-    if (n.parent && byId[n.parent]) addLine(byId[n.parent], n, 'hier', Math.max(0, n.level));
-  });
-  DATA.links.forEach((l) => {
-    const a = byId[l.from];
-    const b = byId[l.to];
-    if (a && b) addLine(a, b, 'cross', Math.max(a.level, b.level), l.note);
+    if (n.parent && byId[n.parent]) addLine(byId[n.parent], n, Math.max(0, n.level));
   });
 
   // --- Camera ---
@@ -957,11 +785,7 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
       el.classList.toggle('mk-hidden', !vis);
     });
     lines.forEach((l) => {
-      const vis = l.need <= maxLvl;
-      l.vis.classList.toggle('mk-hidden', !vis);
-      // opacity alone doesn't stop hit-testing, so an LOD-culled link's
-      // invisible hit-stroke would otherwise stay clickable/hoverable
-      l.hit.style.pointerEvents = vis ? '' : 'none';
+      l.vis.classList.toggle('mk-hidden', l.need > maxLvl);
     });
   }
 
@@ -1228,27 +1052,6 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     });
   }
 
-  // --- Tooltip ---
-  function showTip(text: string, ev: MouseEvent) {
-    tooltip.textContent = text;
-    tooltip.hidden = false;
-    moveTip(ev);
-  }
-  function moveTip(ev: MouseEvent) {
-    const pad = 14;
-    let x = ev.clientX + pad;
-    let y = ev.clientY + pad;
-    const w = tooltip.offsetWidth || 200;
-    const h = tooltip.offsetHeight || 60;
-    if (x + w > window.innerWidth - 10) x = ev.clientX - w - pad;
-    if (y + h > window.innerHeight - 10) y = ev.clientY - h - pad;
-    tooltip.style.left = `${x}px`;
-    tooltip.style.top = `${y}px`;
-  }
-  function hideTip() {
-    tooltip.hidden = true;
-  }
-
   // --- Pan / zoom interaction ---
   // Click-to-select is handled here (not via a plain `click` listener on each
   // node/link) because `setPointerCapture` below redirects the click that
@@ -1288,9 +1091,7 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     if (!wasClick) return;
     const el = target as HTMLElement | null;
     const nodeEl = el?.closest<HTMLElement>('.mk-node');
-    const linkEl = el?.closest<SVGElement>('.mk-link-hit.is-cross') as (SVGElement & { dataset: DOMStringMap }) | null;
     if (nodeEl?.dataset.id) select(nodeEl.dataset.id);
-    else if (linkEl?.dataset.gotoId) select(linkEl.dataset.gotoId);
     else if (selId) deselect();
   });
   viewport.addEventListener('pointercancel', () => endDrag());
@@ -1316,20 +1117,13 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     { passive: false },
   );
 
-  // --- Header / legend / intro controls ---
+  // --- Header / intro controls ---
   document.querySelectorAll<HTMLButtonElement>('[data-act]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const act = btn.dataset.act;
       if (act === 'overview' || act === 'close') deselect();
       else if (act === 'zoom-in') zoomBy(1.35);
       else if (act === 'zoom-out') zoomBy(0.74);
-      else if (act === 'legend-open') {
-        legend.hidden = false;
-        legendOpenBtn.hidden = true;
-      } else if (act === 'legend-close') {
-        legend.hidden = true;
-        legendOpenBtn.hidden = false;
-      }
     });
   });
 
@@ -1364,9 +1158,5 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
   window.addEventListener('resize', syncHeaderHeight);
   syncHeaderHeight();
 
-  if (window.matchMedia('(max-width: 680px)').matches) {
-    legend.hidden = true;
-    legendOpenBtn.hidden = false;
-  }
   fitOverview();
 </script>

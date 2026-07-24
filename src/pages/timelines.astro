@@ -538,7 +538,13 @@ const BG_IMAGES = [
     color: rgba(72, 198, 168, 0.4);
   }
 
-  @media (max-width: 680px) {
+  /* 900px, not the more typical ~680px: below this, the desktop two-column
+     layout's cards get squeezed narrower than the width the build-time
+     height estimate (src/lib/timelines.ts's estimateHeight) assumes, so
+     text wraps to more lines than accounted for and cards can overlap —
+     confirmed empirically (fails at 700px, clean from 750px up; 900px
+     keeps a safety margin above that for future content edits). */
+  @media (max-width: 900px) {
     .pa-hero {
       padding-top: 8rem;
       padding-bottom: 1.5rem;
@@ -578,6 +584,11 @@ const BG_IMAGES = [
     .nd {
       position: relative !important;
       top: auto !important;
+      /* Establishes a new block formatting context so .cd's margin-top
+         below can't collapse through .nd and escape upward — without
+         this, .cd renders flush with .nd's top (margin collapsing),
+         landing exactly on top of the absolutely-positioned .pa-nd-dot. */
+      display: flow-root;
       margin-bottom: 1.8rem;
     }
     .cdl,
