@@ -124,6 +124,8 @@ collections:
   - name: timelines
     label: Timelines
     folder: content/timelines
+    extension: json
+    format: json
     create: false
     delete: false
     slug: "{{fields.slug}}"
@@ -160,6 +162,8 @@ collections:
   - name: themes
     label: "Making Of: Themes"
     folder: content/themes/nodes
+    extension: json
+    format: json
     create: true
     slug: "{{fields.id}}"
     summary: "{{number}} — {{label}}"

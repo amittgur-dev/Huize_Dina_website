@@ -50,6 +50,20 @@ const {
 
       <slot />
     </div>
+
+    <!-- Netlify Identity's invite/recovery/confirmation emails link to the
+         site root, not to /admin — this widget needs to be present wherever
+         that link lands so it can pick up the #token in the URL and show
+         the "set your password" dialog, then hand the editor off to the
+         CMS. -->
+    <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script is:inline>
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.on('login', () => {
+          document.location.href = '/admin/';
+        });
+      }
+    </script>
   </body>
 </html>
 
