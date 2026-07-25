@@ -530,6 +530,22 @@ const SLUGS = timelines.map((t) => t.slug);
     .pa-nd-dot {
       left: 28px;
       transform: translateX(0);
+      /* Desktop centers this whole box on the spine (left:50% +
+         translateX(-50%)), so align-items:center naturally lands both the
+         dot and the date on it. Mobile instead anchors the box's own LEFT
+         edge to the spine (so the date text can extend rightward without
+         overflowing off the narrow viewport on the left) — but that makes
+         center-alignment center everything on the *date text's* width
+         instead, pulling the dot off the spine to the right. flex-start
+         keeps the date attached at the spine's x-position; the dot then
+         gets pulled back onto the spine explicitly below. */
+      align-items: flex-start;
+    }
+    .dot {
+      /* Pulls the (10px-wide) dot's center back onto the spine at x=28,
+         since flex-start above left-aligns it flush with the spine
+         instead of centered on it. */
+      margin-left: -5px;
     }
     .nd-date {
       font-size: 13px;
