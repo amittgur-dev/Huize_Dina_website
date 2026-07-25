@@ -96,14 +96,20 @@ const TAG_LABELS: Record<string, string> = { mina: 'Mina', sara: 'Sara', both: '
 
 export function buildTimeline(raw: RawTimeline): BuiltTimeline {
   const PAD = 300;
-  const SEQ_GAP = 110;
-  const SIDE_GAP = 56;
+  const SEQ_GAP = 90;
+  const SIDE_GAP = 45;
 
   const serials = raw.events.map(toSerial);
   const MIN = Math.min(...serials);
   const MAX = Math.max(...serials);
   const span = Math.max(1, MAX - MIN);
-  const SCALE = Math.max(0.42, 4200 / span);
+  // Cards' actual content height (driven by estimateHeight, below) is what
+  // mostly determines scroll length for densely-packed periods — this SCALE
+  // only stretches out otherwise-sparse date gaps so scrolling through them
+  // doesn't feel disproportionately slow. The Math.max(...) in the position
+  // loop below guarantees cards never overlap regardless of this value, so
+  // it's safe to tune purely for pacing feel.
+  const SCALE = Math.max(0.3, 2800 / span);
 
   let lBot = PAD - 120;
   let rBot = PAD - 120;
