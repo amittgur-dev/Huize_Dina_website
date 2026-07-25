@@ -95,7 +95,12 @@ function estimateHeight(ev: RawEvent): number {
 const TAG_LABELS: Record<string, string> = { mina: 'Mina', sara: 'Sara', both: 'Mina & Sara' };
 
 export function buildTimeline(raw: RawTimeline): BuiltTimeline {
-  const PAD = 300;
+  // Baseline vertical offset before the first event. Only actually visible
+  // on desktop: the mobile layout (see the >900px media query in
+  // timelines.astro) drops absolute positioning for events entirely, so
+  // this gap never applied there — desktop had a ~300px empty stretch of
+  // bare spine below the tabs that mobile never had.
+  const PAD = 90;
   const SEQ_GAP = 90;
   const SIDE_GAP = 45;
 
