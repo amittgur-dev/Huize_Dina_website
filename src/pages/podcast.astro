@@ -1,13 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Hero from '../components/Hero.astro';
 import podcast from '../../content/pages/podcast.json';
 
 const TICKS = 52;
 ---
 
 <BaseLayout title="Podcast" active="podcast">
-  <Hero title={podcast.title} eyebrow={podcast.eyebrow} hideTitle />
+  <h1 class="sr-only">{podcast.title}</h1>
 
   <div class="inner">
     {
@@ -62,7 +61,7 @@ const TICKS = 52;
     z-index: 5;
     max-width: 720px;
     margin: 0 auto;
-    padding: 0 1.5rem 5rem;
+    padding: 7.5rem 1.5rem 5rem;
     display: flex;
     flex-direction: column;
     gap: 2.6rem;
@@ -240,7 +239,7 @@ const TICKS = 52;
 
   @media (max-width: 680px) {
     .inner {
-      padding: 0 1rem 4rem;
+      padding: 6.5rem 1rem 4rem;
     }
     .act {
       grid-template-columns: auto 1fr;
