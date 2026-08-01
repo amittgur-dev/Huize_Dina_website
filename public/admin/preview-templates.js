@@ -306,12 +306,7 @@
           h(
             'div',
             { className: 'pc-card-head' },
-            h(
-              'div',
-              null,
-              ep.sideLabel ? h('div', { className: 'pc-side-label' }, ep.sideLabel) : null,
-              h('div', { className: 'pc-ep-title' }, ep.title || '(untitled episode)'),
-            ),
+            h('div', { className: 'pc-ep-title' }, ep.title || '(untitled episode)'),
             ep.numeral ? h('div', { className: 'pc-numeral' }, ep.numeral) : null,
           ),
           h('div', { className: 'pc-acts' }, actEls),
@@ -395,8 +390,7 @@
       ".pc-list { display:flex; flex-direction:column; gap:1.6rem; max-width:620px; }",
       ".pc-card { background:rgba(20,17,25,0.94); border:1px solid rgba(72,198,168,0.4); border-radius:2px; padding:1.4rem 1.6rem 1.5rem; }",
       ".pc-card-head { display:flex; align-items:baseline; justify-content:space-between; gap:1rem; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:0.9rem; margin-bottom:0.2rem; }",
-      ".pc-side-label { font-size:11px; letter-spacing:0.24em; text-transform:uppercase; color:rgba(72,198,168,0.68); }",
-      ".pc-ep-title { font-size:1.1rem; letter-spacing:0.04em; color:rgba(224,219,212,0.92); margin-top:0.35rem; }",
+      ".pc-ep-title { font-size:1.1rem; letter-spacing:0.04em; color:rgba(224,219,212,0.92); }",
       ".pc-numeral { font-size:26px; color:rgba(224,219,212,0.16); line-height:1; }",
       ".pc-act { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 0; border-bottom:1px solid rgba(255,255,255,0.06); }",
       ".pc-act:last-child { border-bottom:none; padding-bottom:0; }",
@@ -416,6 +410,11 @@
   // selectTemplateName: FILES -> slug, FOLDER -> collection.get('name')).
   CMS.registerPreviewTemplate('team', TeamPreview);
   CMS.registerPreviewTemplate('home', HomePreview);
-  CMS.registerPreviewTemplate('timelines', TimelinePreview);
   CMS.registerPreviewTemplate('podcast', PodcastPreview);
+  // "timelines" is a *files* collection (three files, each with its own
+  // schema — see config.yml), so it registers per file name, not once
+  // under the collection name the way the folder collections above do.
+  CMS.registerPreviewTemplate('dejong', TimelinePreview);
+  CMS.registerPreviewTemplate('engers', TimelinePreview);
+  CMS.registerPreviewTemplate('swaab', TimelinePreview);
 })();

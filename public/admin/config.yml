@@ -60,7 +60,6 @@ collections:
             widget: list
             summary: "{{title}}"
             fields:
-              - { label: Side label, name: sideLabel, widget: string }
               - { label: Title, name: title, widget: string }
               - { label: Numeral (I / II / III), name: numeral, widget: string }
               - label: Acts
@@ -121,42 +120,104 @@ collections:
               - { label: Photo, name: photo, widget: image, media_folder: "assets/site", public_folder: "/assets/site" }
 
   # --- Timelines -----------------------------------------------------------
+  # A files (not folder) collection so each of the three timelines can have
+  # its own field schema — needed because the "Sister" field on an event
+  # only ever means something for the Engers timeline (choosing between
+  # Mina and Sara); a shared schema would show that dropdown on every
+  # event in de Jong's and Swaab's timelines too, where it's meaningless.
   - name: timelines
     label: Timelines
-    folder: content/timelines
-    extension: json
-    format: json
-    create: false
-    delete: false
-    slug: "{{fields.slug}}"
-    summary: "{{episode}} — {{name}}"
-    fields:
-      - { label: Slug (matches the filename — do not change), name: slug, widget: string }
-      - { label: Episode, name: episode, widget: select, options: ["I", "II", "III"] }
-      - { label: Name (short), name: name, widget: string }
-      - { label: Title (full name), name: title, widget: string }
-      - { label: Years, name: years, widget: string, hint: "e.g. 1919—1944" }
-      - label: Events
-        name: events
-        widget: list
-        summary: "{{heading}}"
+    files:
+      - name: dejong
+        label: "Episode I — Tilly de Jong"
+        file: content/timelines/dejong.json
         fields:
-          - { label: Date (ISO), name: date_iso, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, hint: "Leave empty for undated-but-ordered events (use Serial order instead)." }
-          - { label: "Date label (display text)", name: date_label, widget: string, required: false, hint: "Shown as-is when set, e.g. \"23 Mar. 1936\". Leave empty to auto-format from the ISO date." }
-          - { label: Serial order, name: serial, widget: number, required: false, hint: "Only for undated events — a legacy sequence number that places the event in order." }
-          - { label: Heading, name: heading, widget: string }
-          - { label: Text, name: text, widget: text }
-          - { label: Sister (Engers timeline only), name: sister, widget: select, options: ["mina", "sara", "both"], required: false }
-          - label: Image
-            name: image
-            widget: object
-            required: false
+          - { label: Slug (matches the filename — do not change), name: slug, widget: string }
+          - { label: Episode, name: episode, widget: select, options: ["I", "II", "III"] }
+          - { label: Name (short), name: name, widget: string }
+          - { label: Title (full name), name: title, widget: string }
+          - { label: Years, name: years, widget: string, hint: "e.g. 1919—1944" }
+          - label: Events
+            name: events
+            widget: list
+            summary: "{{heading}}"
             fields:
-              - { label: Image file, name: file, widget: image, media_folder: "assets/timeline", public_folder: "/assets/timeline" }
-              - { label: Caption, name: caption, widget: string }
-              - { label: Show at full size (portrait scans), name: full, widget: boolean, required: false, default: false }
-              - { label: Focus point (CSS object-position), name: focus, widget: string, required: false, hint: "e.g. \"left center\" — only for tightly-cropped scans." }
-              - { label: Zoom, name: zoom, widget: number, required: false, hint: "CSS scale factor, e.g. 1.6 — pairs with Focus point." }
+              - { label: Date (ISO), name: date_iso, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, hint: "Leave empty for undated-but-ordered events (use Serial order instead)." }
+              - { label: "Date label (display text)", name: date_label, widget: string, required: false, hint: "Shown as-is when set, e.g. \"23 Mar. 1936\". Leave empty to auto-format from the ISO date." }
+              - { label: Serial order, name: serial, widget: number, required: false, hint: "Only for undated events — a legacy sequence number that places the event in order." }
+              - { label: Heading, name: heading, widget: string }
+              - { label: Text, name: text, widget: text }
+              - label: Image
+                name: image
+                widget: object
+                required: false
+                fields:
+                  - { label: Image file, name: file, widget: image, media_folder: "assets/timeline", public_folder: "/assets/timeline" }
+                  - { label: Caption, name: caption, widget: string }
+                  - { label: Show at full size (portrait scans), name: full, widget: boolean, required: false, default: false }
+                  - { label: Focus point (CSS object-position), name: focus, widget: string, required: false, hint: "e.g. \"left center\" — only for tightly-cropped scans." }
+                  - { label: Zoom, name: zoom, widget: number, required: false, hint: "CSS scale factor, e.g. 1.6 — pairs with Focus point." }
+
+      - name: engers
+        label: "Episode II — Mina & Sara Engers"
+        file: content/timelines/engers.json
+        fields:
+          - { label: Slug (matches the filename — do not change), name: slug, widget: string }
+          - { label: Episode, name: episode, widget: select, options: ["I", "II", "III"] }
+          - { label: Name (short), name: name, widget: string }
+          - { label: Title (full name), name: title, widget: string }
+          - { label: Years, name: years, widget: string, hint: "e.g. 1919—1944" }
+          - label: Events
+            name: events
+            widget: list
+            summary: "{{heading}}"
+            fields:
+              - { label: Date (ISO), name: date_iso, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, hint: "Leave empty for undated-but-ordered events (use Serial order instead)." }
+              - { label: "Date label (display text)", name: date_label, widget: string, required: false, hint: "Shown as-is when set, e.g. \"23 Mar. 1936\". Leave empty to auto-format from the ISO date." }
+              - { label: Serial order, name: serial, widget: number, required: false, hint: "Only for undated events — a legacy sequence number that places the event in order." }
+              - { label: Heading, name: heading, widget: string }
+              - { label: Text, name: text, widget: text }
+              - { label: Sister, name: sister, widget: select, options: ["mina", "sara", "both"], required: false, hint: "Which sister this event is about — leave empty if it applies to both / neither specifically." }
+              - label: Image
+                name: image
+                widget: object
+                required: false
+                fields:
+                  - { label: Image file, name: file, widget: image, media_folder: "assets/timeline", public_folder: "/assets/timeline" }
+                  - { label: Caption, name: caption, widget: string }
+                  - { label: Show at full size (portrait scans), name: full, widget: boolean, required: false, default: false }
+                  - { label: Focus point (CSS object-position), name: focus, widget: string, required: false, hint: "e.g. \"left center\" — only for tightly-cropped scans." }
+                  - { label: Zoom, name: zoom, widget: number, required: false, hint: "CSS scale factor, e.g. 1.6 — pairs with Focus point." }
+
+      - name: swaab
+        label: "Episode III — Henriette Swaab"
+        file: content/timelines/swaab.json
+        fields:
+          - { label: Slug (matches the filename — do not change), name: slug, widget: string }
+          - { label: Episode, name: episode, widget: select, options: ["I", "II", "III"] }
+          - { label: Name (short), name: name, widget: string }
+          - { label: Title (full name), name: title, widget: string }
+          - { label: Years, name: years, widget: string, hint: "e.g. 1919—1944" }
+          - label: Events
+            name: events
+            widget: list
+            summary: "{{heading}}"
+            fields:
+              - { label: Date (ISO), name: date_iso, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, hint: "Leave empty for undated-but-ordered events (use Serial order instead)." }
+              - { label: "Date label (display text)", name: date_label, widget: string, required: false, hint: "Shown as-is when set, e.g. \"23 Mar. 1936\". Leave empty to auto-format from the ISO date." }
+              - { label: Serial order, name: serial, widget: number, required: false, hint: "Only for undated events — a legacy sequence number that places the event in order." }
+              - { label: Heading, name: heading, widget: string }
+              - { label: Text, name: text, widget: text }
+              - label: Image
+                name: image
+                widget: object
+                required: false
+                fields:
+                  - { label: Image file, name: file, widget: image, media_folder: "assets/timeline", public_folder: "/assets/timeline" }
+                  - { label: Caption, name: caption, widget: string }
+                  - { label: Show at full size (portrait scans), name: full, widget: boolean, required: false, default: false }
+                  - { label: Focus point (CSS object-position), name: focus, widget: string, required: false, hint: "e.g. \"left center\" — only for tightly-cropped scans." }
+                  - { label: Zoom, name: zoom, widget: number, required: false, hint: "CSS scale factor, e.g. 1.6 — pairs with Focus point." }
 
   # --- Making Of theme tree ------------------------------------------------
   - name: themes
