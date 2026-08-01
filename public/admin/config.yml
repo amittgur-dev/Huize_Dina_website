@@ -9,7 +9,7 @@ backend:
 site_url: https://huizedina.netlify.app
 display_url: https://huizedina.netlify.app
 
-media_folder: assets/site
+media_folder: /assets/site
 public_folder: /assets/site
 
 collections:
@@ -38,7 +38,7 @@ collections:
                 widget: object
                 fields:
                   - { label: Type, name: type, widget: hidden, default: image }
-                  - { label: Image, name: file, widget: image, media_folder: "assets/site", public_folder: "/assets/site" }
+                  - { label: Image, name: file, widget: image, media_folder: "/assets/site", public_folder: "/assets/site" }
                   - { label: Alt text, name: alt, widget: string }
                   - { label: Caption, name: caption, widget: string, required: false }
           - { label: Source note, name: sourceNote, widget: text, required: false }
@@ -73,7 +73,7 @@ collections:
                     name: audio
                     widget: file
                     required: false
-                    media_folder: "assets/audio"
+                    media_folder: "/assets/audio"
                     public_folder: "/assets/audio"
                     hint: "Leave empty to show \"Recording to follow\"."
           - { label: Footer note, name: footerNote, widget: string }
@@ -117,7 +117,7 @@ collections:
               - { label: Name, name: name, widget: string }
               - { label: Role, name: role, widget: string }
               - { label: Bio, name: bio, widget: text, hint: "Wrap a word in *asterisks* for italics." }
-              - { label: Photo, name: photo, widget: image, media_folder: "assets/site", public_folder: "/assets/site" }
+              - { label: Photo, name: photo, widget: image, media_folder: "/assets/site", public_folder: "/assets/site" }
 
   # --- Timelines -----------------------------------------------------------
   # A files (not folder) collection so each of the three timelines can have
@@ -152,7 +152,7 @@ collections:
                 widget: object
                 required: false
                 fields:
-                  - { label: Image file, name: file, widget: image, media_folder: "assets/timeline", public_folder: "/assets/timeline" }
+                  - { label: Image file, name: file, widget: image, media_folder: "/assets/timeline", public_folder: "/assets/timeline" }
                   - { label: Caption, name: caption, widget: string }
                   - { label: Show at full size (portrait scans), name: full, widget: boolean, required: false, default: false }
                   - { label: Focus point (CSS object-position), name: focus, widget: string, required: false, hint: "e.g. \"left center\" — only for tightly-cropped scans." }
@@ -183,7 +183,7 @@ collections:
                 widget: object
                 required: false
                 fields:
-                  - { label: Image file, name: file, widget: image, media_folder: "assets/timeline", public_folder: "/assets/timeline" }
+                  - { label: Image file, name: file, widget: image, media_folder: "/assets/timeline", public_folder: "/assets/timeline" }
                   - { label: Caption, name: caption, widget: string }
                   - { label: Show at full size (portrait scans), name: full, widget: boolean, required: false, default: false }
                   - { label: Focus point (CSS object-position), name: focus, widget: string, required: false, hint: "e.g. \"left center\" — only for tightly-cropped scans." }
@@ -213,7 +213,7 @@ collections:
                 widget: object
                 required: false
                 fields:
-                  - { label: Image file, name: file, widget: image, media_folder: "assets/timeline", public_folder: "/assets/timeline" }
+                  - { label: Image file, name: file, widget: image, media_folder: "/assets/timeline", public_folder: "/assets/timeline" }
                   - { label: Caption, name: caption, widget: string }
                   - { label: Show at full size (portrait scans), name: full, widget: boolean, required: false, default: false }
                   - { label: Focus point (CSS object-position), name: focus, widget: string, required: false, hint: "e.g. \"left center\" — only for tightly-cropped scans." }
@@ -258,21 +258,21 @@ collections:
             widget: object
             fields:
               - { label: Type, name: type, widget: hidden, default: image }
-              - { label: Image, name: file, widget: image, media_folder: "assets/themes", public_folder: "/assets/themes" }
+              - { label: Image, name: file, widget: image, media_folder: "/assets/themes", public_folder: "/assets/themes" }
               - { label: Caption, name: caption, widget: string, required: false }
           - label: Audio
             name: audio
             widget: object
             fields:
               - { label: Type, name: type, widget: hidden, default: audio }
-              - { label: Audio file, name: file, widget: file, media_folder: "assets/audio", public_folder: "/assets/audio" }
+              - { label: Audio file, name: file, widget: file, media_folder: "/assets/audio", public_folder: "/assets/audio" }
               - { label: Caption, name: caption, widget: string, required: false }
           - label: Video
             name: video
             widget: object
             fields:
               - { label: Type, name: type, widget: hidden, default: video }
-              - { label: Video file, name: file, widget: file, media_folder: "assets/video", public_folder: "/assets/video" }
+              - { label: Video file, name: file, widget: file, media_folder: "/assets/video", public_folder: "/assets/video" }
               - { label: Caption, name: caption, widget: string, required: false }
       - label: Open questions
         name: questions
