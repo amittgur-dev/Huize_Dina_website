@@ -266,6 +266,69 @@
     },
   });
 
+  // Custom preview for the Podcast page (file collection "pages", file
+  // "podcast") — no image fields, so this wasn't part of the original
+  // oversized-image fix, but without it the editor falls back to Decap's
+  // generic flat label:value dump, which also silently omits any field
+  // that's currently empty (including the Audio file field on every act
+  // before one's attached) — easy to mistake for "the field doesn't
+  // exist". Mirrors podcast.astro's card/act layout, including its real
+  // "Recording to follow" fallback text, and plays the actual audio file
+  // when one's attached so an editor can confirm an upload worked without
+  // leaving the CMS.
+  var PodcastPreview = createClass({
+    render: function () {
+      var entry = this.props.entry;
+      var getAsset = this.props.getAsset;
+      var data = entry.get('data') || {};
+
+      var eyebrow = get(data, 'eyebrow', '');
+      var title = get(data, 'title', 'Podcast');
+      var episodes = toPlain(get(data, 'episodes', null), []);
+      var footerNote = get(data, 'footerNote', '');
+
+      var episodeEls = episodes.map(function (ep, i) {
+        if (!ep) return null;
+        var acts = ep.acts || [];
+        var actEls = acts.map(function (act, j) {
+          if (!act) return null;
+          var src = resolveSrc(getAsset, act.audio);
+          return h(
+            'div',
+            { key: j, className: 'pc-act' },
+            h('div', { className: 'pc-act-title' }, act.title || '(untitled act)'),
+            src ? h('audio', { src: src, controls: true }) : h('div', { className: 'pc-act-note' }, 'Recording to follow'),
+          );
+        });
+        return h(
+          'div',
+          { key: i, className: 'pc-card' },
+          h(
+            'div',
+            { className: 'pc-card-head' },
+            h(
+              'div',
+              null,
+              ep.sideLabel ? h('div', { className: 'pc-side-label' }, ep.sideLabel) : null,
+              h('div', { className: 'pc-ep-title' }, ep.title || '(untitled episode)'),
+            ),
+            ep.numeral ? h('div', { className: 'pc-numeral' }, ep.numeral) : null,
+          ),
+          h('div', { className: 'pc-acts' }, actEls),
+        );
+      });
+
+      return h(
+        'div',
+        { className: 'cp-page' },
+        eyebrow ? h('div', { className: 'cp-eyebrow' }, eyebrow) : null,
+        h('h1', { className: 'cp-title' }, title),
+        h('div', { className: 'pc-list' }, episodeEls),
+        footerNote ? h('div', { className: 'pc-footer-note' }, footerNote) : null,
+      );
+    },
+  });
+
   CMS.registerPreviewStyle(
     [
       "body { background:#161320; margin:0; }",
@@ -327,6 +390,20 @@
       ".tl-img-full { max-width:100%; display:block; }",
       ".tl-img-zoom { width:100%; display:block; height:320px; object-fit:cover; }",
       ".tl-img-caption { font-size:12px; letter-spacing:0.05em; color:rgba(224,219,212,0.62); padding:0.5rem 0.65rem; font-style:italic; }",
+
+      // Podcast (mirrors src/pages/podcast.astro's .card/.card-inner/.act)
+      ".pc-list { display:flex; flex-direction:column; gap:1.6rem; max-width:620px; }",
+      ".pc-card { background:rgba(20,17,25,0.94); border:1px solid rgba(72,198,168,0.4); border-radius:2px; padding:1.4rem 1.6rem 1.5rem; }",
+      ".pc-card-head { display:flex; align-items:baseline; justify-content:space-between; gap:1rem; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:0.9rem; margin-bottom:0.2rem; }",
+      ".pc-side-label { font-size:11px; letter-spacing:0.24em; text-transform:uppercase; color:rgba(72,198,168,0.68); }",
+      ".pc-ep-title { font-size:1.1rem; letter-spacing:0.04em; color:rgba(224,219,212,0.92); margin-top:0.35rem; }",
+      ".pc-numeral { font-size:26px; color:rgba(224,219,212,0.16); line-height:1; }",
+      ".pc-act { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 0; border-bottom:1px solid rgba(255,255,255,0.06); }",
+      ".pc-act:last-child { border-bottom:none; padding-bottom:0; }",
+      ".pc-act-title { font-size:0.92rem; letter-spacing:0.04em; color:rgba(224,219,212,0.88); }",
+      ".pc-act-note { font-size:11.5px; font-style:italic; color:rgba(224,219,212,0.4); }",
+      ".pc-act audio { height:32px; max-width:220px; }",
+      ".pc-footer-note { text-align:center; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(224,219,212,0.3); margin-top:0.5rem; }",
     ].join('\n'),
     { raw: true },
   );
@@ -340,4 +417,5 @@
   CMS.registerPreviewTemplate('team', TeamPreview);
   CMS.registerPreviewTemplate('home', HomePreview);
   CMS.registerPreviewTemplate('timelines', TimelinePreview);
+  CMS.registerPreviewTemplate('podcast', PodcastPreview);
 })();
