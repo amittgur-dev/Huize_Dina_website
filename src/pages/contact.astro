@@ -54,13 +54,17 @@ import contact from '../../content/pages/contact.json';
     margin-top: 2.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1.1rem;
+    gap: 1.5rem;
   }
 
+  /* Stacked (label above value) rather than side-by-side with a fixed
+     label column — field labels come from the CMS and can be arbitrarily
+     long (e.g. "E-mail the project's coordinator"), which wrapped badly
+     inside a fixed-width column. */
   .field {
     display: flex;
-    gap: 1.2rem;
-    align-items: baseline;
+    flex-direction: column;
+    gap: 0.4rem;
   }
 
   .field-label {
@@ -68,8 +72,6 @@ import contact from '../../content/pages/contact.json';
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: rgba(72, 198, 168, 0.6);
-    width: 70px;
-    flex: none;
   }
 
   .field-value {
