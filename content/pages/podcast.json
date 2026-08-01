@@ -3,7 +3,6 @@
   "title": "Podcast",
   "episodes": [
     {
-      "sideLabel": "Side A",
       "title": "Episode 1: Tilly",
       "numeral": "I",
       "acts": [
@@ -13,7 +12,6 @@
       ]
     },
     {
-      "sideLabel": "Side A",
       "title": "Episode 2",
       "numeral": "II",
       "acts": [
@@ -23,7 +21,6 @@
       ]
     },
     {
-      "sideLabel": "Side B",
       "title": "Episode 3",
       "numeral": "III",
       "acts": [
