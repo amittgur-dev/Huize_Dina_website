@@ -6,27 +6,63 @@
       "title": "Episode 1: Tilly",
       "numeral": "I",
       "acts": [
-        { "key": "e1a1", "title": "Act 1: Diagnosis", "audio": "" },
-        { "key": "e1a2", "title": "Act 2: Huize Dina", "audio": "" },
-        { "key": "e1a3", "title": "Act 3: Departure", "audio": "" }
+        {
+          "key": "e1a1",
+          "title": "Act 1: Diagnosis",
+          "audio": "/assets/audio/huize-dina_ep1_act1.mp3"
+        },
+        {
+          "key": "e1a2",
+          "title": "Act 2: Huize Dina",
+          "audio": ""
+        },
+        {
+          "key": "e1a3",
+          "title": "Act 3: Departure",
+          "audio": ""
+        }
       ]
     },
     {
       "title": "Episode 2",
       "numeral": "II",
       "acts": [
-        { "key": "e2a1", "title": "Act 1", "audio": "" },
-        { "key": "e2a2", "title": "Act 2", "audio": "" },
-        { "key": "e2a3", "title": "Act 3", "audio": "" }
+        {
+          "key": "e2a1",
+          "title": "Act 1",
+          "audio": ""
+        },
+        {
+          "key": "e2a2",
+          "title": "Act 2",
+          "audio": ""
+        },
+        {
+          "key": "e2a3",
+          "title": "Act 3",
+          "audio": ""
+        }
       ]
     },
     {
       "title": "Episode 3",
       "numeral": "III",
       "acts": [
-        { "key": "e3a1", "title": "Act 1", "audio": "" },
-        { "key": "e3a2", "title": "Act 2", "audio": "" },
-        { "key": "e3a3", "title": "Act 3", "audio": "" }
+        {
+          "key": "e3a1",
+          "title": "Act 1",
+          "audio": ""
+        },
+        {
+          "key": "e3a2",
+          "title": "Act 2",
+          "audio": ""
+        },
+        {
+          "key": "e3a3",
+          "title": "Act 3",
+          "audio": ""
+        }
       ]
     }
   ],
