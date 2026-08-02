@@ -10,22 +10,8 @@ import contact from '../../content/pages/contact.json';
   <div class="inner">
     <div class="text-block">{contact.intro}</div>
 
-    <div class="fields">
-      {
-        contact.fields.map((field: any) => (
-          <div class="field">
-            <div class="field-label">{field.label}</div>
-            <div class="field-value">
-              {field.value.split('\n').map((line: string, i: number, arr: string[]) => (
-                <>
-                  {line}
-                  {i < arr.length - 1 && <br />}
-                </>
-              ))}
-            </div>
-          </div>
-        ))
-      }
+    <div class="email-line">
+      <a href={`mailto:${contact.email}`}>{contact.email}</a>
     </div>
 
     <div class="link-row">
@@ -50,34 +36,19 @@ import contact from '../../content/pages/contact.json';
     text-wrap: pretty;
   }
 
-  .fields {
-    margin-top: 2.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+  .email-line {
+    margin-top: 1.6rem;
   }
 
-  /* Stacked (label above value) rather than side-by-side with a fixed
-     label column — field labels come from the CMS and can be arbitrarily
-     long (e.g. "E-mail the project's coordinator"), which wrapped badly
-     inside a fixed-width column. */
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
+  .email-line a {
+    font-size: 15px;
+    letter-spacing: 0.03em;
+    color: #48c6a8;
+    text-decoration: none;
   }
 
-  .field-label {
-    font-size: 10px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: rgba(72, 198, 168, 0.6);
-  }
-
-  .field-value {
-    font-size: 14px;
-    line-height: 1.7;
-    color: rgba(224, 219, 212, 0.75);
+  .email-line a:hover {
+    color: #e0dbd4;
   }
 
   .link-row {

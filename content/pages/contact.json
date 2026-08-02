@@ -2,12 +2,7 @@
   "eyebrow": "Pluralism in Research and the Arts · AHK",
   "title": "Contact",
   "intro": "For questions about the project, the archival material, or the podcast, contact the Lectoraat Pluralism in Research and the Arts at the Amsterdam University of the Arts (AHK).",
-  "fields": [
-    {
-      "label": "E-mail the project's coordinator",
-      "value": "tzlil.sharon@ahk.nl"
-    }
-  ],
+  "email": "lectoraat.pluralisme@ahk.nl",
   "link": {
     "label": "Meet the team →",
     "href": "/team"
