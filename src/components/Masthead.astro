@@ -7,7 +7,7 @@ const { active = '' } = Astro.props;
 const NAV = [
   { key: 'home', label: 'Home', href: '/home' },
   { key: 'podcast', label: 'Podcast', href: '/podcast' },
-  { key: 'timelines', label: "The Girls' Timelines", href: '/timelines' },
+  { key: 'timelines', label: 'Timelines of the girls’ lives', href: '/timelines' },
   { key: 'making-of', label: 'The making of', href: '/making-of' },
   { key: 'team', label: 'Team', href: '/team' },
   { key: 'contact', label: 'Contact', href: '/contact' },
@@ -76,7 +76,8 @@ const NAV = [
 
   .hd-nav {
     display: flex;
-    gap: 1.35rem;
+    align-items: center;
+    gap: 0.8rem;
     margin-top: 9px;
     flex-wrap: wrap;
   }
@@ -100,12 +101,26 @@ const NAV = [
     border-bottom: 1px solid rgba(72, 198, 168, 0.55);
   }
 
+  /* CSS-generated separators rather than markup elements: a real DOM
+     element between links becomes its own flex item, which can end up
+     orphaned at the start of a wrapped line. A pseudo-element on the
+     link itself always wraps together with that link. */
+  .hd-nav a:not(:last-child)::after {
+    content: '\00B7';
+    margin-left: 0.8rem;
+    color: rgba(224, 219, 212, 0.22);
+    display: inline-block;
+  }
+
   @media (max-width: 680px) {
     .hd-row {
       padding: 0.7rem 1rem;
     }
     .hd-nav {
-      gap: 0.9rem;
+      gap: 0.5rem;
+    }
+    .hd-nav a:not(:last-child)::after {
+      margin-left: 0.5rem;
     }
   }
 </style>

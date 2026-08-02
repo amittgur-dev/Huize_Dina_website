@@ -23,7 +23,7 @@ collections:
         fields:
           - { label: Title, name: title, widget: string }
           - { label: "Paragraph 1", name: paragraph1, widget: text, hint: "Wrap a word in *asterisks* for italics." }
-          - { label: "Paragraph 2", name: paragraph2, widget: text, hint: "Write [link text](/url) to add an inline link, e.g. [Girls' Timelines](/timelines). Wrap a phrase in **double asterisks** to brighten it instead (no italics, no bold)." }
+          - { label: "Paragraph 2", name: paragraph2, widget: text, hint: "Write [link text](/url) to add an inline link, e.g. [Timelines of the girls’ lives](/timelines). Wrap a phrase in **double asterisks** to brighten it instead (no italics, no bold)." }
           - { label: "Primary link label (e.g. \"Enter →\") — goes to the Home page", name: primaryLinkLabel, widget: string }
           - { label: "Secondary link label (e.g. \"Listen to the podcast →\") — goes to the Podcast page", name: secondaryLinkLabel, widget: string }
 
@@ -130,7 +130,7 @@ collections:
   # Mina and Sara); a shared schema would show that dropdown on every
   # event in de Jong's and Swaab's timelines too, where it's meaningless.
   - name: timelines
-    label: "The Girls' Timelines"
+    label: "Timelines of the girls’ lives"
     files:
       - name: dejong
         label: "Episode I — Tilly de Jong"
