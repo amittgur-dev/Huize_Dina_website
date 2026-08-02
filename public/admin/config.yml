@@ -103,6 +103,12 @@ collections:
               - { label: Label, name: label, widget: string }
               - { label: Link (e.g. /team), name: href, widget: string }
 
+      - name: timelines-intro
+        label: "Timelines page intro"
+        file: content/pages/timelines-intro.json
+        fields:
+          - { label: Intro, name: intro, widget: text }
+
   # --- Team --------------------------------------------------------------
   - name: team
     label: Team

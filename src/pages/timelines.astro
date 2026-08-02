@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { buildTimeline } from '../lib/timelines';
 import type { RawTimeline } from '../lib/timelines';
+import timelinesIntro from '../../content/pages/timelines-intro.json';
 
 // One file per timeline (content/timelines/*.json) so the CMS can offer
 // them as 3 separate, reorderable-within-themselves entries. Display order
@@ -19,6 +20,8 @@ const SLUGS = timelines.map((t) => t.slug);
 <BaseLayout title="Timelines of the girls’ lives" active="timelines" description="Three life stories from the Huize Dina archive, told episode by episode.">
 
   <section class="pa-hero">
+    <div class="pa-intro">{timelinesIntro.intro}</div>
+
     <div class="pa-hero-title" id="hero-title">{timelines[0].title}</div>
     <div class="hero-years" id="hero-years">{timelines[0].years}</div>
 
@@ -124,6 +127,15 @@ const SLUGS = timelines.map((t) => t.slug);
     padding: 9rem 1rem 2.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     margin-bottom: 2.5rem;
+  }
+
+  .pa-intro {
+    max-width: 560px;
+    margin: 0 auto 1.8rem;
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(224, 219, 212, 0.55);
+    text-wrap: pretty;
   }
 
   .pa-hero-title {
@@ -499,6 +511,10 @@ const SLUGS = timelines.map((t) => t.slug);
     .pa-hero {
       padding-top: 8rem;
       padding-bottom: 1.5rem;
+    }
+    .pa-intro {
+      font-size: 13px;
+      margin-bottom: 1.4rem;
     }
     .pa-hero-title {
       font-size: 1.5rem;
