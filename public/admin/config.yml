@@ -136,7 +136,7 @@ collections:
   # Mina and Sara); a shared schema would show that dropdown on every
   # event in de Jong's and Swaab's timelines too, where it's meaningless.
   - name: timelines
-    label: Timelines
+    label: "The Girls' Timelines"
     files:
       - name: dejong
         label: "Episode I — Tilly de Jong"
