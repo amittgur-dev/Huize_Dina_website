@@ -1,0 +1,119 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import { renderInline } from '../lib/markup';
+import home from '../../content/pages/home.json';
+---
+
+<BaseLayout title="Home" active="home">
+  <Hero title={home.title} eyebrow={home.eyebrow} />
+
+  <div class="inner">
+    {
+      home.blocks.map((block: any) =>
+        block.type === 'text' ? (
+          <div class="text-block" set:html={renderInline(block.text)} />
+        ) : (
+          <figure class="image-block">
+            <img src={block.file} alt={block.alt} loading="lazy" />
+            {block.caption && <figcaption set:html={renderInline(block.caption)} />}
+          </figure>
+        ),
+      )
+    }
+
+    <div class="source-note">{home.sourceNote}</div>
+
+    <div class="links-row">
+      {
+        home.links.map((link: any) => (
+          <a href={link.href}>{link.label}</a>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .inner {
+    position: relative;
+    z-index: 5;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 1.5rem 5rem;
+  }
+
+  .text-block {
+    font-size: 15px;
+    line-height: 1.85;
+    color: rgba(224, 219, 212, 0.68);
+    text-wrap: pretty;
+  }
+
+  .text-block + .text-block {
+    margin-top: 1.6rem;
+  }
+
+  .image-block {
+    margin: 2.8rem 0;
+    border: 1px solid rgba(224, 219, 212, 0.14);
+    padding: 6px;
+    background: rgba(20, 17, 25, 0.5);
+  }
+
+  .image-block img {
+    width: 100%;
+    display: block;
+    filter: saturate(0.55) brightness(0.9);
+  }
+
+  .image-block figcaption {
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    color: rgba(224, 219, 212, 0.32);
+    padding: 0.45rem 0.3rem 0.2rem;
+  }
+
+  .source-note {
+    font-size: 12px;
+    line-height: 1.7;
+    color: rgba(224, 219, 212, 0.38);
+    margin-top: 2.5rem;
+    font-style: italic;
+  }
+
+  .links-row {
+    margin-top: 3.2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .links-row a {
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #48c6a8;
+    text-decoration: none;
+  }
+
+  .links-row a:hover {
+    color: #e0dbd4;
+  }
+
+  .links-row a:nth-child(2) {
+    color: rgba(224, 219, 212, 0.55);
+  }
+
+  .links-row a:nth-child(2):hover {
+    color: #48c6a8;
+  }
+
+  @media (max-width: 680px) {
+    .inner {
+      padding: 0 1rem 4rem;
+    }
+  }
+</style>

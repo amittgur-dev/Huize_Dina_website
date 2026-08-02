@@ -1,119 +1,190 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Hero from '../components/Hero.astro';
 import { renderInline } from '../lib/markup';
-import home from '../../content/pages/home.json';
+import landing from '../../content/pages/landing.json';
 ---
 
-<BaseLayout title="Home" active="home">
-  <Hero title={home.title} eyebrow={home.eyebrow} />
+<BaseLayout title="The Podcast" hideMasthead>
+  <div class="ld-page">
+    <div class="ld-hero">
+      <h1 class="ld-title">{landing.title}</h1>
+      <div class="ld-rule" aria-hidden="true" />
+    </div>
 
-  <div class="inner">
-    {
-      home.blocks.map((block: any) =>
-        block.type === 'text' ? (
-          <div class="text-block" set:html={renderInline(block.text)} />
-        ) : (
-          <figure class="image-block">
-            <img src={block.file} alt={block.alt} loading="lazy" />
-            {block.caption && <figcaption set:html={renderInline(block.caption)} />}
-          </figure>
-        ),
-      )
-    }
+    <div class="ld-inner">
+      <div class="ld-body" set:html={renderInline(landing.paragraph1)} />
+      <div class="ld-body ld-body-2" set:html={renderInline(landing.paragraph2)} />
 
-    <div class="source-note">{home.sourceNote}</div>
-
-    <div class="links-row">
-      {
-        home.links.map((link: any) => (
-          <a href={link.href}>{link.label}</a>
-        ))
-      }
+      <div class="ld-foot">
+        <a href="/home" class="ld-link-primary">{landing.primaryLinkLabel}</a>
+        <a href="/podcast" class="ld-link-secondary">{landing.secondaryLinkLabel}</a>
+      </div>
     </div>
   </div>
 </BaseLayout>
 
 <style>
-  .inner {
+  .ld-page {
     position: relative;
     z-index: 5;
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 0 1.5rem 5rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4vh 0 5vh;
+    box-sizing: border-box;
   }
 
-  .text-block {
-    font-size: 15px;
-    line-height: 1.85;
-    color: rgba(224, 219, 212, 0.68);
+  .ld-hero {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 1.5rem 2.6rem;
+  }
+
+  .ld-title {
+    margin: 0;
+    font-size: 2.9rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: rgba(224, 219, 212, 0.92);
+    line-height: 1.15;
     text-wrap: pretty;
   }
 
-  .text-block + .text-block {
+  .ld-rule {
+    width: 38px;
+    height: 1px;
+    background: rgba(72, 198, 168, 0.55);
+    margin: 1.7rem 0 0;
+  }
+
+  .ld-inner {
+    position: relative;
+    z-index: 5;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .ld-body {
+    font-size: 20px;
+    line-height: 1.8;
+    color: rgba(224, 219, 212, 0.72);
+    text-wrap: pretty;
+  }
+
+  .ld-body-2 {
     margin-top: 1.6rem;
   }
 
-  .image-block {
-    margin: 2.8rem 0;
-    border: 1px solid rgba(224, 219, 212, 0.14);
-    padding: 6px;
-    background: rgba(20, 17, 25, 0.5);
-  }
-
-  .image-block img {
-    width: 100%;
-    display: block;
-    filter: saturate(0.55) brightness(0.9);
-  }
-
-  .image-block figcaption {
-    font-size: 10px;
-    letter-spacing: 0.05em;
-    color: rgba(224, 219, 212, 0.32);
-    padding: 0.45rem 0.3rem 0.2rem;
-  }
-
-  .source-note {
-    font-size: 12px;
-    line-height: 1.7;
-    color: rgba(224, 219, 212, 0.38);
-    margin-top: 2.5rem;
-    font-style: italic;
-  }
-
-  .links-row {
-    margin-top: 3.2rem;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  .ld-foot {
+    margin-top: 3rem;
     display: flex;
     gap: 2.5rem;
     flex-wrap: wrap;
+    align-items: center;
   }
 
-  .links-row a {
-    font-size: 13px;
-    letter-spacing: 0.12em;
+  .ld-link-primary {
+    font-size: 15px;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     color: #48c6a8;
     text-decoration: none;
+    border-bottom: 1px solid rgba(72, 198, 168, 0.45);
+    padding-bottom: 4px;
   }
 
-  .links-row a:hover {
+  .ld-link-primary:hover {
     color: #e0dbd4;
   }
 
-  .links-row a:nth-child(2) {
-    color: rgba(224, 219, 212, 0.55);
+  .ld-link-secondary {
+    font-size: 14px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(224, 219, 212, 0.5);
+    text-decoration: none;
   }
 
-  .links-row a:nth-child(2):hover {
+  .ld-link-secondary:hover {
     color: #48c6a8;
   }
 
   @media (max-width: 680px) {
-    .inner {
-      padding: 0 1rem 4rem;
+    .ld-page {
+      min-height: auto;
+      padding: 3rem 0 3.5rem;
+    }
+    .ld-hero {
+      padding: 0 1.4rem 1.6rem;
+      min-height: auto;
+    }
+    .ld-title {
+      font-size: 1.9rem;
+    }
+    .ld-inner {
+      padding: 0 1.4rem;
+    }
+    .ld-body {
+      font-size: 17px;
+    }
+    .ld-foot {
+      gap: 1.6rem;
+    }
+  }
+
+  @media (max-height: 640px) and (min-width: 681px) {
+    .ld-page {
+      padding: 2.5vh 0 3vh;
+    }
+    .ld-title {
+      font-size: 2.3rem;
+    }
+    .ld-rule {
+      margin: 1.1rem 0 0;
+    }
+    .ld-hero {
+      padding-bottom: 1.1rem;
+    }
+    .ld-body {
+      font-size: 18px;
+      line-height: 1.65;
+    }
+    .ld-body-2 {
+      margin-top: 1rem;
+    }
+    .ld-foot {
+      margin-top: 1.8rem;
+    }
+  }
+
+  @media (max-height: 520px) and (min-width: 681px) {
+    .ld-title {
+      font-size: 1.9rem;
+    }
+    .ld-rule {
+      margin: 0.7rem 0 0;
+    }
+    .ld-hero {
+      padding-bottom: 0.8rem;
+    }
+    .ld-body {
+      font-size: 16px;
+      line-height: 1.55;
+    }
+    .ld-body-2 {
+      margin-top: 0.8rem;
+    }
+    .ld-foot {
+      margin-top: 1.2rem;
     }
   }
 </style>

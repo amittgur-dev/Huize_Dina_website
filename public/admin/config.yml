@@ -13,10 +13,20 @@ media_folder: /assets/site
 public_folder: /assets/site
 
 collections:
-  # --- Page text (Home / Podcast / Contact) ---------------------------
+  # --- Page text (Landing / Home / Podcast / Contact) -----------------
   - name: pages
     label: Page Text
     files:
+      - name: landing
+        label: Landing page
+        file: content/pages/landing.json
+        fields:
+          - { label: Title, name: title, widget: string }
+          - { label: "Paragraph 1", name: paragraph1, widget: text, hint: "Wrap a word in *asterisks* for italics." }
+          - { label: "Paragraph 2", name: paragraph2, widget: text, hint: "Wrap a phrase in **double asterisks** to brighten it (no italics, no bold)." }
+          - { label: "Primary link label (e.g. \"Enter →\") — goes to the Home page", name: primaryLinkLabel, widget: string }
+          - { label: "Secondary link label (e.g. \"Listen to the podcast →\") — goes to the Podcast page", name: secondaryLinkLabel, widget: string }
+
       - name: home
         label: Home page
         file: content/pages/home.json

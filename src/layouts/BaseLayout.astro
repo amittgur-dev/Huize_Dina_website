@@ -7,6 +7,8 @@ export interface Props {
   description?: string;
   active?: string;
   fullscreen?: boolean;
+  // For the landing page: no masthead/nav at all, per its design.
+  hideMasthead?: boolean;
 }
 
 const {
@@ -14,6 +16,7 @@ const {
   description = "Polyphonic Archive — a podcast about the girls of Huize Dina, a Jewish girls' home in Santpoort, 1920s–40s.",
   active = '',
   fullscreen = false,
+  hideMasthead = false,
 } = Astro.props;
 ---
 
@@ -44,9 +47,13 @@ const {
       }
       <slot name="bg-extra" />
 
-      <Masthead active={active}>
-        <slot name="header-extra" slot="extra" />
-      </Masthead>
+      {
+        !hideMasthead && (
+          <Masthead active={active}>
+            <slot name="header-extra" slot="extra" />
+          </Masthead>
+        )
+      }
 
       <slot />
     </div>
