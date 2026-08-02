@@ -45,6 +45,19 @@ img {
   color: var(--text);
 }
 
+/* Inline links produced by lib/markup.ts's [text](url) syntax — content is
+   injected via set:html, which bypasses Astro's scoped per-component CSS,
+   so this has to live here rather than in a page's own <style> block. */
+.inline-link {
+  color: rgba(224, 219, 212, 0.92);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(72, 198, 168, 0.4);
+}
+
+.inline-link:hover {
+  color: #48c6a8;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
