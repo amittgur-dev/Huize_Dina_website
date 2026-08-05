@@ -1778,12 +1778,25 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
   });
 
   // --- Init ---
-  function syncHeaderHeight() {
+  function measureHeader() {
     const header = document.querySelector<HTMLElement>('.hd-header');
     if (header) document.documentElement.style.setProperty('--mk-header-h', `${header.offsetHeight}px`);
+  }
+  function syncHeaderHeight() {
+    measureHeader();
     applyCam();
   }
   window.addEventListener('resize', syncHeaderHeight);
+
+  // Seat the camera at the fitted overview distance *before* the first
+  // paint. cam.z starts at 0, i.e. the camera sitting almost on top of the
+  // intro card (dz = 340, so ~12x scale), and initFit below only pulled it
+  // back to the fitted distance a tick later — which showed as the intro
+  // text appearing hugely magnified before snapping into place. Measure the
+  // header first: overviewDz() fits to the viewport, whose height depends on
+  // the --mk-header-h that measureHeader() sets.
+  measureHeader();
+  cam.z = zForLvl(0) - overviewDz();
   syncHeaderHeight();
 
   updateNudge();
