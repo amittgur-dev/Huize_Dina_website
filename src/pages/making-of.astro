@@ -33,6 +33,15 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     </div>
   </Fragment>
 
+  <!-- Runs during parsing, before the intro card below is painted. The map
+       script is a bundled module and therefore deferred, so between first
+       paint and that script running the intro would otherwise show
+       unpositioned — full size at the top-left corner, over the masthead —
+       which reads as a flash of stray content on the way into the page.
+       Gating on a class set here (rather than defaulting .mk-intro to
+       opacity:0) keeps the card visible when JS never arrives at all. -->
+  <script is:inline>document.documentElement.classList.add('mk-js');</script>
+
   <div id="mk-viewport">
     <div id="mk-bg"></div>
     <svg id="mk-lines" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -363,6 +372,12 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     text-align: center;
     z-index: 15;
     will-change: transform, opacity;
+  }
+
+  /* Hidden only until the camera's first applyCam() gives it a real
+     transform and opacity — see the inline script above the viewport. */
+  :global(html.mk-js) .mk-intro {
+    opacity: 0;
   }
 
   .mk-intro-eyebrow {
