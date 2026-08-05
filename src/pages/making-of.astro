@@ -1739,7 +1739,13 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
       const m0 = F / dz0;
       const worldX = cam.x + (mx - cx) / m0;
       const worldY = cam.y + (my - cy) / m0;
-      const f = e.deltaY < 0 ? 1.07 : 0.934;
+      // Zoom step per wheel event (the magnitude of deltaY is deliberately
+      // ignored, so a trackpad's many small events don't rocket through the
+      // zoom range). These are the previous 1.07 / 0.934 steps raised to
+      // 1/1.6, i.e. reaching any given zoom now takes ~60% more physical
+      // scrolling. Keep them near-reciprocal so zooming in then back out
+      // returns to roughly where you started.
+      const f = e.deltaY < 0 ? 1.0432 : 0.9582;
       let dz1 = dz0 / f;
       dz1 = Math.max(NEAR + 60, Math.min(maxDz, dz1));
       const m1 = F / dz1;
