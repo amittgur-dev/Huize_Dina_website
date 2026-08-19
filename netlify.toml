@@ -4,3 +4,15 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# The CMS reads /admin/config.yml with a plain fetch() (no cache-busting) and
+# keeps it in memory only, so a browser-cached copy silently leaves an editor
+# on an outdated schema. That is exactly how making every field optional
+# appeared not to work: the browser kept serving the previous config and kept
+# refusing to publish with "you've missed a required field". Force a
+# revalidation of this one file so a reload always picks up a deployed change.
+# Scoped deliberately: hashed assets under /_astro/ keep their long caching.
+[[headers]]
+  for = "/admin/config.yml"
+  [headers.values]
+    Cache-Control = "no-cache"
