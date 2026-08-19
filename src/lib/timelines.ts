@@ -73,22 +73,33 @@ export interface BuiltTimeline {
   tagIndex: { mina: number; sara: number };
 }
 
-function toSerial(ev: RawEvent): number {
+// null when the event carries no usable date at all — every date field is
+// optional in the CMS, so an editor can legitimately save an event with none
+// of them filled in yet.
+function toSerial(ev: RawEvent): number | null {
   if (ev.serial != null) return ev.serial;
-  const [y, m, d] = (ev.date_iso as string).split('-').map(Number);
+  if (!ev.date_iso) return null;
+  const [y, m, d] = String(ev.date_iso).split('-').map(Number);
+  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return null;
   return (Date.UTC(y, m - 1, d) - EXCEL_EPOCH_MS) / DAY_MS;
 }
 
-function toLabel(ev: RawEvent, serial: number): string {
+function toLabel(ev: RawEvent, serial: number | null): string {
   if (ev.date_label) return ev.date_label;
+  // No date entered: show no date line rather than inventing one from the
+  // placeholder position the event was given below.
+  if (serial == null) return '';
   const dt = new Date(EXCEL_EPOCH_MS + serial * DAY_MS);
   return `${dt.getUTCDate()} ${MONTHS[dt.getUTCMonth()]} ${dt.getUTCFullYear()}`;
 }
 
 function estimateHeight(ev: RawEvent): number {
   let h = 116;
-  h += Math.ceil(ev.text.length / 30) * 34;
-  if (ev.image) h += ev.image.full ? 640 : 430;
+  h += Math.ceil((ev.text || '').length / 30) * 34;
+  // Only reserve room for an image that will actually render — an Image
+  // block with no file picked yet is skipped below, so it must not be
+  // allotted space here either or the card spacing goes out of step.
+  if (ev.image?.file) h += ev.image.full ? 640 : 430;
   return h;
 }
 
@@ -104,9 +115,20 @@ export function buildTimeline(raw: RawTimeline): BuiltTimeline {
   const SEQ_GAP = 90;
   const SIDE_GAP = 45;
 
-  const serials = raw.events.map(toSerial);
-  const MIN = Math.min(...serials);
-  const MAX = Math.max(...serials);
+  // An event with no date at all still has to be placed somewhere. Inherit
+  // the previous event's position so it simply appears in the order it was
+  // entered; the Math.max(...) spacing in the position loop below keeps it
+  // from colliding with its neighbour. rawSerials (pre-fallback) is what
+  // decides whether a date line is shown, so these placeholders never get
+  // rendered as a real date.
+  const rawSerials = raw.events.map(toSerial);
+  let carried = rawSerials.find((s) => s != null) ?? 0;
+  const serials = rawSerials.map((s) => {
+    if (s != null) carried = s;
+    return carried;
+  });
+  const MIN = serials.length ? Math.min(...serials) : 0;
+  const MAX = serials.length ? Math.max(...serials) : 0;
   const span = Math.max(1, MAX - MIN);
   // Cards' actual content height (driven by estimateHeight, below) is what
   // mostly determines scroll length for densely-packed periods — this SCALE
@@ -140,7 +162,9 @@ export function buildTimeline(raw: RawTimeline): BuiltTimeline {
 
   const events: PositionedEvent[] = raw.events.map((ev, i) => {
     let image: PositionedImage | null = null;
-    if (ev.image) {
+    // Skip an Image block whose file hasn't been picked yet — rendering it
+    // would emit <img src=""> and show as a broken image.
+    if (ev.image?.file) {
       const variant: PositionedImage['variant'] = ev.image.full ? 'full' : ev.image.zoom ? 'zoom' : 'default';
       image = {
         src: ev.image.file,
@@ -154,7 +178,7 @@ export function buildTimeline(raw: RawTimeline): BuiltTimeline {
       idx: i,
       top: tops[i],
       isLeft: i % 2 === 1,
-      date: toLabel(ev, serials[i]),
+      date: toLabel(ev, rawSerials[i]),
       heading: ev.heading,
       text: ev.text,
       tag: ev.sister ?? null,

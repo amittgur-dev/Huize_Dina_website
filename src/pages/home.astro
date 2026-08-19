@@ -13,12 +13,12 @@ import home from '../../content/pages/home.json';
       home.blocks.map((block: any) =>
         block.type === 'text' ? (
           <div class="text-block" set:html={renderInline(block.text)} />
-        ) : (
+        ) : block.file ? (
           <figure class="image-block">
             <img src={block.file} alt={block.alt} loading="lazy" />
             {block.caption && <figcaption set:html={renderInline(block.caption)} />}
           </figure>
-        ),
+        ) : null,
       )
     }
 

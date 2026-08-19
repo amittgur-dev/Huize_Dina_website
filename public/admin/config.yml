@@ -21,64 +21,70 @@ collections:
         label: Landing page
         file: content/pages/landing.json
         fields:
-          - { label: Title, name: title, widget: string }
-          - { label: "Paragraph 1", name: paragraph1, widget: text, hint: "Wrap a word in *asterisks* for italics." }
-          - { label: "Paragraph 2", name: paragraph2, widget: text, hint: "Write [link text](/url) to add an inline link, e.g. [Timelines of the girls’ lives](/timelines). Wrap a phrase in **double asterisks** to brighten it instead (no italics, no bold)." }
-          - { label: "Primary link label (e.g. \"Enter →\") — goes to the Home page", name: primaryLinkLabel, widget: string }
-          - { label: "Secondary link label (e.g. \"Listen to the podcast →\") — goes to the Podcast page", name: secondaryLinkLabel, widget: string }
+          - { label: Title, name: title, widget: string, required: false }
+          - { label: "Paragraph 1", name: paragraph1, widget: text, hint: "Wrap a word in *asterisks* for italics.", required: false }
+          - { label: "Paragraph 2", name: paragraph2, widget: text, hint: "Write [link text](/url) to add an inline link, e.g. [Timelines of the girls’ lives](/timelines). Wrap a phrase in **double asterisks** to brighten it instead (no italics, no bold).", required: false }
+          - { label: "Primary link label (e.g. \"Enter →\") — goes to the Home page", name: primaryLinkLabel, widget: string, required: false }
+          - { label: "Secondary link label (e.g. \"Listen to the podcast →\") — goes to the Podcast page", name: secondaryLinkLabel, widget: string, required: false }
 
       - name: home
         label: Home page
         file: content/pages/home.json
         fields:
-          - { label: Eyebrow, name: eyebrow, widget: string }
-          - { label: Title, name: title, widget: string }
+          - { label: Eyebrow, name: eyebrow, widget: string, required: false }
+          - { label: Title, name: title, widget: string, required: false }
           - label: Content blocks
             name: blocks
             widget: list
+            required: false
             types:
               - label: Paragraph
                 name: text
                 widget: object
+                required: false
                 fields:
-                  - { label: Type, name: type, widget: hidden, default: text }
-                  - { label: Text, name: text, widget: text, hint: "Wrap a word in *asterisks* for italics." }
+                  - { label: Type, name: type, widget: hidden, default: text, required: false }
+                  - { label: Text, name: text, widget: text, hint: "Wrap a word in *asterisks* for italics.", required: false }
               - label: Image
                 name: image
                 widget: object
+                required: false
                 fields:
-                  - { label: Type, name: type, widget: hidden, default: image }
-                  - { label: Image, name: file, widget: image, media_folder: "/assets/site", public_folder: "/assets/site" }
-                  - { label: Alt text, name: alt, widget: string }
+                  - { label: Type, name: type, widget: hidden, default: image, required: false }
+                  - { label: Image, name: file, widget: image, media_folder: "/assets/site", public_folder: "/assets/site", required: false }
+                  - { label: Alt text, name: alt, widget: string, required: false }
                   - { label: Caption, name: caption, widget: string, required: false }
           - { label: Source note, name: sourceNote, widget: text, required: false }
           - label: Footer links
             name: links
             widget: list
+            required: false
             fields:
-              - { label: Label, name: label, widget: string }
-              - { label: Link (e.g. /podcast), name: href, widget: string }
+              - { label: Label, name: label, widget: string, required: false }
+              - { label: Link (e.g. /podcast), name: href, widget: string, required: false }
 
       - name: podcast
         label: Podcast page
         file: content/pages/podcast.json
         fields:
-          - { label: Eyebrow, name: eyebrow, widget: string }
-          - { label: Title, name: title, widget: string }
+          - { label: Eyebrow, name: eyebrow, widget: string, required: false }
+          - { label: Title, name: title, widget: string, required: false }
           - label: Episodes
             name: episodes
             widget: list
+            required: false
             summary: "{{title}}"
             fields:
-              - { label: Title, name: title, widget: string }
-              - { label: Numeral (I / II / III), name: numeral, widget: string }
+              - { label: Title, name: title, widget: string, required: false }
+              - { label: Numeral (I / II / III), name: numeral, widget: string, required: false }
               - label: Acts
                 name: acts
                 widget: list
+                required: false
                 summary: "{{title}}"
                 fields:
-                  - { label: "Key (unique, no spaces)", name: key, widget: string }
-                  - { label: Title, name: title, widget: string }
+                  - { label: "Key (unique, no spaces)", name: key, widget: string, required: false }
+                  - { label: Title, name: title, widget: string, required: false }
                   - label: Audio file
                     name: audio
                     widget: file
@@ -86,28 +92,29 @@ collections:
                     media_folder: "/assets/audio"
                     public_folder: "/assets/audio"
                     hint: "Leave empty to show \"Recording to follow\"."
-          - { label: Footer note, name: footerNote, widget: string }
+          - { label: Footer note, name: footerNote, widget: string, required: false }
 
       - name: contact
         label: Contact page
         file: content/pages/contact.json
         fields:
-          - { label: Eyebrow, name: eyebrow, widget: string }
-          - { label: Title, name: title, widget: string }
-          - { label: Intro, name: intro, widget: text }
-          - { label: Email, name: email, widget: string }
+          - { label: Eyebrow, name: eyebrow, widget: string, required: false }
+          - { label: Title, name: title, widget: string, required: false }
+          - { label: Intro, name: intro, widget: text, required: false }
+          - { label: Email, name: email, widget: string, required: false }
           - label: Footer link
             name: link
             widget: object
+            required: false
             fields:
-              - { label: Label, name: label, widget: string }
-              - { label: Link (e.g. /team), name: href, widget: string }
+              - { label: Label, name: label, widget: string, required: false }
+              - { label: Link (e.g. /team), name: href, widget: string, required: false }
 
       - name: timelines-intro
         label: "Timelines page intro"
         file: content/pages/timelines-intro.json
         fields:
-          - { label: Intro, name: intro, widget: text }
+          - { label: Intro, name: intro, widget: text, required: false }
 
   # --- Team --------------------------------------------------------------
   - name: team
@@ -117,17 +124,18 @@ collections:
         label: Team page
         file: content/team.json
         fields:
-          - { label: Eyebrow, name: eyebrow, widget: string }
-          - { label: Title, name: title, widget: string }
+          - { label: Eyebrow, name: eyebrow, widget: string, required: false }
+          - { label: Title, name: title, widget: string, required: false }
           - label: Members
             name: members
             widget: list
+            required: false
             summary: "{{name}}"
             fields:
-              - { label: Name, name: name, widget: string }
-              - { label: Role, name: role, widget: string }
-              - { label: Bio, name: bio, widget: text, hint: "Wrap a word in *asterisks* for italics." }
-              - { label: Photo, name: photo, widget: image, media_folder: "/assets/site", public_folder: "/assets/site" }
+              - { label: Name, name: name, widget: string, required: false }
+              - { label: Role, name: role, widget: string, required: false }
+              - { label: Bio, name: bio, widget: text, hint: "Wrap a word in *asterisks* for italics.", required: false }
+              - { label: Photo, name: photo, widget: image, media_folder: "/assets/site", public_folder: "/assets/site", required: false }
 
   # --- Timelines -----------------------------------------------------------
   # A files (not folder) collection so each of the three timelines can have
@@ -142,28 +150,29 @@ collections:
         label: "Episode I — Tilly de Jong"
         file: content/timelines/dejong.json
         fields:
-          - { label: Slug (matches the filename — do not change), name: slug, widget: string }
-          - { label: Episode, name: episode, widget: select, options: ["I", "II", "III"] }
-          - { label: Name (short), name: name, widget: string }
-          - { label: Title (full name), name: title, widget: string }
-          - { label: Years, name: years, widget: string, hint: "e.g. 1919—1944" }
+          - { label: Slug (matches the filename — do not change), name: slug, widget: string, required: false }
+          - { label: Episode, name: episode, widget: select, options: ["I", "II", "III"], required: false }
+          - { label: Name (short), name: name, widget: string, required: false }
+          - { label: Title (full name), name: title, widget: string, required: false }
+          - { label: Years, name: years, widget: string, hint: "e.g. 1919—1944", required: false }
           - label: Events
             name: events
             widget: list
+            required: false
             summary: "{{heading}}"
             fields:
               - { label: Date (ISO), name: date_iso, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, hint: "Leave empty for undated-but-ordered events (use Serial order instead)." }
               - { label: "Date label (display text)", name: date_label, widget: string, required: false, hint: "Shown as-is when set, e.g. \"23 Mar. 1936\". Leave empty to auto-format from the ISO date." }
               - { label: Serial order, name: serial, widget: number, required: false, hint: "Only for undated events — a legacy sequence number that places the event in order." }
-              - { label: Heading, name: heading, widget: string }
-              - { label: Text, name: text, widget: text }
+              - { label: Heading, name: heading, widget: string, required: false }
+              - { label: Text, name: text, widget: text, required: false }
               - label: Image
                 name: image
                 widget: object
                 required: false
                 fields:
-                  - { label: Image file, name: file, widget: image, media_folder: "/assets/timeline", public_folder: "/assets/timeline" }
-                  - { label: Caption, name: caption, widget: string }
+                  - { label: Image file, name: file, widget: image, media_folder: "/assets/timeline", public_folder: "/assets/timeline", required: false }
+                  - { label: Caption, name: caption, widget: string, required: false }
                   - { label: Show at full size (portrait scans), name: full, widget: boolean, required: false, default: false }
                   - { label: Focus point (CSS object-position), name: focus, widget: string, required: false, hint: "e.g. \"left center\" — only for tightly-cropped scans." }
                   - { label: Zoom, name: zoom, widget: number, required: false, hint: "CSS scale factor, e.g. 1.6 — pairs with Focus point." }
@@ -172,29 +181,30 @@ collections:
         label: "Episode II — Mina & Sara Engers"
         file: content/timelines/engers.json
         fields:
-          - { label: Slug (matches the filename — do not change), name: slug, widget: string }
-          - { label: Episode, name: episode, widget: select, options: ["I", "II", "III"] }
-          - { label: Name (short), name: name, widget: string }
-          - { label: Title (full name), name: title, widget: string }
-          - { label: Years, name: years, widget: string, hint: "e.g. 1919—1944" }
+          - { label: Slug (matches the filename — do not change), name: slug, widget: string, required: false }
+          - { label: Episode, name: episode, widget: select, options: ["I", "II", "III"], required: false }
+          - { label: Name (short), name: name, widget: string, required: false }
+          - { label: Title (full name), name: title, widget: string, required: false }
+          - { label: Years, name: years, widget: string, hint: "e.g. 1919—1944", required: false }
           - label: Events
             name: events
             widget: list
+            required: false
             summary: "{{heading}}"
             fields:
               - { label: Date (ISO), name: date_iso, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, hint: "Leave empty for undated-but-ordered events (use Serial order instead)." }
               - { label: "Date label (display text)", name: date_label, widget: string, required: false, hint: "Shown as-is when set, e.g. \"23 Mar. 1936\". Leave empty to auto-format from the ISO date." }
               - { label: Serial order, name: serial, widget: number, required: false, hint: "Only for undated events — a legacy sequence number that places the event in order." }
-              - { label: Heading, name: heading, widget: string }
-              - { label: Text, name: text, widget: text }
+              - { label: Heading, name: heading, widget: string, required: false }
+              - { label: Text, name: text, widget: text, required: false }
               - { label: Sister, name: sister, widget: select, options: ["mina", "sara", "both"], required: false, hint: "Which sister this event is about — leave empty if it applies to both / neither specifically." }
               - label: Image
                 name: image
                 widget: object
                 required: false
                 fields:
-                  - { label: Image file, name: file, widget: image, media_folder: "/assets/timeline", public_folder: "/assets/timeline" }
-                  - { label: Caption, name: caption, widget: string }
+                  - { label: Image file, name: file, widget: image, media_folder: "/assets/timeline", public_folder: "/assets/timeline", required: false }
+                  - { label: Caption, name: caption, widget: string, required: false }
                   - { label: Show at full size (portrait scans), name: full, widget: boolean, required: false, default: false }
                   - { label: Focus point (CSS object-position), name: focus, widget: string, required: false, hint: "e.g. \"left center\" — only for tightly-cropped scans." }
                   - { label: Zoom, name: zoom, widget: number, required: false, hint: "CSS scale factor, e.g. 1.6 — pairs with Focus point." }
@@ -203,28 +213,29 @@ collections:
         label: "Episode III — Henriette Swaab"
         file: content/timelines/swaab.json
         fields:
-          - { label: Slug (matches the filename — do not change), name: slug, widget: string }
-          - { label: Episode, name: episode, widget: select, options: ["I", "II", "III"] }
-          - { label: Name (short), name: name, widget: string }
-          - { label: Title (full name), name: title, widget: string }
-          - { label: Years, name: years, widget: string, hint: "e.g. 1919—1944" }
+          - { label: Slug (matches the filename — do not change), name: slug, widget: string, required: false }
+          - { label: Episode, name: episode, widget: select, options: ["I", "II", "III"], required: false }
+          - { label: Name (short), name: name, widget: string, required: false }
+          - { label: Title (full name), name: title, widget: string, required: false }
+          - { label: Years, name: years, widget: string, hint: "e.g. 1919—1944", required: false }
           - label: Events
             name: events
             widget: list
+            required: false
             summary: "{{heading}}"
             fields:
               - { label: Date (ISO), name: date_iso, widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false, hint: "Leave empty for undated-but-ordered events (use Serial order instead)." }
               - { label: "Date label (display text)", name: date_label, widget: string, required: false, hint: "Shown as-is when set, e.g. \"23 Mar. 1936\". Leave empty to auto-format from the ISO date." }
               - { label: Serial order, name: serial, widget: number, required: false, hint: "Only for undated events — a legacy sequence number that places the event in order." }
-              - { label: Heading, name: heading, widget: string }
-              - { label: Text, name: text, widget: text }
+              - { label: Heading, name: heading, widget: string, required: false }
+              - { label: Text, name: text, widget: text, required: false }
               - label: Image
                 name: image
                 widget: object
                 required: false
                 fields:
-                  - { label: Image file, name: file, widget: image, media_folder: "/assets/timeline", public_folder: "/assets/timeline" }
-                  - { label: Caption, name: caption, widget: string }
+                  - { label: Image file, name: file, widget: image, media_folder: "/assets/timeline", public_folder: "/assets/timeline", required: false }
+                  - { label: Caption, name: caption, widget: string, required: false }
                   - { label: Show at full size (portrait scans), name: full, widget: boolean, required: false, default: false }
                   - { label: Focus point (CSS object-position), name: focus, widget: string, required: false, hint: "e.g. \"left center\" — only for tightly-cropped scans." }
                   - { label: Zoom, name: zoom, widget: number, required: false, hint: "CSS scale factor, e.g. 1.6 — pairs with Focus point." }
@@ -239,10 +250,10 @@ collections:
     slug: "{{fields.id}}"
     summary: "{{number}} — {{label}}"
     fields:
-      - { label: "ID (unique, no spaces — e.g. t1-2)", name: id, widget: string }
-      - { label: "Number (e.g. 1.2)", name: number, widget: string }
-      - { label: Label, name: label, widget: string }
-      - { label: "Level (-1 = root, 0 = region, 1-3 = sub-themes)", name: level, widget: number, value_type: int, min: -1, max: 3 }
+      - { label: "ID (unique, no spaces — e.g. t1-2)", name: id, widget: string, required: false }
+      - { label: "Number (e.g. 1.2)", name: number, widget: string, required: false }
+      - { label: Label, name: label, widget: string, required: false }
+      - { label: "Level (-1 = root, 0 = region, 1-3 = sub-themes)", name: level, widget: number, value_type: int, min: -1, max: 3, required: false }
       - label: Parent theme
         name: parent
         widget: relation
@@ -255,39 +266,44 @@ collections:
       - label: Content
         name: blocks
         widget: list
+        required: false
         hint: "Add, remove, and reorder text and media freely — they render in exactly this order, so this controls how images/audio/video interleave with the text."
         types:
           - label: Paragraph
             name: text
             widget: object
+            required: false
             fields:
-              - { label: Type, name: type, widget: hidden, default: text }
-              - { label: Text, name: text, widget: text }
+              - { label: Type, name: type, widget: hidden, default: text, required: false }
+              - { label: Text, name: text, widget: text, required: false }
           - label: Image
             name: image
             widget: object
+            required: false
             fields:
-              - { label: Type, name: type, widget: hidden, default: image }
-              - { label: Image, name: file, widget: image, media_folder: "/assets/themes", public_folder: "/assets/themes" }
+              - { label: Type, name: type, widget: hidden, default: image, required: false }
+              - { label: Image, name: file, widget: image, media_folder: "/assets/themes", public_folder: "/assets/themes", required: false }
               - { label: Caption, name: caption, widget: string, required: false }
           - label: Audio
             name: audio
             widget: object
+            required: false
             fields:
-              - { label: Type, name: type, widget: hidden, default: audio }
-              - { label: Audio file, name: file, widget: file, media_folder: "/assets/audio", public_folder: "/assets/audio" }
+              - { label: Type, name: type, widget: hidden, default: audio, required: false }
+              - { label: Audio file, name: file, widget: file, media_folder: "/assets/audio", public_folder: "/assets/audio", required: false }
               - { label: Caption, name: caption, widget: string, required: false }
           - label: Video
             name: video
             widget: object
+            required: false
             fields:
-              - { label: Type, name: type, widget: hidden, default: video }
-              - { label: Video file, name: file, widget: file, media_folder: "/assets/video", public_folder: "/assets/video" }
+              - { label: Type, name: type, widget: hidden, default: video, required: false }
+              - { label: Video file, name: file, widget: file, media_folder: "/assets/video", public_folder: "/assets/video", required: false }
               - { label: Caption, name: caption, widget: string, required: false }
       - label: Open questions
         name: questions
         widget: list
-        field: { label: Question, name: question, widget: string }
+        field: { label: Question, name: question, widget: string, required: false }
         required: false
       - { label: Authors, name: authors, widget: string, required: false, hint: "e.g. \"Jair (text) · Amit (review)\"" }
 
@@ -301,11 +317,13 @@ collections:
           - label: Links
             name: links
             widget: list
+            required: false
             summary: "{{from}} → {{to}}"
             fields:
               - label: From theme
                 name: from
                 widget: relation
+                required: false
                 collection: themes
                 search_fields: [label, id]
                 value_field: id
@@ -313,11 +331,12 @@ collections:
               - label: To theme
                 name: to
                 widget: relation
+                required: false
                 collection: themes
                 search_fields: [label, id]
                 value_field: id
                 display_fields: [number, label]
-              - { label: Note (explains the connection), name: note, widget: text }
+              - { label: Note (explains the connection), name: note, widget: text, required: false }
 
   - name: theme_colors
     label: "Making Of: Region Colors"
@@ -326,8 +345,8 @@ collections:
         label: Region colors
         file: content/themes/region-colors.json
         fields:
-          - { label: Root, name: root, widget: color }
-          - { label: Absence, name: absence, widget: color }
-          - { label: Storybuilding, name: storybuilding, widget: color }
-          - { label: Translation, name: translation, widget: color }
-          - { label: Ethics, name: ethics, widget: color }
+          - { label: Root, name: root, widget: color, required: false }
+          - { label: Absence, name: absence, widget: color, required: false }
+          - { label: Storybuilding, name: storybuilding, widget: color, required: false }
+          - { label: Translation, name: translation, widget: color, required: false }
+          - { label: Ethics, name: ethics, widget: color, required: false }

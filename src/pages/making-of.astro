@@ -1618,9 +1618,13 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
         blocksWrap.appendChild(p);
         return;
       }
+      // Every CMS field is optional, so a media block can exist with no file
+      // picked yet — skip it rather than emitting an empty-src element that
+      // renders as a broken image / dead player.
+      if (!b.file) return;
       const wrap = document.createElement('div');
       wrap.className = 'mk-block-media';
-      const src = b.file || '';
+      const src = b.file;
       if (b.type === 'image') {
         const img = document.createElement('img');
         img.src = src;
