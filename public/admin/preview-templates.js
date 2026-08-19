@@ -207,10 +207,28 @@
   // doesn't apply here, and isn't what this preview needs to get right.
   var TL_TAG_LABELS = { mina: 'Mina', sara: 'Sara', both: 'Mina & Sara' };
 
+  // Mirrors toLabel() in src/lib/timelines.ts. Many real events carry only a
+  // legacy `serial` (an Excel day number) rather than an ISO date; without
+  // resolving that here the preview labelled them "(undated)" while the live
+  // site showed a proper date, which reads as broken data to an editor.
+  var TL_EXCEL_EPOCH_MS = Date.UTC(1899, 11, 30);
+  var TL_DAY_MS = 86400000;
+  var TL_MONTHS = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'Jun.', 'Jul.', 'Aug.', 'Sep.', 'Oct.', 'Nov.', 'Dec.'];
+
   function tlFormatDate(ev) {
     if (ev.date_label) return ev.date_label;
-    if (ev.date_iso) return ev.date_iso;
-    return '(undated)';
+    var serial = null;
+    if (ev.serial != null && ev.serial !== '') {
+      serial = Number(ev.serial);
+    } else if (ev.date_iso) {
+      var p = String(ev.date_iso).split('-').map(Number);
+      if (p.length >= 3 && p.every(function (n) { return isFinite(n); })) {
+        serial = (Date.UTC(p[0], p[1] - 1, p[2]) - TL_EXCEL_EPOCH_MS) / TL_DAY_MS;
+      }
+    }
+    if (serial == null || !isFinite(serial)) return '(no date yet)';
+    var dt = new Date(TL_EXCEL_EPOCH_MS + serial * TL_DAY_MS);
+    return dt.getUTCDate() + ' ' + TL_MONTHS[dt.getUTCMonth()] + ' ' + dt.getUTCFullYear();
   }
 
   var TimelinePreview = createClass({
