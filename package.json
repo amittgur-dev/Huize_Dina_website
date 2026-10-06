@@ -10,10 +10,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "postinstall": "node scripts/vendor-decap-cms.mjs",
-    "prebuild": "node scripts/vendor-decap-cms.mjs",
-    "test:line-similarity": "node experiments/line-similarity/test.mjs",
-    "test:line-similarity:browser": "node experiments/line-similarity/browser-test.mjs",
-    "serve:line-similarity": "npx --yes http-server public/line-similarity -p 8000 -c-1"
+    "prebuild": "node scripts/vendor-decap-cms.mjs"
   },
   "dependencies": {
     "astro": "^7.1.3"
