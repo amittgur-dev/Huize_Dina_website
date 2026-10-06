@@ -16,3 +16,12 @@
   for = "/admin/config.yml"
   [headers.values]
     Cache-Control = "no-cache"
+
+# The line-similarity experiment is a static app under /line-similarity/.
+# Its module scripts are referenced relative to the folder, so the bare path
+# must resolve to the directory URL.
+[[redirects]]
+  from = "/line-similarity"
+  to = "/line-similarity/"
+  status = 301
+  force = true
