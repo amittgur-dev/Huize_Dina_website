@@ -6,8 +6,8 @@ backend:
 # dashboard (Site configuration → Identity) before this works — see
 # README.md's "Editing the site" section.
 
-site_url: https://huizedina.netlify.app
-display_url: https://huizedina.netlify.app
+site_url: https://huizedina.nl
+display_url: https://huizedina.nl
 
 media_folder: /assets/site
 public_folder: /assets/site
