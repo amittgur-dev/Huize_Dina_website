@@ -1,0 +1,9 @@
+services:
+  web:
+    build: .
+    container_name: huize-dina-web
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - proxy
