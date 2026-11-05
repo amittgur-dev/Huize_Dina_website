@@ -1,4 +1,6 @@
-FROM node:22-alpine AS build
+# Build natively on the runner: the output is static, so only the final stage
+# needs to be per-platform (avoids running Node under QEMU emulation).
+FROM --platform=$BUILDPLATFORM node:22-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY scripts ./scripts
