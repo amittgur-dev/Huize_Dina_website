@@ -98,6 +98,11 @@ const mkmConns = (id: string) =>
         <div class="mk-eyebrow mk-intro-hint">drag to pan · scroll to zoom · press a theme to read</div>
         <button type="button" id="mk-intro-close" class="mk-intro-enter" aria-label="Enter the map">↓</button>
         <div class="mk-eyebrow mk-intro-foot">the map lies below ↓ · you can always drag your way back up here</div>
+        <div class="mk-intro-credit">
+          Some of the texts and quotations in this section are drawn from a forthcoming publication: Sharon, T., &
+          Bueno de Mesquita, N. (Eds.) (forthcoming). Polyphonic Archive: Pluralism as Practice and Modes of
+          Translation. Amsterdam University of the Arts.
+        </div>
       </div>
     </div>
   </div>
@@ -563,6 +568,21 @@ const mkmConns = (id: string) =>
   .mk-intro-foot {
     font-size: 11px;
     color: #655e55;
+  }
+
+  .mk-intro-credit {
+    margin-top: 1.6rem;
+    max-width: 620px;
+    font-size: 11.5px;
+    font-style: italic;
+    line-height: 1.7;
+    color: rgba(224, 219, 212, 0.38);
+    text-wrap: pretty;
+    /* the card floats over the map — keep the credit readable when a dim
+       node happens to sit behind its last lines */
+    text-shadow:
+      0 0 6px rgba(18, 15, 24, 0.95),
+      0 0 14px rgba(18, 15, 24, 0.85);
   }
 
   .mk-panel {
