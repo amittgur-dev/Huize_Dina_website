@@ -7,13 +7,25 @@
   "blocks": [
     {
       "type": "text",
-      "text": "\"As the work progressed, we encountered challenges that I came to think of as auditory riddles. For example, there is a scene where Tilly is writing letters in her room, and we wondered how to dramatize that content. If Jaïr reads them, he would sound alien to the format of the implicit listener, particularly since the audience is already familiar with his voice from the interviews between the auditory scenes. If Tilly (or rather an actor playing Tilly) reads the letters, this would deviate from the basic principle of the format: the implicit listener only listens; she does not speak. Hence if the audience hears a girl's voice supposedly reading the letters aloud, it would probably be interpreted as someone reading them to the implicit listener. The solution we found was built in stages: first, we feature the sound of a pencil scratching; then the music shifts from diegetic to non-diegetic (until that moment it had been playing on Tilly's radio, with a slightly distorted quality suggesting a period radio set); and only then does Jaïr's voice enter, reading the letters.\" — Amit",
+      "text": "A format without precedent produces problems without precedent. Amit came to call them auditory riddles. The first: Tilly writes letters in her room. Who reads them aloud? Not Jaïr, whose voice belongs to the interviews between the scenes. Not Tilly, because the implicit listener does not speak — a girl's voice reading would be heard as someone reading to her.",
       "file": null,
       "caption": null
     },
     {
       "type": "text",
-      "text": "\"Another auditory riddle arose in the story of Mina and Sara Engers: how can the medium of the implicit listener represent two implicit listeners within the same episode? Here we applied two strategies. One was to move between the girls, using Ari's voice to announce 'Mina' or 'Sara,' to let the audience know which girl was the implicit listener at that moment. The other was to use two sets of footsteps, one slightly lagging behind the other, allowing us to deduce that the two girls were walking together.\" — Amit",
+      "text": "\"The solution we found was built in stages: first, we feature the sound of a pencil scratching; then the music shifts from diegetic to non-diegetic (until that moment it had been playing on Tilly's radio, with a slightly distorted quality suggesting a period radio set); and only then does Jaïr's voice enter, reading the letters.\" — Amit",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "The second riddle came with Mina and Sara Engers: two implicit listeners in one episode.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"One was to move between the girls, using Ari's voice to announce 'Mina' or 'Sara,' to let the audience know which girl was the implicit listener at that moment. The other was to use two sets of footsteps, one slightly lagging behind the other, allowing us to deduce that the two girls were walking together.\" — Amit",
       "file": null,
       "caption": null
     }

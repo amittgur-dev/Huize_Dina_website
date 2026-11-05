@@ -7,6 +7,12 @@
   "blocks": [
     {
       "type": "text",
+      "text": "While historical research is mostly grounded in archival sources, the artistic dimension necessarily enters spaces where the archive is silent. This becomes especially visible when reconstructing bodily experiences such as breathing, heartbeats, hesitation, fear, or physical discomfort. These sensations are not recorded in institutional files, yet they are essential to imagining lived experience. Art may suggest historical possibilities, but should not claim certainty where the sources remain silent.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
       "text": "\"The girl listening and responding to her own judiciary file is an impossible imagined scenario.\" — Ari",
       "file": null,
       "caption": null
@@ -19,19 +25,13 @@
     },
     {
       "type": "text",
-      "text": "While historical research is mostly grounded in archival sources, the artistic dimension necessarily enters spaces where the archive is silent. This becomes especially visible when reconstructing bodily experiences such as breathing, heartbeats, hesitation, fear, or physical discomfort. These sensations are not recorded in institutional files, yet they are essential to imagining lived experience. The question, therefore, is not whether art can offer a fully accurate representation of the past, but how it can responsibly engage with what cannot be known with certainty. Art may suggest historical possibilities, but should not claim certainty where the sources remain silent.",
+      "text": "Two rules kept the fiction honest. We decided early not to speculate about what the girls would have said in reply to what was written about them: the implicit listener listens, she does not speak. And the world she moves through exists only through her listening — which is why an attractive idea, letting Hetta Prins answer the telephone in her office, was turned down.",
       "file": null,
       "caption": null
     },
     {
       "type": "text",
-      "text": "\"This conceptual breakthrough complemented our ethical decision not to speculate about what the Huize Dina girls would have said had they been able to respond to what was written about them.\" — Tzlil",
-      "file": null,
-      "caption": null
-    },
-    {
-      "type": "text",
-      "text": "\"At one point, Amit suggested making the archival voices feel more alive by letting characters perform small everyday actions, such as hearing Hetta Prins answer the telephone in her office. I found myself stubbornly defending the internal logic of the listening device we had developed. I wanted it to feel as though the implicit listener was opening doors that functioned as auditory equivalents of the paper folders one flips through in an archive. This was not a stage play in which the characters existed independently of the archive, but a sonic world that emerged solely through the girl's act of listening to archival records.\" — Tzlil",
+      "text": "\"I wanted it to feel as though the implicit listener was opening doors that functioned as auditory equivalents of the paper folders one flips through in an archive. This was not a stage play in which the characters existed independently of the archive, but a sonic world that emerged solely through the girl's act of listening to archival records.\" — Tzlil",
       "file": null,
       "caption": null
     }

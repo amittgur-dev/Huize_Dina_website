@@ -7,25 +7,25 @@
   "blocks": [
     {
       "type": "text",
+      "text": "The girls in the juvenile files appear mostly as subjects, and rarely as narrators of their own lives. The archive speaks extensively about them through reports, assessments and legal observations, rather than through their own voices — adult perspectives shaped by supervision, moral judgment and institutional aims. These silences limit what can be known about how the girls themselves experienced care, discipline, \"home\", or separation from their families.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
       "text": "\"Now everything is all right with me again. Or would I not be allowed to go back to Zeist after all... But then, in truth, I have no future either.\" — Alida Mathilda (Tilly) de Jong (1919–1944), pupil of Huize Dina",
       "file": null,
       "caption": null
     },
     {
       "type": "text",
-      "text": "The girls in the juvenile files appear mostly as subjects, and rarely as narrators of their own lives. The archive speaks extensively about them through reports, assessments and legal observations, rather than through their own voices — adult (medical, legal and psychological) perspectives shaped by supervision, moral judgment and institutional aims.",
+      "text": "\"The Huize Dina documents contained almost no traces of childhood noises — of laughter, of crying, of fights, of the small interruptions of everyday life. [...] Still, they presented the late childhood of these young girls, soon-to-be women, as a sequence of logged events.\" — Tzlil",
       "file": null,
       "caption": null
     },
     {
       "type": "text",
-      "text": "These archival silences matter because they limit what can be known about how the girls themselves experienced care, discipline, \"home\", or separation from their families. The archive therefore tells us not only about the girls, but also about the structures that mediated, filtered, and often silenced their own perspectives. Polyphonic Archive asks how we can read both with and against the archive: attentive to what is preserved, but also to what remains silent.",
-      "file": null,
-      "caption": null
-    },
-    {
-      "type": "text",
-      "text": "\"The material we had at our disposal was almost entirely institutional correspondence: reports from the guardian or the social worker, police documents, an occasional letter from the girls' parents. The archive could never give us the whole picture. It consisted of fragments that told the girls' stories from afar. Even when the files provided intimate details about a certain girl, those were merely the outline of a person, not her inner world. It left us with silhouettes: figures, whose missing parts imagination had to fill in.\" — Amit",
+      "text": "\"Even when the files provided intimate details about a certain girl, those were merely the outline of a person, not her inner world. It left us with silhouettes: figures, whose missing parts imagination had to fill in.\" — Amit",
       "file": null,
       "caption": null
     }

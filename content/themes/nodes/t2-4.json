@@ -7,7 +7,13 @@
   "blocks": [
     {
       "type": "text",
-      "text": "\"Apart from the voices of the actors, we hear auditory objects such as telephones ringing, trains passing, cars honking. It was important for us that these auditory objects authentically matched the sounds of the relevant era in the Netherlands.\" — Amit",
+      "text": "Beyond the voices and the music, the podcast is full of things that make sounds: a ticking clock, a radio set, a telephone, a train passing a window. Each of them had to belong to its time.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"It was important for us that these auditory objects authentically matched the sounds of the relevant era in the Netherlands.\" — Amit",
       "file": null,
       "caption": null
     }

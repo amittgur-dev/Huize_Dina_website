@@ -7,12 +7,6 @@
   "blocks": [
     {
       "type": "text",
-      "text": "\"There is only a limited variety of sounds that by hearing them, you recognize what they are.\" — Amit",
-      "file": null,
-      "caption": null
-    },
-    {
-      "type": "text",
       "text": "To create a subtle auditory environment, we worked with a minimal sound palette. We thought of the hallway as an extended rectangular long space. We defined one edge with a clock. Another edge with a window and a soundscape from the window. Then when you walk back and forth, you hear that you come closer to the clock, or you come closer to the window and this insinuates the spatiality.",
       "file": null,
       "caption": null
@@ -25,13 +19,25 @@
     },
     {
       "type": "text",
-      "text": "\"In the judge's room, we wanted to convey the experience of a courtroom: a very quiet environment with incredibly sharp acoustics, in which we hear every tiny event with absolute clarity. For the room of Huize Dina's directress, Hetta Prins, we went for a homey ambience, with softer sounds and voices emulating the acoustics of a rather small, cozily furnished room, with a distinct sound of fire crackling in a fireplace. In this way, each room acquired a distinct auditory identity.\" — Amit",
+      "text": "Along the hallway, every room has its own acoustics.",
       "file": null,
       "caption": null
     },
     {
       "type": "text",
-      "text": "\"It is also a beautiful metaphor for the archive: every room in the hallway is like a case cabinet full of dossiers. And so, when walking down the hallway, opening doors and hearing voices in the rooms, the implicit listener and the audience hear fragments of a reality that began before and will continue beyond what is audible to them. [...] Opening a door creates a temporal window; closing it closes the window, not the reality behind it.\" — Amit",
+      "text": "\"In the judge's room, we wanted to convey the experience of a courtroom: a very quiet environment with incredibly sharp acoustics, in which we hear every tiny event with absolute clarity. For the room of Huize Dina's directress, Hetta Prins, we went for a homey ambience, with softer sounds and voices emulating the acoustics of a rather small, cozily furnished room, with a distinct sound of fire crackling in a fireplace.\" — Amit",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"[23/06, 09:30, Tzlil]: Hetta's room tone sounds like she's speaking from inside a burrow or a closet. [...] You can hear the fireplace in the background, but I'd actually turn up the crackling of the fire. It should sound like the Netflix fireplace, not like Hetta is speaking from inside an industrial kiln.\" — Tzlil",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"It is also a beautiful metaphor for the archive: every room in the hallway is like a case cabinet full of dossiers. [...] Opening a door creates a temporal window; closing it closes the window, not the reality behind it.\" — Amit",
       "file": null,
       "caption": null
     }

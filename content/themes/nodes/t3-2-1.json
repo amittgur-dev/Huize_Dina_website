@@ -7,7 +7,13 @@
   "blocks": [
     {
       "type": "text",
-      "text": "\"The texts of the documents are performed by actors, so that a letter or a report originally becomes a text spoken live. These can be thought of as 'one-sided dialogues.'\" — Amit",
+      "text": "A letter to the judge, a report on a girl: in the podcast each is read aloud in the presence of someone who was never its addressee, and who cannot answer.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"These can be thought of as 'one-sided dialogues.'\" — Amit",
       "file": null,
       "caption": null
     },

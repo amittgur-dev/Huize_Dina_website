@@ -7,19 +7,19 @@
   "blocks": [
     {
       "type": "text",
-      "text": "\"Archival material is documented reality. Distilling a narrative from it required committing to the actual past. We were not writing a story but engraving it.\" — Amit",
-      "file": null,
-      "caption": null
-    },
-    {
-      "type": "text",
       "text": "Each girl's archival file contains between seventy and two hundred pages. Therefore, being selective was inevitable. To guide the creative team through the archival maze, the historians created timelines. For each girl, big life events, important documents, and character descriptions were featured.",
       "file": null,
       "caption": null
     },
     {
       "type": "text",
-      "text": "\"It soon became clear that the only way to construct what could be called a 'script' from the original archival materials was to assemble it from carefully selected excerpts: passages from letters, reports, and other documents that seemed to reveal something essential about each girl, her experiences, or the ways in which she was perceived.\" — Tzlil",
+      "text": "The script was assembled rather than written: excerpts from letters and reports, selected and cut, never paraphrased.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"As we worked through the documents, it felt as though the narrative slowly took shape like a sculpture revealing itself as layer after layer of stone was carefully carved away, emerging from the archive itself.\" — Tzlil",
       "file": null,
       "caption": null
     },

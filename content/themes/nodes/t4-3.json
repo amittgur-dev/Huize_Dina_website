@@ -7,13 +7,13 @@
   "blocks": [
     {
       "type": "text",
-      "text": "\"As a historian, I found AI to be both a powerful time-saver and a real challenge: it could accelerate parts of the research process, but it also required constant critical precision because of the mistakes it sometimes produced.\" — Jaïr",
+      "text": "In transcribing typescripts and handwritten documents from the 1930s and 1940s, we experimented with AI text recognition. This saved considerable time but also showed the need for careful human oversight: AI did not always recognize the text correctly and sometimes produced entirely different sentences. The technology was therefore used solely as a form of mediation rather than replacement: every transcription was checked closely against the original source. The same applies to historically stylized translation, where AI can help suggest phrasing but cannot determine meaning or nuance on its own.",
       "file": null,
       "caption": null
     },
     {
       "type": "text",
-      "text": "In transcribing typescripts and handwritten documents from the 1930s and 1940s, we experimented with AI text recognition. This saved considerable time but also showed the need for careful human oversight: AI did not always recognize the text correctly and sometimes produced entirely different sentences. The technology was therefore used solely as a form of mediation rather than replacement: every transcription was checked closely against the original source. The same applies to historically stylized translation, where AI can help suggest phrasing but cannot determine meaning or nuance on its own.",
+      "text": "\"As a historian, I found AI to be both a powerful time-saver and a real challenge: it could accelerate parts of the research process, but it also required constant critical precision because of the mistakes it sometimes produced.\" — Jaïr",
       "file": null,
       "caption": null
     },

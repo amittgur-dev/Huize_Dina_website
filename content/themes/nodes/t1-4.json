@@ -6,16 +6,16 @@
   "parent": "t1",
   "blocks": [
     {
-      "type": "image",
-      "text": null,
-      "file": "/assets/themes/photo-huize-dina-dinner-table.jpg",
-      "caption": "Girls and staff of Huize Dina around the dinner table. (Photo in the draft, section 1.1.)"
-    },
-    {
       "type": "text",
       "text": "Within Huize Dina, there was a genuine attempt to create a domestic, protective, and emotionally supportive environment. Yet this institutional \"home\" could never fully replace the homes the girls had left behind. Daily life was shaped by supervision, rules, observation, and moral guidance, creating a space that was both caring and controlling.",
       "file": null,
       "caption": null
+    },
+    {
+      "type": "image",
+      "text": null,
+      "file": "/assets/themes/photo-huize-dina-dinner-table.jpg",
+      "caption": "Girls and staff of Huize Dina around the dinner table. (Photo in the draft, section 1.1.)"
     },
     {
       "type": "text",
