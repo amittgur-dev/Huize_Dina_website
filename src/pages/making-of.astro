@@ -853,11 +853,14 @@ const mkmConns = (id: string) =>
     }
 
     /* the map needs a frozen 100vh page; the browser needs a normal
-       scrolling document */
+       scrolling document. !important because this ties on specificity
+       with BaseLayout's scoped .page-root.fullscreen rule and must win
+       regardless of stylesheet order (without it, the page kept the
+       map's overflow:hidden lock and phones couldn't scroll at all). */
     :global(.page-root.fullscreen) {
-      height: auto;
-      min-height: 100vh;
-      overflow: visible;
+      height: auto !important;
+      min-height: 100vh !important;
+      overflow: visible !important;
     }
 
     #mkm {
