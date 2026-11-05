@@ -6,9 +6,9 @@ services:
     expose:
       - "80"
     networks:
-      - nginx_proxy
+      - nginx_network
 
 # Shared network the parent nginx reverse proxy is attached to.
 networks:
-  nginx_proxy:
+  nginx_network:
     external: true
