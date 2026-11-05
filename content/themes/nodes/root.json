@@ -7,14 +7,29 @@
   "blocks": [
     {
       "type": "text",
-      "text": "The map of how Polyphonic Archive was made — the questions, tensions and craft behind turning a near-silent archive into a podcast. Four regions branch from here: what was absent, how the story was built, how it was translated between media, and the ethics beneath it all.",
+      "text": "The podcast Huize Dina explores how historical archives can be experienced through sound. Using the case of Huize Dina — a home for Jewish girls in Santpoort — we translate institutional records into an auditory experience, to reimagine the lives of the girls who lived there.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "This map offers a look behind the scenes. It focuses on the questions, challenges and decisions that shaped the work. What do you do when important voices are missing from the archive? How do you transform historical documents into an engaging audio experience? Where is the line between historical accuracy and creative interpretation?",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "Four themes organize the map. Absence explores what is missing from the archive and how we worked with archival silences. Story-building examines how historical fragments were transformed into narrative. Translation between media follows the material as it moves between languages, media and senses. Ethics addresses the responsibilities involved in interpreting, representing and sharing the lives of people from the past. The same tension often surfaces in more than one place; the links between nodes show where.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"Polyphony, after all, is not the absence of difference. It is about making different voices move together without asking them to become the same.\" — Tzlil",
       "file": null,
       "caption": null
     }
   ],
-  "questions": [
-    "What does it take to give voice to those the archive left silent?",
-    "When the record runs out, what may we honestly add?"
-  ],
+  "questions": [],
   "authors": null
 }

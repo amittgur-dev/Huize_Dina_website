@@ -1,17 +1,29 @@
 {
   "id": "t2-3-1",
   "number": "2.3.1",
-  "label": "Virtual auditory space & binaural design",
+  "label": "The original compositions",
   "level": 2,
   "parent": "t2-3",
   "blocks": [
     {
       "type": "text",
-      "text": "Designing a believable auditory space — binaural sound as the room the story happens in.",
+      "text": "\"Before composing music for a particular episode, I spent time learning the story of its main character and trying to imagine her. I did not look for music that directly portrayed the girl, but rather for a musical idea that connected with one aspect of her personality while also serving the needs of the episode. I felt that there was enough sadness in the girls' life-stories and saw no reason to add more. Instead, I aimed to create a delicate frame, with a dimension of sweetness, grace, and acceptance, that would support the story of each episode. For example, reading Tilly's files, I learned how much she longed for love and connection, and caught a glimpse of her playful side too. I tried to connect with that in the music.\" — Amit",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"The music was composed for piano and performed by me. I wrote down the main themes, while parts of a more textural character were improvised. To maintain a sense of cohesion between the themes and the improvisation, I first wrote a melodic theme related to the aspect of each girl's personality I wanted to emphasize, and then arranged its pitches in a circle, which I called a necklace of tones. This gave me a series of pitches arranged in a fixed order but without a defined beginning or end, like the beads in a necklace.\" — Amit",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"Most of the music in the podcast is featured between the sections of the implicit listener. In a few instances, however, we felt the need to include music within the virtual world of the girls, even though its presence was somewhat at odds with the realistic aesthetic we were striving for. [...] In the second act of episode 1, Tilly de Jong is in a place that feels like Huize Dina. She moves between her room, the room of Hetta Prins, and the room of the judge. We felt we needed music that would give a sense of home and support the narrative of her gradually settling and finding her footing. Our solution was to make this music diegetic: Tilly enters her room, turns on her radio, and the music that plays is a moderato piano chorale that I improvised. Then she leaves the room, keeping the door open, so the music can still be heard as she walks down the hallway from her room, toward the room of Hetta Prins, and then the room of the judge.\" — Amit",
       "file": null,
       "caption": null
     }
   ],
-  "questions": null,
-  "authors": "Amit (text) · Bartek (review)"
+  "questions": [],
+  "authors": null
 }

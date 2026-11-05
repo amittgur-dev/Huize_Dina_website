@@ -7,14 +7,17 @@
   "blocks": [
     {
       "type": "text",
-      "text": "The founding problem. The girls of Huize Dina barely speak in the surviving record. This region maps every kind of silence we worked against — and what the gaps themselves can be made to say.",
+      "text": "How did we work with what is missing?",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "Through institutional records, correspondence, photographs and personal documents, the archive offers a glimpse into daily life within the home. At the same time, it reveals the limits of the historical record: while administrative voices are well documented, much remains unknown about the girls themselves — their experiences, emotions and perspectives. These absences form a central starting point for Polyphonic Archive.",
       "file": null,
       "caption": null
     }
   ],
-  "questions": [
-    "How can we tell the story of the girls when they are absent from the archive?",
-    "Which opportunities come with the public making of archives?"
-  ],
+  "questions": [],
   "authors": null
 }

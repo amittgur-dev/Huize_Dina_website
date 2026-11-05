@@ -1,69 +1,64 @@
 {
   "links": [
     {
-      "from": "t1-1-2",
-      "to": "t4-3",
-      "note": "The girls’ letters are private documents — using them raises the rights of the deceased and their living relatives."
+      "from": "t1-1",
+      "to": "t2-2",
+      "note": "The absent voices are the reason the girl in the podcast listens but does not speak."
     },
     {
-      "from": "t1-2",
-      "to": "t3-1",
-      "note": "The implicit listener is the figure the auditory space is designed to address."
-    },
-    {
-      "from": "t1-2",
-      "to": "t2-3",
-      "note": "Defined under Absence, enacted under Storybuilding — the same listener, concept and craft."
-    },
-    {
-      "from": "t1-3-3",
+      "from": "t1-1",
       "to": "t4-1",
-      "note": "Filling the void with speculation forces the ethical question of accuracy versus narrative."
+      "note": "Silhouettes whose missing parts imagination fills in: the same gap seen from the ethics side."
     },
     {
-      "from": "t1-3-3",
-      "to": "t4-1-2",
-      "note": "Where the record stops, can what we add still be “accurate”? The known unknowns test the limit."
+      "from": "t1-1-1",
+      "to": "t3-2",
+      "note": "The surviving letters are the texts that become spoken in the podcast."
     },
     {
-      "from": "t3-4",
-      "to": "t1-3-3",
-      "note": "Giving voice to the text means voicing the known unknowns — what we know of but never heard."
+      "from": "t1-2",
+      "to": "t4-2",
+      "note": "Public access to the files and the rights of living relatives are two sides of one tension."
     },
     {
-      "from": "t2-1-1",
-      "to": "t4-1-1",
-      "note": "Distilling dramatic structure from documents runs straight into the accuracy-versus-art tension."
+      "from": "t1-4",
+      "to": "t2-2-1-1",
+      "note": "The homey acoustics of Hetta Prins's room are the sound design's answer to whether Huize Dina was a home."
+    },
+    {
+      "from": "t2-1",
+      "to": "t3-2-2",
+      "note": "Phrases chosen for their scolding tone on the page; what they do once spoken aloud."
     },
     {
       "from": "t2-2",
       "to": "t4-1-1",
-      "note": "Choosing what stays in frame is the accuracy-versus-art tension, seen from the edit."
+      "note": "The implicit listener is both the solution to the absent voices and an \"impossible imagined scenario\"."
     },
     {
-      "from": "t3-2",
-      "to": "t4-2",
-      "note": "Translating across languages and times leans on AI — and on the ethics of using it."
+      "from": "t2-2-1-1",
+      "to": "t4-1-2",
+      "note": "The footsteps that carry the hallway depend on an educated guess about shoes."
     },
     {
-      "from": "t4-1-2",
-      "to": "t4-2",
-      "note": "Whether accurate representation is possible bears on whether AI translation is defensible."
+      "from": "t2-4",
+      "to": "t4-4",
+      "note": "Sounds from the past, and the discipline of leaving out sounds that did not yet exist."
     },
     {
-      "from": "t3-3",
-      "to": "t2-1",
-      "note": "What is gained and lost in translation shapes how immersive the story can honestly be."
-    },
-    {
-      "from": "t3-3",
-      "to": "t1-3",
-      "note": "Translating the archive depends on what records survive to translate."
+      "from": "t3-2-1",
+      "to": "t2-1-1",
+      "note": "The one-sided dialogue sets the rule that creates the riddle of Tilly's letters."
     },
     {
       "from": "t3-3",
-      "to": "t4-1",
-      "note": "Gain and loss in translation is, finally, an ethical question."
+      "to": "t2-2-1",
+      "note": "Stillness and headphones are required because the implicit listener is built from breath and motion."
+    },
+    {
+      "from": "t3-1",
+      "to": "t4-3",
+      "note": "AI-assisted translation and AI transcription make the same demand for human checking."
     }
   ]
 }

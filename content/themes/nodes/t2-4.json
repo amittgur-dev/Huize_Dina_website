@@ -1,17 +1,17 @@
 {
   "id": "t2-4",
   "number": "2.4",
-  "label": "The role of music",
+  "label": "Sounds from the past",
   "level": 1,
   "parent": "t2",
   "blocks": [
     {
       "type": "text",
-      "text": "What music does in the podcast — and where it must stay silent.",
+      "text": "\"Apart from the voices of the actors, we hear auditory objects such as telephones ringing, trains passing, cars honking. It was important for us that these auditory objects authentically matched the sounds of the relevant era in the Netherlands.\" — Amit",
       "file": null,
       "caption": null
     }
   ],
-  "questions": null,
+  "questions": [],
   "authors": null
 }

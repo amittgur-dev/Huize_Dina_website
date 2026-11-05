@@ -1,0 +1,25 @@
+{
+  "id": "t3-2-1",
+  "number": "3.2.1",
+  "label": "Are these dialogues?",
+  "level": 2,
+  "parent": "t3-2",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "\"The texts of the documents are performed by actors, so that a letter or a report originally becomes a text spoken live. These can be thought of as 'one-sided dialogues.'\" — Amit",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"A letter may be addressed to the judge, but to activate the dramatic situation, I instructed the readers to find the feeling that it was directed at the girl.\" — Ari",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": [
+    "Are these dialogues?"
+  ],
+  "authors": null
+}

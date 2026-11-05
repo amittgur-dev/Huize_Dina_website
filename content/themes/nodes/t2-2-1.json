@@ -1,0 +1,53 @@
+{
+  "id": "t2-2-1",
+  "number": "2.2.1",
+  "label": "Auditory space",
+  "level": 2,
+  "parent": "t2-2",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "\"Space is something so visual, so physical that it is challenging to make it in sound.\" — Amit",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "Auditory perception has limitations, so we had to play with what it does offer. For example, a sense of distance: is the sound far, or near? A sense of materiality: what made the sound? A sense of direction: is it coming from behind me, or from the left? But most importantly: a sense of time.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"If we sit blindfolded in a room, surrounded by nine speakers that are positioned in the form of a triangle, we won't 'hear a triangle.' Moreover, if all nine speakers play the same sound, say, a middle C on a clarinet, we won't hear nine clarinets or even multiple clarinets, but a single sound. The reason for this is that identical sounds merge, regardless of their positions in space.\" — Amit",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "image",
+      "text": null,
+      "file": "/assets/themes/nine-speakers-triangle.png",
+      "caption": "Figure 2 from Amit's chapter."
+    },
+    {
+      "type": "text",
+      "text": "In auditory perception, if you just increase the volume, you are not aware of spatiality. When you add the element of footsteps, however, it appears like you come closer to the sound. All these things become possible when you add the dimension of time.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"The first way to achieve this is embodiment. For example, we (the audience) hear breaths that seem to be positioned between our own ears, or very close to them; as if the implicit listener was given a body, and we were placed inside it. The second way is through motion. Using binaural design (a technique that produces a rich sense of sound localization with ordinary headphones or stereo speakers) we play sounds with distinct spatial positions. For example, after hearing the implicit listener's breath, we hear distant sounds with a muffled quality to them, as though they are coming from behind the closed door of a room. Then we hear footsteps. The sound of these footsteps remains close to us, while the voices behind the door gradually become closer (i.e. louder, with less reverb). Since the position of the footsteps stays constant, we infer that they belong to the listener and that what changes is the listener's position in space.\" — Amit",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "image",
+      "text": null,
+      "file": "/assets/themes/implicit-listener-diagram.png",
+      "caption": "Figure 5 from Amit's chapter."
+    }
+  ],
+  "questions": [],
+  "authors": null
+}

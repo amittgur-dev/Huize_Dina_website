@@ -1,17 +1,23 @@
 {
   "id": "t1-1-1",
   "number": "1.1.1",
-  "label": "Privacy of the individual",
+  "label": "The girls' letters",
   "level": 2,
   "parent": "t1-1",
   "blocks": [
     {
       "type": "text",
-      "text": "What the record withholds out of care — the privacy of the individual, even within an opened archive.",
+      "text": "Yet some private letters have survived: letters to the juvenile judge, to family guardians, and sometimes to their parents. These fragments are crucial because they offer rare glimpses of the girls' emotions, wishes, and attempts to influence their own futures. At the same time, they remain fragmentary traces within a much larger institutional archive.",
       "file": null,
       "caption": null
+    },
+    {
+      "type": "image",
+      "text": null,
+      "file": "/assets/themes/tilly-self-portrait.png",
+      "caption": "A small drawing, a self-portrait, that Tilly added at the bottom of a letter to her friend Lenie in Zeist. A rare form of personal and artistic self-expression, something that appears only sparingly in the archives. (Source: Het Utrechts Archief.)"
     }
   ],
-  "questions": null,
+  "questions": [],
   "authors": null
 }

@@ -1,17 +1,41 @@
 {
   "id": "t1-4",
   "number": "1.4",
-  "label": "The absence of home",
+  "label": "Huize Dina — a home?",
   "level": 1,
   "parent": "t1",
   "blocks": [
     {
+      "type": "image",
+      "text": null,
+      "file": "/assets/themes/photo-huize-dina-dinner-table.jpg",
+      "caption": "Girls and staff of Huize Dina around the dinner table. (Photo in the draft, section 1.1.)"
+    },
+    {
       "type": "text",
-      "text": "Home is the missing center of these lives — as place, as mother, as belonging.",
+      "text": "Within Huize Dina, there was a genuine attempt to create a domestic, protective, and emotionally supportive environment. Yet this institutional \"home\" could never fully replace the homes the girls had left behind. Daily life was shaped by supervision, rules, observation, and moral guidance, creating a space that was both caring and controlling.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"I found it striking how bureaucratic letter correspondence mediated the girls' lives. Whenever writing confirmed that a girl had to move again, I always wondered how that message reached her and whether she was comforted.\" — Elena",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "For many girls, home was also defined by absence. Relationships with parents — especially mothers — were often disrupted before they arrived at Huize Dina. Some girls longed for their families, while others did not wish to return to difficult or unsafe circumstances. In a letter from 1936, one girl wrote to her father in Amsterdam: \"That's why I thought it important to let you know how I think about 'home.'\" Her words reveal how the meaning of home was continually negotiated rather than taken for granted.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"After that time, I noticed that your home was indeed not so good. Things there had become worse rather than better, and I also believe that if I were to come home, everything would again go completely wrong.\" — Judith Abrahams, pupil of Huize Dina, in a letter to her father, 1936",
       "file": null,
       "caption": null
     }
   ],
-  "questions": null,
-  "authors": "Tzlil, Elena (text) · Ari (review)"
+  "questions": [],
+  "authors": null
 }

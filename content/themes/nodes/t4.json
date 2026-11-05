@@ -7,11 +7,17 @@
   "blocks": [
     {
       "type": "text",
-      "text": "The questions that sit under every other decision — truth, accuracy, AI, and the rights of people who cannot consent.",
+      "text": "What ethical considerations arose in the making of the podcast?",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "What responsibilities arise when transforming archival lives into an audio narrative? Turning fragmented records into stories requires care, restraint, and transparency. We wanted to avoid filling silences in too easily, and at the same time respect the vulnerability of the people involved, and make clear where and what the archive speaks about, where interpretation begins, and where uncertainty remains.",
       "file": null,
       "caption": null
     }
   ],
-  "questions": null,
+  "questions": [],
   "authors": null
 }

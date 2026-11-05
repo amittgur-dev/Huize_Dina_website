@@ -1,17 +1,29 @@
 {
   "id": "t3-2",
   "number": "3.2",
-  "label": "Between languages & times",
+  "label": "From written to spoken",
   "level": 1,
   "parent": "t3",
   "blocks": [
     {
       "type": "text",
-      "text": "Translating across languages and across decades — and what that asks of us.",
+      "text": "\"There is something about sound and specifically the voice, that carries a more intimate, engaging quality.\" — Tzlil",
       "file": null,
       "caption": null
+    },
+    {
+      "type": "text",
+      "text": "For the vocal interpretation of the texts, we worked with voice actors to give the texts a voice without claiming to recover the voices of those who wrote them. This process involved finding the right voice for each text: maybe a more bureaucratic and strict tone for the juvenile judge, and a tone of voice that matched the age of the character. The letters and archival fragments became spoken (embodied), sometimes fragile, and present through a present-day performance. Their voices mediated the texts, making fragmentary traces audible while always keeping visible the distance between archival evidence and reconstruction.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "image",
+      "text": null,
+      "file": "/assets/themes/photo-recording-session-mic.png",
+      "caption": "At the microphone during a recording session. (Photo in the draft, section 2.2.)"
     }
   ],
-  "questions": null,
-  "authors": "Tzlil, Elena, Naomi"
+  "questions": [],
+  "authors": null
 }

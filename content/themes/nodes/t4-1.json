@@ -1,17 +1,29 @@
 {
   "id": "t4-1",
   "number": "4.1",
-  "label": "Art & truth",
+  "label": "Filling up the unknowns",
   "level": 1,
   "parent": "t4",
   "blocks": [
     {
       "type": "text",
-      "text": "Where the documentary obligation meets the freedom of art.",
+      "text": "Throughout the process, we realized that representing the past in some way means accepting that history can never be fully recovered. Archival research always reveals fragments, silences, and contradictions that limit what we are able to know. Fabulation and speculation can help us imagine possibilities around missing voices, but they must remain critically grounded. We also have to guard against anachronistic interpretations.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"When I talk about these archives or these specific files, I often sound a bit repressing or negative about the system. It is however good to be aware that the child welfare system only started around 1921. So it was a very new thing back then, and people had to find their ways with it. It stemmed from a good intention: helping the girls by taking them out of their toxic environments.\" — Jaïr",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "Impossible completeness is part of historical reconstruction. Huize Dina presents the past as layered, uncertain, carefully interpreted, and continuously open to revision.",
       "file": null,
       "caption": null
     }
   ],
-  "questions": null,
+  "questions": [],
   "authors": null
 }

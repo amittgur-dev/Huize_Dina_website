@@ -1,17 +1,32 @@
 {
   "id": "t1-2",
   "number": "1.2",
-  "label": "The implicit listener",
+  "label": "The resurfacing of the archive",
   "level": 1,
   "parent": "t1",
   "blocks": [
     {
       "type": "text",
-      "text": "From the implicit looker to the implicit listener — the figure the podcast is built to address.",
+      "text": "The Amsterdam juvenile court files in which our historian discovered the story of Huize Dina have been open to everyone only since 2025. That year, the Noord-Hollands Archief in Haarlem opened access to juvenile court files from the Amsterdam District Court, including archival access 489, which primarily covers the years 1940–1949. Under the Dutch Archives Act, such court records generally become public after 75 years. This opening made the research into Huize Dina possible.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"Shortly after joining the research team the historian Jaïr van Dijk and I visited the Amsterdam Juvenile Judge Archive. I watched Jaïr work through materials he was seeing for the first time. His excitement really drew me in as he took a pile of documents from a dossier, reversed their order so that the earliest were on top, and started reconstructing the story of a person.\" — Amit",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "Legal accessibility does not remove ethical responsibility. Archives are sometimes called \"the memory of the state\", and public access is a precondition for research. But archives sometimes contain information about living people, or information that can harm their relatives: a tension with a fundamental right, the protection of private life. The debate is still in motion. A bill submitted in January 2026 to amend the Archives Act would allow archival institutions to make digitized archives searchable online for everyone; the Dutch Data Protection Authority has warned that it goes too far.",
       "file": null,
       "caption": null
     }
   ],
-  "questions": null,
-  "authors": "Amit (text) · Ari (review)"
+  "questions": [
+    "Where does the responsibility of archives lie in guaranteeing careful access?",
+    "What is the role of the historian as translator to the public?"
+  ],
+  "authors": null
 }

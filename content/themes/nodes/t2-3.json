@@ -1,17 +1,17 @@
 {
   "id": "t2-3",
   "number": "2.3",
-  "label": "Enacting the implicit listener",
+  "label": "The role of music",
   "level": 1,
   "parent": "t2",
   "blocks": [
     {
       "type": "text",
-      "text": "Turning the implicit listener from concept into something the audience performs.",
+      "text": "\"When we started working on the project, the team's intention was not to feature a lot of music in the podcast. Non-diegetic music (i.e. music heard by the podcast listeners but not by the characters) felt artificial within the realistic aesthetic we were striving for. However, this intention changed somewhat during the trial stages of the work. The podcast was taking shape as a movement between two worlds: short interviews with Jaïr, the historian, edited so that only his answers remain, providing context for the girls' stories, and the sections featuring the implicit listener, which were the heart of the work. We came to realize that moving between these two could feel disorienting for the podcast listener. The solution we found was to use brief musical compositions, to smooth these transitions — teleports of sorts, between current reality and the reality of the implicit listener. As my musical compositions took on a more substantial role in the podcast, we also discovered that they added a dramatic element that supported the narrative.\" — Amit",
       "file": null,
       "caption": null
     }
   ],
-  "questions": null,
-  "authors": "Ari, Amit (text) · Tzlil (review)"
+  "questions": [],
+  "authors": null
 }

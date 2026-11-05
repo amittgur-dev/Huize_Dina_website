@@ -1,20 +1,29 @@
 {
   "id": "t2",
   "number": "2",
-  "label": "Storybuilding",
+  "label": "Story-building",
   "level": 0,
   "parent": "root",
   "blocks": [
     {
       "type": "text",
-      "text": "How the material becomes a story you can be inside — dramaturgy, emphasis, sound, and the figure who carries the telling.",
+      "text": "How did we build a story from fragmented archival records?",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "Story-building examines how historical fragments are transformed into narratives.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"We wanted to sonify the Huize Dina archive and present it in the form of an artistic podcast; we envisioned it taking place in a virtual auditory space; we strove to tell the girls' stories (though their actual voices were absent from the files, and many details about them were missing), and we restricted ourselves to a single kind of material — the documents found in the archive. As it turned out, these very constraints led us to a breakthrough.\" — Amit",
       "file": null,
       "caption": null
     }
   ],
-  "questions": [
-    "How do you distil a narrative form from archival material?",
-    "Can the historian be the protagonist of the story?"
-  ],
+  "questions": [],
   "authors": null
 }

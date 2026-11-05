@@ -1,0 +1,23 @@
+{
+  "id": "t4-4",
+  "number": "4.4",
+  "label": "Period authenticity",
+  "level": 1,
+  "parent": "t4",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "\"But creating a believable auditory reality also meant paying attention to the historical authenticity of the sounds themselves. This sometimes required us to balance the needs of the artwork against the need to remain historically accurate. [...] In the scene of Tilly's hospitalization, following her accident with a military vehicle, we were tempted to feature the beeping of a heart monitor, which is such an iconic sound of a hospital environment, but of course we had to give it up, as such monitors didn't exist at the time.\" — Amit",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"When Ari and I were working on the second episode of the podcast, we became fascinated by the idea of placing the juvenile judge as the implicit listener in his office, listening to witness statements from archival police reports on a tape recorder. The possibility of stopping the tape, rewinding it, and playing it back seemed to resonate beautifully with the idea of shifting perspectives. The sound of the magnetic reel turning also foregrounded the materiality of the archival trace, becoming a sonic equivalent of flipping through folders in the physical archive. But making this choice would have required an anachronism. It would have suggested that the judge was listening to a tape recorder at a historical moment when such a scene simply could not have taken place. [...] But it just did not seem right.\" — Tzlil",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": [],
+  "authors": null
+}

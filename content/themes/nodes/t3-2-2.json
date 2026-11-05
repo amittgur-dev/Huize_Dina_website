@@ -1,0 +1,25 @@
+{
+  "id": "t3-2-2",
+  "number": "3.2.2",
+  "label": "What happens when a text is performed",
+  "level": 2,
+  "parent": "t3-2",
+  "blocks": [
+    {
+      "type": "text",
+      "text": "\"I was always trying to create a varied picture of vocal intentions and effects. A dry institutional report, for example, had to be a monotone experience.\" — Ari",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"Sentences that appear bureaucratically neutral on the page may sound deeply violent once spoken aloud. Repetition, hesitation, rhythm, tone, and silence suddenly become perceptible. Certain formulations expose forms of distance, paternalism, judgement, or institutional control that are less immediately visible during silent reading. Sound reveals the emotional texture of the archive without claiming to resolve it.\" — Naomi",
+      "file": null,
+      "caption": null
+    }
+  ],
+  "questions": [
+    "Should institutional reports sound cold and distant, or hesitant and uncertain? Where should silence enter?"
+  ],
+  "authors": null
+}

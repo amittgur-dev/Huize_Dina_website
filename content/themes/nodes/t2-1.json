@@ -1,17 +1,47 @@
 {
   "id": "t2-1",
   "number": "2.1",
-  "label": "An immersive story from the archive",
+  "label": "From archival material to dramatic scenes",
   "level": 1,
   "parent": "t2",
   "blocks": [
     {
       "type": "text",
-      "text": "How do you build an immersive story out of archival fragments?",
+      "text": "\"Archival material is documented reality. Distilling a narrative from it required committing to the actual past. We were not writing a story but engraving it.\" — Amit",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "Each girl's archival file contains between seventy and two hundred pages. Therefore, being selective was inevitable. To guide the creative team through the archival maze, the historians created timelines. For each girl, big life events, important documents, and character descriptions were featured.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"It soon became clear that the only way to construct what could be called a 'script' from the original archival materials was to assemble it from carefully selected excerpts: passages from letters, reports, and other documents that seemed to reveal something essential about each girl, her experiences, or the ways in which she was perceived.\" — Tzlil",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "Subsequently, our scriptwriters Ari and Tzlil went through the girls' archival files. They looked for phrases that activated the implicit listener situation. Throughout the files, we often encountered an educating, scolding, almost cruel tone. Phrases like: \"She has developed into a difficult little person.\"",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"An example is the psychiatrist who says Tilly's menstruation is stable. The knowledge that the girl herself would be listening to this intrusive text is very engaging.\" — Ari",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"Putting this together is like walking through a field of stones. You constantly select one, pick it up, and examine it up close, only to discover that each stone contains an entire world of questions, contexts, and possibilities for telling the story.\" — Ari",
       "file": null,
       "caption": null
     }
   ],
-  "questions": null,
+  "questions": [],
   "authors": null
 }

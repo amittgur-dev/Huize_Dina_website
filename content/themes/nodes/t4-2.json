@@ -1,17 +1,37 @@
 {
   "id": "t4-2",
   "number": "4.2",
-  "label": "Our use of AI",
+  "label": "Living relatives",
   "level": 1,
   "parent": "t4",
   "blocks": [
     {
       "type": "text",
-      "text": "AI for historically stylized translation — and the ethics of doing so.",
+      "text": "\"How do you deal with these kinds of texts when you know that there are still children alive who never knew their mothers?\" — Jaïr",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "Legal accessibility does not remove ethical responsibility: some files still concern living people, as in the case of the Engers girls, whose youngest daughter, born in 1938, was still alive at the time the files were made public.",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"Recently, during archival research, I found information about a friend of mine. He is 85 and has never known who his parents were. My enthusiasm about such a find as a historian — I then have to temper it. Someone who is 85, you shouldn't tell them something like that anymore. It can be harmful. Those are the considerations I make.\" — Jaïr",
+      "file": null,
+      "caption": null
+    },
+    {
+      "type": "text",
+      "text": "\"I do think the right of relatives stops somewhere. It can't go on six generations. If someone gives me permission to research their parents, I don't think their children should be able to refuse that.\" — Jaïr",
       "file": null,
       "caption": null
     }
   ],
-  "questions": null,
-  "authors": "Elena (text) · Tzlil, Naomi (review)"
+  "questions": [
+    "How far does the right of relatives reach?"
+  ],
+  "authors": null
 }
