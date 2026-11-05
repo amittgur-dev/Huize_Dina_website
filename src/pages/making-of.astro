@@ -17,6 +17,39 @@ const themesRaw: RawThemesData = {
 
 const themeMap = buildThemeMap(themesRaw);
 const regions = themeMap.nodes.filter((n) => n.level === 0);
+
+// --- Phone fallback: the pan/zoom map is a pointer interface, so under
+// 680px the page swaps to a hierarchical browser (one node per "screen",
+// drill down through sub-themes, hash-routed so the browser back button
+// works). Everything below is rendered statically from the same themeMap.
+const mkmById = Object.fromEntries(themeMap.nodes.map((n) => [n.id, n]));
+const mkmNumKey = (num: string) => num.split('.').map((s) => Number(s) || 0);
+const mkmKids = (id: string) =>
+  themeMap.nodes
+    .filter((n) => n.parent === id)
+    .sort((a, b) => {
+      const ka = mkmNumKey(a.number);
+      const kb = mkmNumKey(b.number);
+      for (let i = 0; i < Math.max(ka.length, kb.length); i++) {
+        const d = (ka[i] ?? -1) - (kb[i] ?? -1);
+        if (d) return d;
+      }
+      return 0;
+    });
+const mkmCrumbs = (n: (typeof themeMap.nodes)[number]) => {
+  const chain = [];
+  let cur = n.parent ? mkmById[n.parent] : undefined;
+  while (cur) {
+    chain.unshift(cur);
+    cur = cur.parent ? mkmById[cur.parent] : undefined;
+  }
+  return chain;
+};
+const mkmConns = (id: string) =>
+  themeMap.links
+    .filter((l) => l.from === id || l.to === id)
+    .map((l) => ({ other: mkmById[l.from === id ? l.to : l.from], note: l.note }))
+    .filter((c) => c.other);
 ---
 
 <BaseLayout
@@ -101,6 +134,109 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     </div>
     <div id="mk-panel-parent" class="mk-panel-parent" hidden></div>
   </aside>
+
+  <!-- Phone version: one node per screen, drilled into via the sub-theme
+       rows below each text. Hash-routed (#t2-2) so the browser's back
+       button walks back up the tree. Hidden on desktop; the map and its
+       whole script are skipped on phones (see the media-query guard at the
+       top of the map script). -->
+  <div id="mkm">
+    {
+      themeMap.nodes.map((n) => (
+        <article class="mkm-node" id={`mkm-${n.id}`} hidden>
+          {n.level === -1 ? (
+            <div class="mkm-eyebrow">Polyphonic Archive · the making-of</div>
+          ) : (
+            <nav class="mkm-crumbs" aria-label="You are here">
+              {mkmCrumbs(n).map((a) => (
+                <a href={`#${a.id}`}>{a.level === -1 ? 'The making of' : a.label}</a>
+              ))}
+            </nav>
+          )}
+
+          <h2 class="mkm-title">{n.level >= 1 ? `${n.number} — ${n.label}` : n.label}</h2>
+          <div class="mkm-rule" style={`background:${n.color}`} />
+
+          <div class="mkm-blocks">
+            {n.blocks.map((b) =>
+              b.type === 'text' && b.text ? (
+                <p class="mkm-text">{b.text}</p>
+              ) : b.type === 'image' && b.file ? (
+                <figure class="mkm-media">
+                  <img src={b.file} alt={b.caption || ''} loading="lazy" />
+                  {b.caption && <figcaption>{b.caption}</figcaption>}
+                </figure>
+              ) : b.type === 'audio' && b.file ? (
+                <figure class="mkm-media mkm-media-audio">
+                  <audio controls preload="none" src={b.file} />
+                  {b.caption && <figcaption>{b.caption}</figcaption>}
+                </figure>
+              ) : b.type === 'video' && b.file ? (
+                <figure class="mkm-media">
+                  <video controls playsinline preload="metadata" src={b.file} />
+                  {b.caption && <figcaption>{b.caption}</figcaption>}
+                </figure>
+              ) : null,
+            )}
+          </div>
+
+          {mkmKids(n.id).length > 0 && (
+            <div class="mkm-section">
+              <div class="mkm-label">{n.level === -1 ? 'Themes' : 'Sub-themes'}</div>
+              {mkmKids(n.id).map((c) => (
+                <a class="mkm-row" href={`#${c.id}`} style={`--c:${c.color}`}>
+                  {c.level >= 1 && <span class="mkm-row-num">{c.number}</span>}
+                  <span class="mkm-row-label">{c.label}</span>
+                  <span class="mkm-row-arrow">→</span>
+                </a>
+              ))}
+            </div>
+          )}
+
+          {mkmConns(n.id).length > 0 && (
+            <div class="mkm-section">
+              <div class="mkm-label mkm-label-teal">Connections</div>
+              {mkmConns(n.id).map((c) => (
+                <a class="mkm-conn" href={`#${c.other.id}`}>
+                  <span class="mkm-conn-note">{c.note}</span>
+                  <span class="mkm-conn-target" style={`color:${c.other.color}`}>
+                    {c.other.level >= 1 ? `${c.other.number} — ` : ''}{c.other.label} →
+                  </span>
+                </a>
+              ))}
+            </div>
+          )}
+
+          {n.parent && (
+            <a class="mkm-back" href={`#${n.parent}`}>
+              ← Back to {n.parent === 'root' ? 'the overview' : mkmById[n.parent].label}
+            </a>
+          )}
+        </article>
+      ))
+    }
+  </div>
+
+  <script is:inline>
+    // Router for the phone version: show exactly one .mkm-node, chosen by
+    // the URL hash (#t2-2), falling back to the root. Runs on any viewport
+    // (it only touches elements that are display:none on desktop), so no
+    // media-query coordination is needed here.
+    (function () {
+      var views = Array.prototype.slice.call(document.querySelectorAll('.mkm-node'));
+      if (!views.length) return;
+      function show() {
+        var id = (location.hash || '').replace(/^#/, '') || 'root';
+        var target = document.getElementById('mkm-' + id) || document.getElementById('mkm-root');
+        views.forEach(function (v) {
+          v.hidden = v !== target;
+        });
+        window.scrollTo(0, 0);
+      }
+      window.addEventListener('hashchange', show);
+      show();
+    })();
+  </script>
 
   <script
     type="application/json"
@@ -679,9 +815,216 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
       width: 100%;
     }
   }
+
+  /* ---- Phone version: hierarchical browser instead of the map ---- */
+
+  #mkm {
+    display: none;
+  }
+
+  @media (max-width: 680px) {
+    #mk-viewport,
+    #mk-panel,
+    #mk-to-intro,
+    #mk-nudge,
+    #mk-tooltip,
+    .mk-header-controls {
+      display: none !important;
+    }
+
+    /* the map needs a frozen 100vh page; the browser needs a normal
+       scrolling document */
+    :global(.page-root.fullscreen) {
+      height: auto;
+      min-height: 100vh;
+      overflow: visible;
+    }
+
+    #mkm {
+      display: block;
+      position: relative;
+      z-index: 5;
+      max-width: 560px;
+      margin: 0 auto;
+      /* the fixed masthead wraps to three lines at phone width */
+      padding: 10rem 1.1rem 3.5rem;
+    }
+
+    .mkm-eyebrow {
+      font-size: 10.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(224, 219, 212, 0.45);
+      margin-bottom: 0.9rem;
+    }
+
+    .mkm-crumbs {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      line-height: 2;
+      margin-bottom: 0.9rem;
+    }
+
+    .mkm-crumbs a {
+      color: rgba(224, 219, 212, 0.5);
+      text-decoration: none;
+    }
+
+    .mkm-crumbs a:not(:last-child)::after {
+      content: ' / ';
+      color: rgba(224, 219, 212, 0.25);
+    }
+
+    .mkm-title {
+      margin: 0;
+      font-size: 1.45rem;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      color: #f2eee6;
+      text-wrap: pretty;
+    }
+
+    .mkm-rule {
+      height: 1px;
+      opacity: 0.5;
+      margin: 1.1rem 0 1.3rem;
+    }
+
+    .mkm-text {
+      margin: 0 0 1rem;
+      font-size: 15px;
+      line-height: 1.8;
+      color: rgba(224, 219, 212, 0.74);
+      text-wrap: pretty;
+    }
+
+    .mkm-media {
+      margin: 1.4rem 0;
+      border: 1px solid rgba(224, 219, 212, 0.14);
+      padding: 6px;
+      background: rgba(20, 17, 25, 0.5);
+    }
+
+    .mkm-media img,
+    .mkm-media video {
+      width: 100%;
+      display: block;
+    }
+
+    .mkm-media audio {
+      width: 100%;
+      display: block;
+    }
+
+    .mkm-media-audio {
+      padding: 10px;
+    }
+
+    .mkm-media figcaption {
+      font-size: 11px;
+      font-style: italic;
+      line-height: 1.5;
+      color: rgba(224, 219, 212, 0.45);
+      padding: 0.5rem 0.3rem 0.2rem;
+    }
+
+    .mkm-section {
+      margin-top: 1.9rem;
+    }
+
+    .mkm-label {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(224, 219, 212, 0.4);
+      margin-bottom: 0.7rem;
+    }
+
+    .mkm-label-teal {
+      color: rgba(72, 198, 168, 0.75);
+    }
+
+    .mkm-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.7rem;
+      padding: 0.9rem 0.95rem;
+      margin-bottom: 0.55rem;
+      background: rgba(20, 17, 25, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 3px solid var(--c, #48c6a8);
+      border-radius: 2px;
+      color: rgba(224, 219, 212, 0.88);
+      text-decoration: none;
+    }
+
+    .mkm-row-num {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--c, #48c6a8);
+      flex: none;
+    }
+
+    .mkm-row-label {
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .mkm-row-arrow {
+      margin-left: auto;
+      color: rgba(224, 219, 212, 0.35);
+      flex: none;
+    }
+
+    .mkm-conn {
+      display: block;
+      padding: 0.8rem 0.95rem;
+      margin-bottom: 0.55rem;
+      background: rgba(20, 17, 25, 0.4);
+      border: 1px solid rgba(72, 198, 168, 0.22);
+      border-radius: 2px;
+      text-decoration: none;
+    }
+
+    .mkm-conn-note {
+      display: block;
+      font-size: 13px;
+      font-style: italic;
+      line-height: 1.55;
+      color: rgba(224, 219, 212, 0.6);
+    }
+
+    .mkm-conn-target {
+      display: block;
+      margin-top: 0.45rem;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+    }
+
+    .mkm-back {
+      display: inline-block;
+      margin-top: 2rem;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #48c6a8;
+      text-decoration: none;
+    }
+  }
 </style>
 
 <script>
+  // On phones the hierarchical browser (#mkm) replaces the map entirely, so
+  // skip building the map's DOM and camera. Crossing the breakpoint (e.g.
+  // rotating a tablet or resizing a window) reloads once to swap modes —
+  // cheaper and far simpler than tearing either mode down live.
+  const MKM_MQ = window.matchMedia('(max-width: 680px)');
+  MKM_MQ.addEventListener('change', () => location.reload());
+  if (!MKM_MQ.matches) initMap();
+
+  function initMap() {
   interface ContentBlock {
     type: 'text' | 'image' | 'audio' | 'video';
     text: string | null;
@@ -1838,4 +2181,5 @@ const regions = themeMap.nodes.filter((n) => n.level === 0);
     if (++fitTries < 22) window.setTimeout(initFit, 90);
   }
   window.setTimeout(initFit, 30);
+  } // end initMap()
 </script>
