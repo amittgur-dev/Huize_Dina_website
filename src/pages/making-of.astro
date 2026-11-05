@@ -230,6 +230,17 @@ const mkmConns = (id: string) =>
     (function () {
       var views = Array.prototype.slice.call(document.querySelectorAll('.mkm-node'));
       if (!views.length) return;
+      // Belt and braces for the scroll unlock: the stylesheet override of
+      // the map's fullscreen page freeze exists, but enforce it inline too
+      // so no cascade-order or browser quirk can leave phones unscrollable.
+      if (window.matchMedia('(max-width: 680px)').matches) {
+        var pr = document.querySelector('.page-root');
+        if (pr) {
+          pr.style.setProperty('height', 'auto', 'important');
+          pr.style.setProperty('min-height', '100vh', 'important');
+          pr.style.setProperty('overflow', 'visible', 'important');
+        }
+      }
       function show() {
         var id = (location.hash || '').replace(/^#/, '') || 'root';
         var target = document.getElementById('mkm-' + id) || document.getElementById('mkm-root');
