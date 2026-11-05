@@ -363,6 +363,60 @@
     },
   });
 
+  // Custom preview for the preliminary Listening page (file collection
+  // "pages", file "listen") — mirrors listen.astro's launch header and
+  // sample-card layout, and plays an uploaded track so editors can
+  // confirm an upload worked without leaving the CMS.
+  var ListenPreview = createClass({
+    render: function () {
+      var entry = this.props.entry;
+      var getAsset = this.props.getAsset;
+      var data = entry.get('data') || {};
+
+      var launchLine = get(data, 'launchLine', '');
+      var intro = get(data, 'intro', '');
+      var sampleTitle = get(data, 'sampleTitle', '');
+      var numeral = get(data, 'numeral', '');
+      var tracks = toPlain(get(data, 'tracks', null), []);
+      var footerNote = get(data, 'footerNote', '');
+
+      var trackEls = tracks.map(function (t, i) {
+        if (!t) return null;
+        var src = resolveSrc(getAsset, t.audio);
+        return h(
+          'div',
+          { key: i, className: 'pc-act' },
+          h('div', { className: 'pc-act-title' }, t.title || '(untitled track)'),
+          src ? h('audio', { src: src, controls: true }) : h('div', { className: 'pc-act-note' }, 'Coming shortly'),
+        );
+      });
+
+      return h(
+        'div',
+        { className: 'cp-page' },
+        h(
+          'div',
+          { className: 'ls-head' },
+          launchLine ? h('div', { className: 'ls-launch' }, launchLine) : null,
+          h('div', { className: 'ls-rule' }),
+          intro ? h('div', { className: 'ls-intro' }, intro) : null,
+        ),
+        h(
+          'div',
+          { className: 'pc-card ls-card' },
+          h(
+            'div',
+            { className: 'pc-card-head' },
+            h('div', { className: 'pc-ep-title' }, sampleTitle || '(untitled sample)'),
+            numeral ? h('div', { className: 'pc-numeral' }, numeral) : null,
+          ),
+          h('div', { className: 'pc-acts' }, trackEls),
+        ),
+        footerNote ? h('div', { className: 'pc-footer-note ls-footer' }, footerNote) : null,
+      );
+    },
+  });
+
   CMS.registerPreviewStyle(
     [
       "body { background:#161320; margin:0; }",
@@ -446,6 +500,14 @@
       ".pc-act-note { font-size:11.5px; font-style:italic; color:rgba(224,219,212,0.4); }",
       ".pc-act audio { height:32px; max-width:220px; }",
       ".pc-footer-note { text-align:center; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:rgba(224,219,212,0.3); margin-top:0.5rem; }",
+
+      // Listening page (mirrors src/pages/listen.astro's launch header + card)
+      ".ls-head { text-align:center; display:flex; flex-direction:column; align-items:center; margin-bottom:2rem; }",
+      ".ls-launch { font-size:13px; letter-spacing:0.24em; text-transform:uppercase; color:#48c6a8; }",
+      ".ls-rule { width:38px; height:1px; background:rgba(72,198,168,0.55); margin:1.1rem 0; }",
+      ".ls-intro { font-size:15px; line-height:1.85; color:rgba(224,219,212,0.68); max-width:520px; white-space:pre-wrap; }",
+      ".ls-card { max-width:620px; margin:0 auto; }",
+      ".ls-footer { max-width:620px; margin:1.4rem auto 0; }",
     ].join('\n'),
     { raw: true },
   );
@@ -459,6 +521,7 @@
   CMS.registerPreviewTemplate('team', TeamPreview);
   CMS.registerPreviewTemplate('home', HomePreview);
   CMS.registerPreviewTemplate('podcast', PodcastPreview);
+  CMS.registerPreviewTemplate('listen', ListenPreview);
   // "timelines" is a *files* collection (three files, each with its own
   // schema — see config.yml), so it registers per file name, not once
   // under the collection name the way the folder collections above do.

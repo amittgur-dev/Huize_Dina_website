@@ -1,0 +1,17 @@
+{
+  "launchLine": "The podcast launches in January 2027",
+  "intro": "The podcast will feature three episodes, each consisting of three to four acts. Below is a sample from Episode 1.",
+  "sampleTitle": "Sample from Episode one: Tilly",
+  "numeral": "I",
+  "tracks": [
+    {
+      "title": "Introduction",
+      "audio": ""
+    },
+    {
+      "title": "Excerpt from Act 1: Diagnosis",
+      "audio": ""
+    }
+  ],
+  "footerNote": "Huize Dina · A Polyphonic Archive production"
+}

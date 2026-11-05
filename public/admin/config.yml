@@ -146,6 +146,30 @@ collections:
                     hint: "Leave empty to show \"Recording to follow\"."
           - { label: Footer note, name: footerNote, widget: string, required: false }
 
+      - name: listen
+        label: "Listening page (preliminary sample)"
+        file: content/pages/listen.json
+        fields:
+          - { label: "Launch line (teal, at the top)", name: launchLine, widget: string, required: false }
+          - { label: Intro, name: intro, widget: text, required: false }
+          - { label: "Sample title (above the player)", name: sampleTitle, widget: string, required: false }
+          - { label: "Numeral (e.g. I)", name: numeral, widget: string, required: false }
+          - label: Tracks
+            name: tracks
+            widget: list
+            required: false
+            summary: "{{title}}"
+            fields:
+              - { label: Title, name: title, widget: string, required: false }
+              - label: Audio file
+                name: audio
+                widget: file
+                required: false
+                media_folder: "/assets/audio"
+                public_folder: "/assets/audio"
+                hint: "Leave empty to show \"Coming shortly\"."
+          - { label: Footer note, name: footerNote, widget: string, required: false }
+
       - name: contact
         label: Contact page
         file: content/pages/contact.json

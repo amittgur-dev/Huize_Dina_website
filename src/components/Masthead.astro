@@ -6,7 +6,10 @@ const { active = '' } = Astro.props;
 
 const NAV = [
   { key: 'home', label: 'Home', href: '/home' },
-  { key: 'podcast', label: 'Podcast', href: '/podcast' },
+  // Preliminary-launch period: the nav's Podcast entry points at the
+  // sample listening page (/listen); the full /podcast page stays
+  // published at its URL — flip this href back at the January 2027 debut.
+  { key: 'podcast', label: 'Podcast', href: '/listen' },
   { key: 'timelines', label: 'Timelines of the girls’ lives', href: '/timelines' },
   { key: 'making-of', label: 'The making of', href: '/making-of' },
   { key: 'team', label: 'Team', href: '/team' },
