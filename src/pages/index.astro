@@ -19,6 +19,8 @@ import landing from '../../content/pages/landing.json';
         <a href="/home" class="ld-link-primary">{landing.primaryLinkLabel}</a>
         <a href="/podcast" class="ld-link-secondary">{landing.secondaryLinkLabel}</a>
       </div>
+
+      {landing.notice && <div class="ld-notice">{landing.notice}</div>}
     </div>
   </div>
 </BaseLayout>
@@ -118,6 +120,14 @@ import landing from '../../content/pages/landing.json';
     color: #48c6a8;
   }
 
+  .ld-notice {
+    margin-top: 3rem;
+    font-size: 10.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(224, 219, 212, 0.32);
+  }
+
   @media (max-width: 680px) {
     .ld-page {
       min-height: auto;
@@ -138,6 +148,9 @@ import landing from '../../content/pages/landing.json';
     }
     .ld-foot {
       gap: 1.6rem;
+    }
+    .ld-notice {
+      margin-top: 2.2rem;
     }
   }
 
@@ -164,6 +177,9 @@ import landing from '../../content/pages/landing.json';
     .ld-foot {
       margin-top: 1.8rem;
     }
+    .ld-notice {
+      margin-top: 1.8rem;
+    }
   }
 
   @media (max-height: 660px) and (min-width: 681px) {
@@ -184,6 +200,9 @@ import landing from '../../content/pages/landing.json';
       margin-top: 0.8rem;
     }
     .ld-foot {
+      margin-top: 1.2rem;
+    }
+    .ld-notice {
       margin-top: 1.2rem;
     }
   }

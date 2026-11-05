@@ -26,6 +26,7 @@ collections:
           - { label: "Paragraph 2", name: paragraph2, widget: text, hint: "Write [link text](/url) to add an inline link, e.g. [Timelines of the girls’ lives](/timelines). Wrap a phrase in **double asterisks** to brighten it instead (no italics, no bold).", required: false }
           - { label: "Primary link label (e.g. \"Enter →\") — goes to the Home page", name: primaryLinkLabel, widget: string, required: false }
           - { label: "Secondary link label (e.g. \"Listen to the podcast →\") — goes to the Podcast page", name: secondaryLinkLabel, widget: string, required: false }
+          - { label: "Notice (small line at the very bottom, e.g. a preliminary-version note — leave empty to hide)", name: notice, widget: string, required: false }
 
       - name: home
         label: Home page
