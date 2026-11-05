@@ -12,9 +12,22 @@ import home from '../../content/pages/home.json';
     {
       home.blocks.map((block: any) =>
         block.type === 'text' ? (
-          <div class="text-block" set:html={renderInline(block.text)} />
+          <div class={`text-block ts-${block.size || 'normal'}`} set:html={renderInline(block.text)} />
+        ) : block.type === 'pair' ? (
+          block.left?.file || block.right?.file ? (
+            <div class={`image-pair ${block.left?.file && block.right?.file ? '' : 'pair-single'}`}>
+              {[block.left, block.right].map((img: any) =>
+                img?.file ? (
+                  <figure class="image-block pair-item">
+                    <img src={img.file} alt={img.alt} loading="lazy" />
+                    {img.caption && <figcaption set:html={renderInline(img.caption)} />}
+                  </figure>
+                ) : null,
+              )}
+            </div>
+          ) : null
         ) : block.file ? (
-          <figure class="image-block">
+          <figure class={`image-block iw-${block.width || 'full'} ia-${block.align || 'center'}`}>
             <img src={block.file} alt={block.alt} loading="lazy" />
             {block.caption && <figcaption set:html={renderInline(block.caption)} />}
           </figure>
@@ -54,6 +67,16 @@ import home from '../../content/pages/home.json';
     margin-top: 1.6rem;
   }
 
+  .text-block.ts-large {
+    font-size: 17px;
+    line-height: 1.8;
+  }
+
+  .text-block.ts-small {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
   .image-block {
     margin: 2.8rem 0;
     border: 1px solid rgba(224, 219, 212, 0.14);
@@ -72,6 +95,42 @@ import home from '../../content/pages/home.json';
     letter-spacing: 0.05em;
     color: rgba(224, 219, 212, 0.32);
     padding: 0.45rem 0.3rem 0.2rem;
+  }
+
+  .image-block.iw-medium {
+    width: 66%;
+  }
+
+  .image-block.iw-small {
+    width: 45%;
+  }
+
+  .image-block.ia-center {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .image-block.ia-right {
+    margin-left: auto;
+  }
+
+  .image-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-items: start;
+    margin: 2.8rem 0;
+  }
+
+  .image-pair .image-block.pair-item {
+    margin: 0;
+  }
+
+  .image-pair.pair-single {
+    grid-template-columns: 1fr;
+    width: 66%;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .source-note {
@@ -114,6 +173,20 @@ import home from '../../content/pages/home.json';
   @media (max-width: 680px) {
     .inner {
       padding: 0 1rem 4rem;
+    }
+    /* keep deliberately-small images legible on phone-width columns */
+    .image-block.iw-small {
+      width: 62%;
+    }
+    .image-block.iw-medium {
+      width: 80%;
+    }
+    .image-pair {
+      grid-template-columns: 1fr;
+      gap: 1.2rem;
+    }
+    .image-pair.pair-single {
+      width: 100%;
     }
   }
 </style>

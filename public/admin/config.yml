@@ -45,6 +45,15 @@ collections:
                 fields:
                   - { label: Type, name: type, widget: hidden, default: text, required: false }
                   - { label: Text, name: text, widget: text, hint: "Wrap a word in *asterisks* for italics.", required: false }
+                  - label: Text size
+                    name: size
+                    widget: select
+                    required: false
+                    default: normal
+                    options:
+                      - { label: Normal, value: normal }
+                      - { label: Large, value: large }
+                      - { label: Small, value: small }
               - label: Image
                 name: image
                 widget: object
@@ -54,6 +63,48 @@ collections:
                   - { label: Image, name: file, widget: image, media_folder: "/assets/site", public_folder: "/assets/site", required: false }
                   - { label: Alt text, name: alt, widget: string, required: false }
                   - { label: Caption, name: caption, widget: string, required: false }
+                  - label: Width
+                    name: width
+                    widget: select
+                    required: false
+                    default: full
+                    hint: "How much of the text column the image spans."
+                    options:
+                      - { label: Full width, value: full }
+                      - { label: "Medium (about two thirds)", value: medium }
+                      - { label: "Small (about half)", value: small }
+                  - label: Position
+                    name: align
+                    widget: select
+                    required: false
+                    default: center
+                    hint: "Where a Medium or Small image sits in the column (Full-width images ignore this)."
+                    options:
+                      - { label: Center, value: center }
+                      - { label: Left, value: left }
+                      - { label: Right, value: right }
+              - label: Two images side by side
+                name: pair
+                widget: object
+                required: false
+                fields:
+                  - { label: Type, name: type, widget: hidden, default: pair, required: false }
+                  - label: Left image
+                    name: left
+                    widget: object
+                    required: false
+                    fields:
+                      - { label: Image, name: file, widget: image, media_folder: "/assets/site", public_folder: "/assets/site", required: false }
+                      - { label: Alt text, name: alt, widget: string, required: false }
+                      - { label: Caption, name: caption, widget: string, required: false }
+                  - label: Right image
+                    name: right
+                    widget: object
+                    required: false
+                    fields:
+                      - { label: Image, name: file, widget: image, media_folder: "/assets/site", public_folder: "/assets/site", required: false }
+                      - { label: Alt text, name: alt, widget: string, required: false }
+                      - { label: Caption, name: caption, widget: string, required: false }
           - { label: Source note, name: sourceNote, widget: text, required: false }
           - label: Footer links
             name: links
