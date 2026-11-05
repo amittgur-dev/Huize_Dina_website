@@ -1,9 +1,14 @@
 services:
   web:
-    build: .
+    image: ghcr.io/amittgur-dev/huize_dina_website:latest
     container_name: huize-dina-web
     restart: unless-stopped
     expose:
       - "80"
     networks:
-      - proxy
+      - nginx_proxy
+
+# Shared network the parent nginx reverse proxy is attached to.
+networks:
+  nginx_proxy:
+    external: true
