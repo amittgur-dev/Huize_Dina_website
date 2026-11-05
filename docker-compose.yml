@@ -8,6 +8,21 @@ services:
     networks:
       - nginx_network
 
+  # GitHub OAuth provider for the CMS at /admin (see deploy/oauth/).
+  # Put OAUTH_CLIENT_ID and OAUTH_CLIENT_SECRET in a .env file next to this one.
+  oauth:
+    image: ghcr.io/amittgur-dev/huize_dina_oauth:latest
+    container_name: huize-dina-oauth
+    restart: unless-stopped
+    environment:
+      OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID:?set in .env}
+      OAUTH_CLIENT_SECRET: ${OAUTH_CLIENT_SECRET:?set in .env}
+      SITE_ORIGIN: https://huizedina.nl
+    expose:
+      - "3000"
+    networks:
+      - nginx_network
+
 # Shared network the parent nginx reverse proxy is attached to.
 networks:
   nginx_network:

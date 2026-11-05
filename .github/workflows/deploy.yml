@@ -27,3 +27,9 @@ jobs:
           tags: |
             ghcr.io/amittgur-dev/huize_dina_website:latest
             ghcr.io/amittgur-dev/huize_dina_website:${{ github.sha }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: deploy/oauth
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ghcr.io/amittgur-dev/huize_dina_oauth:latest

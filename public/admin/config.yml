@@ -1,10 +1,11 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: amittgur-dev/Huize_Dina_website
   branch: main
-
-# Netlify Identity + Git Gateway must be enabled in the Netlify site's
-# dashboard (Site configuration → Identity) before this works — see
-# README.md's "Editing the site" section.
+  # Login goes through the small OAuth service in deploy/oauth/, proxied by
+  # the parent nginx at /oauth/. Editors need write access to the repo.
+  base_url: https://huizedina.nl
+  auth_endpoint: oauth/auth
 
 site_url: https://huizedina.nl
 display_url: https://huizedina.nl

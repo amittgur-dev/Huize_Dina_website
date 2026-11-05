@@ -152,9 +152,58 @@ first (`npm run build && npm run preview`) since the CMS bundle is vendored
 into `public/admin/decap/` by a `prebuild`/`postinstall` script, not fetched
 from a CDN.
 
-**Deploy to Netlify:** connect the repo (build command `npm run build`,
-publish `dist`, already set in `netlify.toml`), then in the Netlify
-dashboard enable **Identity** and, under Identity settings, **Git Gateway**
-— this is what `/admin`'s `git-gateway` backend logs editors in through, and
-can only be turned on from Netlify's UI, not from this repo. Invite editors
-under Identity → Invite users.
+## Deployment (self-hosted)
+
+The site is served from a Docker container behind the server's nginx reverse
+proxy. (The original brief targeted Netlify; `netlify.toml` is still there
+but no longer used for hosting.)
+
+**How it flows:** a push to `main` runs `.github/workflows/deploy.yml`, which
+builds two multi-platform (amd64 + arm64) images and pushes them to GHCR:
+- `ghcr.io/amittgur-dev/huize_dina_website` — the `Dockerfile` builds the Astro
+  site and serves `dist/` with nginx (`nginx.conf`).
+- `ghcr.io/amittgur-dev/huize_dina_oauth` — the CMS login service in
+  `deploy/oauth/`.
+
+The server never receives connections from GitHub. It pulls on a schedule:
+`update.sh` runs `docker compose pull && up -d` and removes old untagged
+versions of these two images. Run it from cron, e.g.
+`*/5 * * * * /opt/huize-dina/update.sh >> /var/log/huize-dina-update.log 2>&1`.
+
+**Server setup (once):**
+1. Copy `docker-compose.yml` and `update.sh` to e.g. `/opt/huize-dina`. The
+   compose file joins the external Docker network `nginx_network`, which the
+   parent nginx must also be attached to.
+2. Create a GitHub OAuth app (under the `amittgur-dev` account/org) with
+   homepage `https://huizedina.nl` and callback
+   `https://huizedina.nl/oauth/callback`. Put its credentials in a `.env`
+   next to the compose file: `OAUTH_CLIENT_ID=...` and `OAUTH_CLIENT_SECRET=...`.
+3. After the first workflow run, set both GHCR packages to **public** (package
+   settings → change visibility), or `docker login ghcr.io` on the server with
+   a `read:packages` token.
+4. In the parent nginx, for the `huizedina.nl` server block:
+   ```nginx
+   location / {
+       proxy_pass http://huize-dina-web:80;
+       proxy_set_header Host $host;
+       proxy_set_header X-Real-IP $remote_addr;
+       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+       proxy_set_header X-Forwarded-Proto $scheme;
+   }
+   location /oauth/ {
+       proxy_pass http://huize-dina-oauth:3000;
+       proxy_set_header Host $host;
+       proxy_set_header X-Forwarded-Proto $scheme;
+   }
+   ```
+5. `docker compose up -d`.
+
+**Editing content (`/admin`):** Decap CMS uses the `github` backend
+(`public/admin/config.yml`). Editors sign in with their own GitHub account
+through the OAuth service, so they need **write access to
+`amittgur-dev/Huize_Dina_website`**. Each save is a commit straight to `main`,
+which triggers a build and goes live on the next `update.sh` run. The OAuth
+scope defaults to `public_repo`; set `OAUTH_SCOPE=repo` on the `oauth` service
+if the repo is ever made private.
+
+**Local Docker test:** `docker build -t hd-test . && docker run --rm -p 8080:80 hd-test`.

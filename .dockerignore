@@ -3,3 +3,5 @@ dist
 .astro
 .git
 .env*
+deploy
+update.sh

@@ -6,11 +6,13 @@ set -eu
 
 cd "$(dirname "$0")"
 
-IMAGE=ghcr.io/amittgur-dev/huize_dina_website
+IMAGES="ghcr.io/amittgur-dev/huize_dina_website ghcr.io/amittgur-dev/huize_dina_oauth"
 
 docker compose pull -q
 docker compose up -d
 
-docker images "$IMAGE" --format '{{.ID}} {{.Tag}}' \
-  | awk '$2=="<none>"{print $1}' \
-  | xargs -r docker rmi
+for IMAGE in $IMAGES; do
+  docker images "$IMAGE" --format '{{.ID}} {{.Tag}}' \
+    | awk '$2=="<none>"{print $1}' \
+    | xargs -r docker rmi
+done
