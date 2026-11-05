@@ -8,6 +8,7 @@ import landing from '../../content/pages/landing.json';
   <div class="ld-page">
     <div class="ld-hero">
       <h1 class="ld-title">{landing.title}</h1>
+      {landing.notice && <div class="ld-notice">{landing.notice}</div>}
       <div class="ld-rule" aria-hidden="true" />
     </div>
 
@@ -19,8 +20,6 @@ import landing from '../../content/pages/landing.json';
         <a href="/home" class="ld-link-primary">{landing.primaryLinkLabel}</a>
         <a href="/podcast" class="ld-link-secondary">{landing.secondaryLinkLabel}</a>
       </div>
-
-      {landing.notice && <div class="ld-notice">{landing.notice}</div>}
     </div>
   </div>
 </BaseLayout>
@@ -121,11 +120,12 @@ import landing from '../../content/pages/landing.json';
   }
 
   .ld-notice {
-    margin-top: 3rem;
-    font-size: 10.5px;
-    letter-spacing: 0.22em;
+    margin-top: 1.3rem;
+    font-size: 12.5px;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: rgba(224, 219, 212, 0.32);
+    color: #48c6a8;
+    line-height: 1.8;
   }
 
   @media (max-width: 680px) {
@@ -150,7 +150,8 @@ import landing from '../../content/pages/landing.json';
       gap: 1.6rem;
     }
     .ld-notice {
-      margin-top: 2.2rem;
+      margin-top: 1rem;
+      font-size: 11px;
     }
   }
 
@@ -178,7 +179,8 @@ import landing from '../../content/pages/landing.json';
       margin-top: 1.8rem;
     }
     .ld-notice {
-      margin-top: 1.8rem;
+      margin-top: 0.9rem;
+      font-size: 11.5px;
     }
   }
 
@@ -203,7 +205,8 @@ import landing from '../../content/pages/landing.json';
       margin-top: 1.2rem;
     }
     .ld-notice {
-      margin-top: 1.2rem;
+      margin-top: 0.7rem;
+      font-size: 11px;
     }
   }
 </style>
