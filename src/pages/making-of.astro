@@ -272,6 +272,13 @@ const mkmConns = (id: string) =>
     background: #120f18;
     touch-action: none;
     cursor: grab;
+    /* The viewport is a drag-to-pan surface: without this, a pan gesture
+       selects the intro/node text, and the next drag picks that selection
+       up as a native browser drag-ghost — a trail of duplicate text
+       chasing the cursor. (The reading panel sits outside the viewport,
+       so its text stays selectable.) */
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   #mk-viewport.is-dragging {
@@ -1562,9 +1569,13 @@ const mkmConns = (id: string) =>
   // --- Camera flight (rAF-eased) ---
   let flyRaf: number | null = null;
   let flyTimer: number | undefined;
-  function animateTo(target: { x: number; y: number; z: number }, dur = 700) {
+  // target.refZ, when given, is eased along with the camera: refZ is the
+  // focal reference plane that drives every node's depth-fade and blur, so
+  // snapping it to the new level in one frame (as select() used to) made
+  // the whole map visibly jump while the camera itself was still mid-glide.
+  function animateTo(target: { x: number; y: number; z: number; refZ?: number }, dur = 700) {
     manualPan = false;
-    const start = { x: cam.x, y: cam.y, z: cam.z };
+    const start = { x: cam.x, y: cam.y, z: cam.z, refZ: refZ };
     const t0 = performance.now();
     const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
     const step = (now: number) => {
@@ -1574,6 +1585,7 @@ const mkmConns = (id: string) =>
       cam.x = start.x + (target.x - start.x) * e;
       cam.y = start.y + (target.y - start.y) * e;
       cam.z = start.z + (target.z - start.z) * e;
+      if (target.refZ != null) refZ = start.refZ + (target.refZ - start.refZ) * e;
       applyCam();
       if (k < 1) flyRaf = requestAnimationFrame(step);
     };
@@ -1583,6 +1595,7 @@ const mkmConns = (id: string) =>
       cam.x = target.x;
       cam.y = target.y;
       cam.z = target.z;
+      if (target.refZ != null) refZ = target.refZ;
       applyCam();
     }, dur + 60);
   }
@@ -1593,7 +1606,7 @@ const mkmConns = (id: string) =>
     flyTimer = undefined;
   }
 
-  function fitBox(minx: number, miny: number, maxx: number, maxy: number, dur: number) {
+  function fitBox(minx: number, miny: number, maxx: number, maxy: number, dur: number, refZTarget?: number) {
     const { w, h } = vpSize();
     const availW = (w - (panelWidth || 0)) * 0.86;
     const availH = h * 0.9;
@@ -1602,15 +1615,14 @@ const mkmConns = (id: string) =>
     let s = Math.min(availW / bw, availH / bh);
     s = Math.max(0.1, Math.min(3.6, s));
     const planeZ = fitZ != null ? fitZ : refZ;
-    animateTo({ x: (minx + maxx) / 2, y: (miny + maxy) / 2, z: planeZ - F / s }, dur);
+    animateTo({ x: (minx + maxx) / 2, y: (miny + maxy) / 2, z: planeZ - F / s, refZ: refZTarget }, dur);
   }
 
   function fitOverview(dur = 1200) {
     const b = regionBBox();
     const pad = 480;
-    refZ = zForLvl(0);
     fitZ = zForLvl(0);
-    fitBox(b.minx - pad, b.miny - pad, b.maxx + pad, b.maxy + pad, dur);
+    fitBox(b.minx - pad, b.miny - pad, b.maxx + pad, b.maxy + pad, dur, zForLvl(0));
   }
 
   function flyToIntro() {
@@ -1618,11 +1630,15 @@ const mkmConns = (id: string) =>
     userMoved = true;
     hideTip();
     panelWidth = 0;
-    refZ = zForLvl(0);
     fitZ = zForLvl(0);
     startFocus();
-    animateTo({ x: INTRO.x, y: INTRO.y, z: zForLvl(0) - overviewDz() }, 1400);
+    animateTo({ x: INTRO.x, y: INTRO.y, z: zForLvl(0) - overviewDz(), refZ: zForLvl(0) }, 1400);
   }
+
+  // Belt and braces alongside the viewport's user-select:none — if any text
+  // does end up selected (e.g. selected in the panel, drag started over the
+  // map), never let the browser turn the gesture into a native text drag.
+  viewport.addEventListener('dragstart', (e) => e.preventDefault());
 
   function zoomBy(f: number) {
     let dz = (refZ - cam.z) / f;
@@ -1844,7 +1860,6 @@ const mkmConns = (id: string) =>
     updateNudge();
     panelHintEl.hidden = panelHintSeen;
     if (!panelHintSeen) panelHintShownThisSelection = true;
-    refZ = zForLvl(n.level);
     fitZ = zForLvl(n.level);
     startFocus();
     pluck(id);
@@ -1955,7 +1970,7 @@ const mkmConns = (id: string) =>
     const maxx = Math.max(...pts.map((p) => p.x));
     const maxy = Math.max(...pts.map((p) => p.y));
     const pad = kids.length ? 360 : 300;
-    fitBox(minx - pad, miny - pad, maxx + pad, maxy + pad, 1700);
+    fitBox(minx - pad, miny - pad, maxx + pad, maxy + pad, 1700, zForLvl(n.level));
   }
 
   function deselect() {
@@ -1968,8 +1983,6 @@ const mkmConns = (id: string) =>
     }
     panel.hidden = true;
     panelWidth = 0;
-    refZ = zForLvl(0);
-    fitZ = zForLvl(0);
     startFocus();
     setAtIntro(false);
     fitOverview(1500);
