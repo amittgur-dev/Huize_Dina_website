@@ -1,0 +1,2698 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import regionColors from '../../content/themes/region-colors.json';
+import crossLinksFile from '../../content/themes/cross-links.json';
+import { buildThemeMap } from '../lib/themes';
+import type { RawThemeNode, RawThemesData } from '../lib/themes';
+
+// One file per theme node (content/themes/nodes/*.json) so editors can add,
+// rename, and re-nest themes as independent CMS entries — the tree shape
+// comes entirely from each node's own `parent` field, not file order.
+const nodeFiles = import.meta.glob<RawThemeNode>('../../content/themes/nodes/*.json', { eager: true, import: 'default' });
+const themesRaw: RawThemesData = {
+  regionColors,
+  nodes: Object.values(nodeFiles),
+  crossLinks: crossLinksFile.links,
+};
+
+const themeMap = buildThemeMap(themesRaw, { relax: true });
+const regions = themeMap.nodes.filter((n) => n.level === 0);
+
+// --- Phone fallback: the pan/zoom map is a pointer interface, so under
+// 680px the page swaps to a hierarchical browser (one node per "screen",
+// drill down through sub-themes, hash-routed so the browser back button
+// works). Everything below is rendered statically from the same themeMap.
+const mkmById = Object.fromEntries(themeMap.nodes.map((n) => [n.id, n]));
+const mkmNumKey = (num: string) => num.split('.').map((s) => Number(s) || 0);
+const mkmKids = (id: string) =>
+  themeMap.nodes
+    .filter((n) => n.parent === id)
+    .sort((a, b) => {
+      const ka = mkmNumKey(a.number);
+      const kb = mkmNumKey(b.number);
+      for (let i = 0; i < Math.max(ka.length, kb.length); i++) {
+        const d = (ka[i] ?? -1) - (kb[i] ?? -1);
+        if (d) return d;
+      }
+      return 0;
+    });
+const mkmCrumbs = (n: (typeof themeMap.nodes)[number]) => {
+  const chain = [];
+  let cur = n.parent ? mkmById[n.parent] : undefined;
+  while (cur) {
+    chain.unshift(cur);
+    cur = cur.parent ? mkmById[cur.parent] : undefined;
+  }
+  return chain;
+};
+const mkmConns = (id: string) =>
+  themeMap.links
+    .filter((l) => l.from === id || l.to === id)
+    .map((l) => ({ other: mkmById[l.from === id ? l.to : l.from], note: l.note }))
+    .filter((c) => c.other);
+---
+
+<BaseLayout
+  title="The Making Of"
+  active="making-of"
+  fullscreen
+  description="A pannable, zoomable map of the themes behind the Polyphonic Archive podcast."
+>
+  <Fragment slot="header-extra">
+    <div class="mk-header-controls">
+      <button type="button" class="mk-btn" data-act="overview">Overview</button>
+      <button type="button" class="mk-btn mk-btn-square" data-act="zoom-out" aria-label="Zoom out">−</button>
+      <button type="button" class="mk-btn mk-btn-square" data-act="zoom-in" aria-label="Zoom in">+</button>
+    </div>
+  </Fragment>
+
+  <!-- Runs during parsing, before the intro card below is painted. The map
+       script is a bundled module and therefore deferred, so between first
+       paint and that script running the intro would otherwise show
+       unpositioned — full size at the top-left corner, over the masthead —
+       which reads as a flash of stray content on the way into the page.
+       Gating on a class set here (rather than defaulting .mk-intro to
+       opacity:0) keeps the card visible when JS never arrives at all. -->
+  <script is:inline>document.documentElement.classList.add('mk-js');</script>
+
+  <div id="mk-viewport">
+    <div id="mk-bg"></div>
+    <svg id="mk-lines" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="mk-terr"></div>
+    <div id="mk-lamp"></div>
+    <div id="mk-nodes">
+      <div id="mk-intro" class="mk-intro">
+        <div class="mk-eyebrow mk-intro-eyebrow">Polyphonic Archive · the making-of</div>
+        <div class="mk-intro-title">A map of the themes behind the podcast</div>
+        <div class="mk-intro-body">
+          Four regions grow from one centre —
+          {
+            regions.map((r, i) => (
+              <>
+                <span style={`color:${r.color};`}>{r.label}</span>
+                {i < regions.length - 2 ? ', ' : i === regions.length - 2 ? ' and ' : ''}
+              </>
+            ))
+          }
+          . Themes light up as you move through them; wires show what belongs where, and each theme's reading panel surfaces what it connects across.
+        </div>
+        <div class="mk-eyebrow mk-intro-hint">drag to pan · scroll to zoom · press a theme to read</div>
+        <div class="mk-eyebrow mk-intro-press">press here to begin</div>
+        <button type="button" id="mk-intro-close" class="mk-intro-enter" aria-label="Enter the map">↓</button>
+        <div class="mk-eyebrow mk-intro-foot">the map lies below ↓ · you can always drag your way back up here</div>
+        <div class="mk-intro-credit">
+          Some of the texts and quotations in this section are drawn from a forthcoming publication: Sharon, T., &
+          Bueno de Mesquita, N. (Eds.) (forthcoming). Polyphonic Archive: Pluralism as Practice and Modes of
+          Translation. Amsterdam University of the Arts.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button type="button" id="mk-to-intro" class="mk-pill" hidden>
+    <span class="mk-pill-arrow">↑</span><span>Intro</span>
+  </button>
+
+  <div id="mk-nudge" class="mk-nudge" hidden>Press a lit theme to read more</div>
+
+  <div id="mk-tooltip" class="mk-tooltip" hidden></div>
+
+  <div id="mk-spill" aria-hidden="true"></div>
+  <div class="mk-preview-badge" aria-hidden="true">preview</div>
+
+  <aside id="mk-panel" class="mk-panel">
+    <div class="mk-panel-top">
+      <div id="mk-breadcrumb" class="mk-breadcrumb"></div>
+      <button type="button" class="mk-btn" data-act="close">Close ×</button>
+    </div>
+    <div id="mk-panel-hint" class="mk-panel-hint" hidden>The path above shows where you are — press a step to go back out, or a sub-theme below to go deeper.</div>
+    <h2 id="mk-panel-title" class="mk-panel-title"></h2>
+    <div id="mk-panel-authors" class="mk-panel-authors" hidden></div>
+    <div id="mk-panel-rule" class="mk-panel-rule"></div>
+    <div id="mk-panel-blocks" class="mk-panel-blocks"></div>
+    <div id="mk-panel-questions" class="mk-panel-questions" hidden>
+      <div class="mk-eyebrow mk-panel-label">Open questions</div>
+      <div id="mk-panel-questions-list"></div>
+    </div>
+    <div id="mk-panel-children" class="mk-panel-children" hidden>
+      <div class="mk-eyebrow mk-panel-label">Sub-themes</div>
+      <div id="mk-panel-children-list"></div>
+    </div>
+    <div id="mk-panel-connections" class="mk-panel-connections" hidden>
+      <div class="mk-eyebrow mk-panel-label mk-panel-label-teal">Connections</div>
+      <div id="mk-panel-connections-list"></div>
+    </div>
+    <div id="mk-panel-parent" class="mk-panel-parent" hidden></div>
+  </aside>
+
+  <!-- Phone version: one node per screen, drilled into via the sub-theme
+       rows below each text. Hash-routed (#t2-2) so the browser's back
+       button walks back up the tree. Hidden on desktop; the map and its
+       whole script are skipped on phones (see the media-query guard at the
+       top of the map script). -->
+  <div id="mkm">
+    {
+      themeMap.nodes.map((n) => (
+        <article class="mkm-node" id={`mkm-${n.id}`} hidden>
+          {n.level === -1 ? (
+            <div class="mkm-eyebrow">Polyphonic Archive · the making-of</div>
+          ) : (
+            <nav class="mkm-crumbs" aria-label="You are here">
+              {mkmCrumbs(n).map((a) => (
+                <a href={`#${a.id}`}>{a.level === -1 ? 'The making of' : a.label}</a>
+              ))}
+            </nav>
+          )}
+
+          <h2 class="mkm-title">{n.level >= 1 ? `${n.number} — ${n.label}` : n.label}</h2>
+          <div class="mkm-rule" style={`background:${n.color}`} />
+
+          <div class="mkm-blocks">
+            {n.blocks.map((b) =>
+              b.type === 'text' && b.text ? (
+                <p class="mkm-text">{b.text}</p>
+              ) : b.type === 'image' && b.file ? (
+                <figure class="mkm-media">
+                  <img src={b.file} alt={b.caption || ''} loading="lazy" />
+                  {b.caption && <figcaption>{b.caption}</figcaption>}
+                </figure>
+              ) : b.type === 'audio' && b.file ? (
+                <figure class="mkm-media mkm-media-audio">
+                  <audio controls preload="none" src={b.file} />
+                  {b.caption && <figcaption>{b.caption}</figcaption>}
+                </figure>
+              ) : b.type === 'video' && b.file ? (
+                <figure class="mkm-media">
+                  <video controls playsinline preload="metadata" src={b.file} />
+                  {b.caption && <figcaption>{b.caption}</figcaption>}
+                </figure>
+              ) : null,
+            )}
+          </div>
+
+          {mkmKids(n.id).length > 0 && (
+            <div class="mkm-section">
+              <div class="mkm-label">{n.level === -1 ? 'Themes' : 'Sub-themes'}</div>
+              {mkmKids(n.id).map((c) => (
+                <a class="mkm-row" href={`#${c.id}`} style={`--c:${c.color}`}>
+                  {c.level >= 1 && <span class="mkm-row-num">{c.number}</span>}
+                  <span class="mkm-row-label">{c.label}</span>
+                  <span class="mkm-row-arrow">→</span>
+                </a>
+              ))}
+            </div>
+          )}
+
+          {mkmConns(n.id).length > 0 && (
+            <div class="mkm-section">
+              <div class="mkm-label mkm-label-teal">Connections</div>
+              {mkmConns(n.id).map((c) => (
+                <a class="mkm-conn" href={`#${c.other.id}`}>
+                  <span class="mkm-conn-note">{c.note}</span>
+                  <span class="mkm-conn-target" style={`color:${c.other.color}`}>
+                    {c.other.level >= 1 ? `${c.other.number} — ` : ''}{c.other.label} →
+                  </span>
+                </a>
+              ))}
+            </div>
+          )}
+
+          {n.parent && (
+            <a class="mkm-back" href={`#${n.parent}`}>
+              ← Back to {n.parent === 'root' ? 'the overview' : mkmById[n.parent].label}
+            </a>
+          )}
+        </article>
+      ))
+    }
+  </div>
+
+  <script is:inline>
+    // Router for the phone version: show exactly one .mkm-node, chosen by
+    // the URL hash (#t2-2), falling back to the root. Runs on any viewport
+    // (it only touches elements that are display:none on desktop), so no
+    // media-query coordination is needed here.
+    (function () {
+      var views = Array.prototype.slice.call(document.querySelectorAll('.mkm-node'));
+      if (!views.length) return;
+      // Belt and braces for the scroll unlock: the stylesheet override of
+      // the map's fullscreen page freeze exists, but enforce it inline too
+      // so no cascade-order or browser quirk can leave phones unscrollable.
+      if (window.matchMedia('(max-width: 680px)').matches) {
+        var pr = document.querySelector('.page-root');
+        if (pr) {
+          pr.style.setProperty('height', 'auto', 'important');
+          pr.style.setProperty('min-height', '100vh', 'important');
+          pr.style.setProperty('overflow', 'visible', 'important');
+        }
+      }
+      function show() {
+        var id = (location.hash || '').replace(/^#/, '') || 'root';
+        var target = document.getElementById('mkm-' + id) || document.getElementById('mkm-root');
+        views.forEach(function (v) {
+          v.hidden = v !== target;
+        });
+        window.scrollTo(0, 0);
+      }
+      window.addEventListener('hashchange', show);
+      show();
+    })();
+  </script>
+
+  <script
+    type="application/json"
+    id="mk-data"
+    set:html={JSON.stringify({ nodes: themeMap.nodes, links: themeMap.links, regionColors: themeMap.regionColors, bbox: themeMap.bbox })}
+  />
+</BaseLayout>
+
+<style>
+  #mk-viewport {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: var(--mk-header-h, 72px);
+    bottom: 0;
+    overflow: hidden;
+    background: #120f18;
+    touch-action: none;
+    cursor: grab;
+    /* The viewport is a drag-to-pan surface: without this, a pan gesture
+       selects the intro/node text, and the next drag picks that selection
+       up as a native browser drag-ghost — a trail of duplicate text
+       chasing the cursor. (The reading panel sits outside the viewport,
+       so its text stays selectable.) */
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  #mk-viewport.is-dragging {
+    cursor: grabbing;
+  }
+
+  /* A static backdrop, kept to two soft glows rather than four so there's
+     less for the browser to recomposite behind the constantly-repositioned
+     nodes/lines/territories on every repaint. */
+  #mk-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(ellipse 1100px 750px at 30% 28%, rgba(122, 152, 214, 0.07), transparent 68%),
+      radial-gradient(ellipse 1100px 750px at 70% 78%, rgba(210, 130, 136, 0.07), transparent 68%);
+  }
+
+  #mk-lines {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  #mk-terr {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  /* The reading lamp: one warm pool of light behind the selected theme and
+     its sub-themes, positioned and faded by the camera code. A single
+     element instead of stacked drop-shadow filters on every node. */
+  #mk-lamp {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1000px;
+    height: 1000px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 4;
+    opacity: 0;
+    background: radial-gradient(
+      closest-side,
+      rgba(255, 214, 150, 0.2),
+      rgba(255, 200, 120, 0.09) 42%,
+      rgba(255, 196, 110, 0) 100%
+    );
+    will-change: transform, opacity;
+  }
+
+  #mk-nodes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  :global(.mk-node) {
+    position: absolute;
+    left: 0;
+    top: 0;
+    box-sizing: border-box;
+    cursor: pointer;
+    text-align: center;
+    font-family: 'Courier Prime', 'Courier New', monospace;
+  }
+
+  :global(.mk-node:hover .mk-node-title) {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  :global(.mk-node:hover) {
+    filter: brightness(1.14);
+  }
+
+  :global(.mk-node.is-selected) {
+    outline: 2px solid #f4cb7a;
+    outline-offset: 3px;
+  }
+
+  :global(.mk-node-title) {
+    font-weight: 400;
+    color: #f2eee6;
+    line-height: 1.15;
+  }
+
+  :global(.mk-node-num) {
+    font-family: 'Courier Prime', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  :global(.mk-node-sub) {
+    letter-spacing: 0.05em;
+    color: #9a938a;
+  }
+
+  :global(.mk-link) {
+    fill: none;
+    stroke-linecap: round;
+    pointer-events: none;
+  }
+
+  :global(.mk-link-hit) {
+    stroke: #000;
+    stroke-opacity: 0;
+    stroke-width: 16;
+    pointer-events: stroke;
+    cursor: default;
+  }
+
+  @keyframes mkfadein {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  :global(.mk-terr-label) {
+    position: absolute;
+    left: 0;
+    top: 0;
+    white-space: nowrap;
+    font-family: 'Courier Prime', monospace;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    font-size: 118px;
+  }
+
+  .mk-tooltip {
+    position: fixed;
+    z-index: 60;
+    pointer-events: none;
+    max-width: 268px;
+    background: #2a2632;
+    border: 1px solid rgba(230, 225, 217, 0.3);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 10px 28px rgba(0, 0, 0, 0.4);
+    padding: 11px 14px;
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #e6e1d9;
+    animation: mkfadein 0.14s ease;
+  }
+
+  .mk-tooltip[hidden] {
+    display: none;
+  }
+
+  .mk-nudge {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 41;
+    pointer-events: none;
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    color: #48c6a8;
+    background: rgba(18, 15, 24, 0.82);
+    border: 1px solid rgba(72, 198, 168, 0.28);
+    padding: 7px 14px;
+    animation: mkfadein 0.5s ease;
+  }
+
+  .mk-nudge[hidden] {
+    display: none;
+  }
+
+  .mk-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+  }
+
+  .mk-btn {
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    padding: 8px 13px;
+    border: 1px solid rgba(230, 225, 217, 0.5);
+    background: transparent;
+    color: #e6e1d9;
+    cursor: pointer;
+  }
+
+  .mk-btn:hover {
+    border-color: #48c6a8;
+    color: #48c6a8;
+  }
+
+  .mk-btn-square {
+    font-size: 16px;
+    width: 33px;
+    height: 33px;
+    padding: 0;
+  }
+
+  .mk-pill {
+    position: fixed;
+    top: calc(var(--mk-header-h, 72px) + 18px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 40;
+    font-family: 'Courier Prime', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1;
+    padding: 7px 12px;
+    border: 1px solid rgba(230, 225, 217, 0.35);
+    background: rgba(26, 23, 32, 0.85);
+    color: #9a938a;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .mk-pill:hover {
+    border-color: #f4cb7a;
+    color: #f4cb7a;
+  }
+
+  .mk-pill[hidden] {
+    display: none;
+  }
+
+  .mk-pill-arrow {
+    font-size: 13px;
+  }
+
+  .mk-eyebrow {
+    font-family: 'Courier Prime', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 400;
+  }
+
+  .mk-intro {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 860px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    text-align: center;
+    z-index: 15;
+    will-change: transform, opacity;
+  }
+
+  /* Hidden only until the camera's first applyCam() gives it a real
+     transform and opacity — see the inline script above the viewport. */
+  :global(html.mk-js) .mk-intro {
+    opacity: 0;
+  }
+
+  .mk-intro-eyebrow {
+    font-size: 13px;
+    color: #f4cb7a;
+  }
+
+  .mk-intro-title {
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 2.75rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: #f2eee6;
+    max-width: 800px;
+  }
+
+  .mk-intro-body {
+    font-size: 17px;
+    line-height: 1.75;
+    color: #b9b2a7;
+    max-width: 600px;
+  }
+
+  .mk-intro-hint {
+    font-size: 12px;
+    color: #9a938a;
+  }
+
+  .mk-intro-press {
+    font-size: 12px;
+    color: #f4cb7a;
+    margin-bottom: 2px;
+  }
+
+  .mk-intro-enter {
+    font-family: 'Courier Prime', monospace;
+    margin-top: 6px;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    border: 2px solid #f4cb7a;
+    background: transparent;
+    color: #f4cb7a;
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+    /* a slow breathing glow, so the one pressable thing on this screen
+       reads as pressable without anyone having to be told twice */
+    animation: mk-enter-pulse 2.6s ease-in-out infinite;
+  }
+
+  @keyframes mk-enter-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(244, 203, 122, 0);
+      background: transparent;
+    }
+    50% {
+      box-shadow: 0 0 22px 2px rgba(244, 203, 122, 0.28);
+      background: rgba(244, 203, 122, 0.08);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mk-intro-enter {
+      animation: none;
+      background: rgba(244, 203, 122, 0.08);
+    }
+  }
+
+  .mk-intro-enter:hover {
+    background: rgba(244, 203, 122, 0.16);
+    animation: none;
+    box-shadow: 0 0 22px 2px rgba(244, 203, 122, 0.32);
+  }
+
+  .mk-intro-foot {
+    font-size: 11px;
+    color: #655e55;
+  }
+
+  .mk-intro-credit {
+    margin-top: 1.6rem;
+    max-width: 620px;
+    font-size: 11.5px;
+    font-style: italic;
+    line-height: 1.7;
+    color: rgba(224, 219, 212, 0.38);
+    text-wrap: pretty;
+    /* the card floats over the map — keep the credit readable when a dim
+       node happens to sit behind its last lines */
+    text-shadow:
+      0 0 6px rgba(18, 15, 24, 0.95),
+      0 0 14px rgba(18, 15, 24, 0.85);
+  }
+
+  .mk-panel {
+    position: fixed;
+    top: var(--mk-header-h, 72px);
+    right: 0;
+    bottom: 0;
+    width: min(452px, 42vw);
+    z-index: 45;
+    /* the brightest surface on screen while reading: the map goes dark
+       around it, this stays lit */
+    background: #2b2735;
+    border-left: 1px solid rgba(255, 224, 170, 0.16);
+    padding: 26px 28px 44px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    font-family: 'Courier Prime', monospace;
+    color: #ece7df;
+    /* closed: parked just off the right edge (not display:none, so it can
+       slide rather than pop) */
+    transform: translateX(104%);
+    visibility: hidden;
+    transition:
+      transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s linear 420ms;
+  }
+
+  .mk-panel.is-open {
+    transform: none;
+    visibility: visible;
+    transition:
+      transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s;
+  }
+
+  /* text swap between themes: out, replace, back in */
+  .mk-panel > * {
+    transition: opacity 150ms ease;
+  }
+
+  .mk-panel.is-swapping > * {
+    opacity: 0;
+  }
+
+  /* Where the map meets the panel: a soft falloff into shadow instead of
+     a hard edge, so the map recedes toward the text. */
+  #mk-spill {
+    position: fixed;
+    top: var(--mk-header-h, 72px);
+    bottom: 0;
+    right: min(452px, 42vw);
+    width: 150px;
+    z-index: 44;
+    pointer-events: none;
+    background: linear-gradient(to right, rgba(18, 15, 24, 0), rgba(18, 15, 24, 0.55));
+    opacity: 0;
+    transition: opacity 420ms ease;
+  }
+
+  :global(html.mk-reading) #mk-spill {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mk-panel,
+    .mk-panel.is-open,
+    .mk-panel > *,
+    #mk-spill {
+      transition: none;
+    }
+  }
+
+  .mk-panel-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .mk-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    row-gap: 5px;
+    min-width: 0;
+    padding-top: 4px;
+    font-size: 11px;
+  }
+
+  :global(.mk-crumb) {
+    display: inline-flex;
+    align-items: baseline;
+    cursor: pointer;
+  }
+
+  :global(.mk-crumb-label) {
+    font-size: 11px;
+    color: #9a938a;
+  }
+
+  :global(.mk-crumb-label:hover) {
+    color: #48c6a8;
+    text-decoration: underline;
+  }
+
+  :global(.mk-crumb-sep) {
+    font-size: 11px;
+    color: #655e55;
+    padding: 0 6px;
+  }
+
+  .mk-panel-hint {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: #f4cb7a;
+    margin-top: 10px;
+  }
+
+  .mk-panel-hint[hidden] {
+    display: none;
+  }
+
+  .mk-panel-title {
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1.14;
+    letter-spacing: -0.02em;
+    margin: 13px 0 0;
+    color: #f2eee6;
+  }
+
+  .mk-panel-authors {
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    color: #9a938a;
+    margin-top: 12px;
+  }
+
+  .mk-panel-authors[hidden] {
+    display: none;
+  }
+
+  .mk-panel-rule {
+    height: 1px;
+    opacity: 0.45;
+    margin: 18px 0;
+  }
+
+  .mk-panel-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  :global(.mk-block-text) {
+    font-size: 17px;
+    line-height: 1.7;
+    color: #e6e1d9;
+  }
+
+  :global(.mk-block-media) {
+    border: 1px solid rgba(230, 225, 217, 0.16);
+    background: rgba(0, 0, 0, 0.22);
+  }
+
+  :global(.mk-block-media img),
+  :global(.mk-block-media video) {
+    display: block;
+    width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+  }
+
+  :global(.mk-block-media audio) {
+    display: block;
+    width: 100%;
+  }
+
+  :global(.mk-block-media .mk-block-audio-wrap) {
+    padding: 14px;
+  }
+
+  :global(.mk-block-caption) {
+    font-size: 12px;
+    font-style: italic;
+    line-height: 1.5;
+    color: #9a938a;
+    padding: 8px 10px;
+  }
+
+  .mk-panel-label {
+    font-size: 12px;
+    color: #9a938a;
+    margin: 26px 0 10px;
+  }
+
+  .mk-panel-label-teal {
+    color: #48c6a8;
+  }
+
+  .mk-panel-questions[hidden],
+  .mk-panel-children[hidden],
+  .mk-panel-connections[hidden],
+  .mk-panel-parent[hidden] {
+    display: none;
+  }
+
+  :global(.mk-question) {
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #e6e1d9;
+    border-left: 2px solid;
+    padding-left: 14px;
+    margin: 11px 0;
+  }
+
+  :global(.mk-child-row) {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(230, 225, 217, 0.12);
+    cursor: pointer;
+  }
+
+  :global(.mk-child-num) {
+    font-size: 12px;
+    color: #9a938a;
+    flex: none;
+  }
+
+  :global(.mk-child-label) {
+    font-size: 16px;
+    line-height: 1.3;
+    color: #e6e1d9;
+  }
+
+  :global(.mk-child-row:hover .mk-child-label) {
+    color: #48c6a8;
+  }
+
+  :global(.mk-conn) {
+    border: 1px solid rgba(230, 225, 217, 0.3);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    background: #211d27;
+  }
+
+  :global(.mk-conn-head) {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    flex-wrap: nowrap;
+  }
+
+  :global(.mk-conn-num) {
+    font-size: 12px;
+    color: #48c6a8;
+    flex: none;
+    white-space: nowrap;
+  }
+
+  :global(.mk-conn-label) {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.3;
+    color: #e6e1d9;
+    flex: 1;
+  }
+
+  :global(.mk-conn-text) {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #9a938a;
+    margin-top: 7px;
+  }
+
+  .mk-panel-parent {
+    height: 1px;
+    background: rgba(230, 225, 217, 0.12);
+    margin: 22px 0 13px;
+    padding-top: 13px;
+    border-top: none;
+  }
+
+  :global(.mk-parent-link) {
+    font-size: 13px;
+    color: #9a938a;
+    cursor: pointer;
+  }
+
+  :global(.mk-parent-link:hover) {
+    color: #48c6a8;
+  }
+
+  @media (max-width: 780px) {
+    .mk-panel {
+      width: 100%;
+    }
+    #mk-spill {
+      display: none;
+    }
+  }
+
+  /* Marks this as the trial version of the page (removed on promotion). */
+  .mk-preview-badge {
+    position: fixed;
+    left: 14px;
+    bottom: 12px;
+    z-index: 60;
+    pointer-events: none;
+    font-family: 'Courier Prime', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(244, 203, 122, 0.55);
+  }
+
+  /* ---- Phone version: hierarchical browser instead of the map ---- */
+
+  #mkm {
+    display: none;
+  }
+
+  @media (max-width: 680px) {
+    #mk-viewport,
+    #mk-panel,
+    #mk-spill,
+    #mk-to-intro,
+    #mk-nudge,
+    #mk-tooltip,
+    .mk-header-controls {
+      display: none !important;
+    }
+
+    /* the map needs a frozen 100vh page; the browser needs a normal
+       scrolling document. !important because this ties on specificity
+       with BaseLayout's scoped .page-root.fullscreen rule and must win
+       regardless of stylesheet order (without it, the page kept the
+       map's overflow:hidden lock and phones couldn't scroll at all). */
+    :global(.page-root.fullscreen) {
+      height: auto !important;
+      min-height: 100vh !important;
+      overflow: visible !important;
+    }
+
+    #mkm {
+      display: block;
+      position: relative;
+      z-index: 5;
+      max-width: 560px;
+      margin: 0 auto;
+      /* the fixed masthead wraps to three lines at phone width */
+      padding: 10rem 1.1rem 3.5rem;
+    }
+
+    .mkm-eyebrow {
+      font-size: 10.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(224, 219, 212, 0.45);
+      margin-bottom: 0.9rem;
+    }
+
+    .mkm-crumbs {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      line-height: 2;
+      margin-bottom: 0.9rem;
+    }
+
+    .mkm-crumbs a {
+      color: rgba(224, 219, 212, 0.5);
+      text-decoration: none;
+    }
+
+    .mkm-crumbs a:not(:last-child)::after {
+      content: ' / ';
+      color: rgba(224, 219, 212, 0.25);
+    }
+
+    .mkm-title {
+      margin: 0;
+      font-size: 1.45rem;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      color: #f2eee6;
+      text-wrap: pretty;
+    }
+
+    .mkm-rule {
+      height: 1px;
+      opacity: 0.5;
+      margin: 1.1rem 0 1.3rem;
+    }
+
+    .mkm-text {
+      margin: 0 0 1rem;
+      font-size: 15px;
+      line-height: 1.8;
+      color: rgba(224, 219, 212, 0.74);
+      text-wrap: pretty;
+    }
+
+    .mkm-media {
+      margin: 1.4rem 0;
+      border: 1px solid rgba(224, 219, 212, 0.14);
+      padding: 6px;
+      background: rgba(20, 17, 25, 0.5);
+    }
+
+    .mkm-media img,
+    .mkm-media video {
+      width: 100%;
+      display: block;
+    }
+
+    .mkm-media audio {
+      width: 100%;
+      display: block;
+    }
+
+    .mkm-media-audio {
+      padding: 10px;
+    }
+
+    .mkm-media figcaption {
+      font-size: 11px;
+      font-style: italic;
+      line-height: 1.5;
+      color: rgba(224, 219, 212, 0.45);
+      padding: 0.5rem 0.3rem 0.2rem;
+    }
+
+    .mkm-section {
+      margin-top: 1.9rem;
+    }
+
+    .mkm-label {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(224, 219, 212, 0.4);
+      margin-bottom: 0.7rem;
+    }
+
+    .mkm-label-teal {
+      color: rgba(72, 198, 168, 0.75);
+    }
+
+    .mkm-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.7rem;
+      padding: 0.9rem 0.95rem;
+      margin-bottom: 0.55rem;
+      background: rgba(20, 17, 25, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 3px solid var(--c, #48c6a8);
+      border-radius: 2px;
+      color: rgba(224, 219, 212, 0.88);
+      text-decoration: none;
+    }
+
+    .mkm-row-num {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--c, #48c6a8);
+      flex: none;
+    }
+
+    .mkm-row-label {
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .mkm-row-arrow {
+      margin-left: auto;
+      color: rgba(224, 219, 212, 0.35);
+      flex: none;
+    }
+
+    .mkm-conn {
+      display: block;
+      padding: 0.8rem 0.95rem;
+      margin-bottom: 0.55rem;
+      background: rgba(20, 17, 25, 0.4);
+      border: 1px solid rgba(72, 198, 168, 0.22);
+      border-radius: 2px;
+      text-decoration: none;
+    }
+
+    .mkm-conn-note {
+      display: block;
+      font-size: 13px;
+      font-style: italic;
+      line-height: 1.55;
+      color: rgba(224, 219, 212, 0.6);
+    }
+
+    .mkm-conn-target {
+      display: block;
+      margin-top: 0.45rem;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+    }
+
+    .mkm-back {
+      display: inline-block;
+      margin-top: 2rem;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #48c6a8;
+      text-decoration: none;
+    }
+  }
+</style>
+
+<script>
+  // On phones the hierarchical browser (#mkm) replaces the map entirely, so
+  // skip building the map's DOM and camera. Crossing the breakpoint (e.g.
+  // rotating a tablet or resizing a window) reloads once to swap modes —
+  // cheaper and far simpler than tearing either mode down live.
+  const MKM_MQ = window.matchMedia('(max-width: 680px)');
+  MKM_MQ.addEventListener('change', () => location.reload());
+  if (!MKM_MQ.matches) initMap();
+
+  function initMap() {
+  interface ContentBlock {
+    type: 'text' | 'image' | 'audio' | 'video';
+    text: string | null;
+    file: string | null;
+    caption: string | null;
+  }
+  interface ThemeNode {
+    id: string;
+    number: string;
+    label: string;
+    level: number;
+    parent: string | null;
+    blocks: ContentBlock[];
+    questions: string[];
+    authors: string | null;
+    color: string;
+    x: number;
+    y: number;
+    children: string[];
+  }
+  interface ThemeLink {
+    from: string;
+    to: string;
+    note: string;
+  }
+
+  const DATA: { nodes: ThemeNode[]; links: ThemeLink[]; regionColors: Record<string, string>; bbox: any } = JSON.parse(
+    document.getElementById('mk-data')!.textContent || '{}',
+  );
+
+  const byId: Record<string, ThemeNode> = {};
+  DATA.nodes.forEach((n) => (byId[n.id] = n));
+  const root = DATA.nodes.find((n) => n.level === -1)!;
+
+  const LEVEL_CFG: Record<
+    number,
+    { width: number; font: number; border: number; blob: 'a' | 'b'; bg: string; shadow: string; padding: string }
+  > = {
+    [-1]: { width: 1400, font: 124, border: 4, blob: 'a', bg: 'rgba(40,36,48,0.82)', shadow: '0 18px 44px rgba(0,0,0,0.5)', padding: '46px 60px' },
+    0: { width: 760, font: 84, border: 3.5, blob: 'a', bg: 'rgba(38,34,46,0.7)', shadow: '0 14px 32px rgba(0,0,0,0.46)', padding: '30px 36px' },
+    1: { width: 440, font: 44, border: 2.5, blob: 'b', bg: 'rgba(34,30,42,0.66)', shadow: '0 9px 22px rgba(0,0,0,0.4)', padding: '18px 22px' },
+    2: { width: 380, font: 36, border: 2.5, blob: 'a', bg: 'rgba(30,27,38,0.62)', shadow: '0 6px 15px rgba(0,0,0,0.36)', padding: '14px 18px' },
+    3: { width: 330, font: 31, border: 2.5, blob: 'b', bg: 'rgba(26,23,33,0.58)', shadow: '0 4px 11px rgba(0,0,0,0.32)', padding: '12px 16px' },
+  };
+  const BLOB_A = '332px 20px 293px 20px / 20px 293px 20px 332px';
+  const BLOB_B = '18px 306px 18px 319px / 306px 18px 319px 18px';
+
+  const viewport = document.getElementById('mk-viewport')!;
+  const linesSvg = document.getElementById('mk-lines') as unknown as SVGSVGElement;
+  const terrLayer = document.getElementById('mk-terr')!;
+  const nodesLayer = document.getElementById('mk-nodes')!;
+  const panel = document.getElementById('mk-panel')!;
+  const introEl = document.getElementById('mk-intro')!;
+  const toIntroBtn = document.getElementById('mk-to-intro')!;
+  const nudgeEl = document.getElementById('mk-nudge')!;
+  const tooltipEl = document.getElementById('mk-tooltip')!;
+  const panelHintEl = document.getElementById('mk-panel-hint')!;
+
+  function hexA(hex: string, a: number) {
+    const v = Math.max(0, Math.min(1, a));
+    return hex.slice(0, 7) + Math.round(v * 255).toString(16).padStart(2, '0');
+  }
+
+  // --- Build node DOM. Position is driven entirely by the 3D camera every
+  // frame (see applyCam below) — these elements carry no left/top of their
+  // own, only their level-based size/shape/color. ---
+  const nodeEls: Record<string, HTMLElement> = {};
+  DATA.nodes.forEach((n) => {
+    const cfg = LEVEL_CFG[n.level] || LEVEL_CFG[3];
+    const el = document.createElement('div');
+    el.className = `mk-node lvl-${n.level}`;
+    el.dataset.id = n.id;
+    el.style.width = `${cfg.width}px`;
+    el.style.background = cfg.bg;
+    el.style.border = `${cfg.border}px solid ${n.color}`;
+    el.style.borderRadius = cfg.blob === 'a' ? BLOB_A : BLOB_B;
+    el.style.padding = cfg.padding;
+    el.style.boxShadow = cfg.shadow;
+
+    const title = document.createElement('div');
+    title.className = 'mk-node-title';
+    title.style.fontSize = `${cfg.font}px`;
+    title.style.fontWeight = n.level <= -1 ? '700' : '400';
+
+    if (n.level >= 1) {
+      const num = document.createElement('div');
+      num.className = 'mk-node-num';
+      num.style.fontSize = `${cfg.font * 0.44}px`;
+      num.style.color = n.color;
+      num.style.marginBottom = `${cfg.font * 0.18}px`;
+      num.textContent = n.number;
+      el.appendChild(num);
+    }
+
+    title.textContent = n.label;
+    el.appendChild(title);
+
+    if (n.children.length && n.level <= 1) {
+      const sub = document.createElement('div');
+      sub.className = 'mk-node-sub';
+      sub.style.fontSize = `${cfg.font * 0.19}px`;
+      sub.style.marginTop = `${cfg.font * 0.18}px`;
+      sub.textContent = `${n.children.length} sub-theme${n.children.length > 1 ? 's' : ''} →`;
+      el.appendChild(sub);
+    }
+
+    nodesLayer.appendChild(el);
+    nodeEls[n.id] = el;
+  });
+
+  // --- Region territory labels: giant background text sized to each
+  // region's own node cluster, its position computed from the auto-layout
+  // (no hardcoded spots) by walking each node up to its level-0 ancestor. ---
+  function topRegion(n: ThemeNode): ThemeNode | null {
+    let cur: ThemeNode | undefined = n;
+    while (cur && cur.level > 0) cur = cur.parent ? byId[cur.parent] : undefined;
+    return cur && cur.level === 0 ? cur : null;
+  }
+  const regionGroups: Record<string, { label: string; color: string; sx: number; sy: number; n: number }> = {};
+  DATA.nodes.forEach((n) => {
+    const reg = topRegion(n);
+    if (!reg) return;
+    const g = (regionGroups[reg.id] ??= { label: reg.label, color: reg.color, sx: 0, sy: 0, n: 0 });
+    g.sx += n.x;
+    g.sy += n.y;
+    g.n += 1;
+  });
+  const territories = Object.values(regionGroups).map((g) => {
+    const el = document.createElement('div');
+    el.className = 'mk-terr-label';
+    el.style.color = g.color;
+    el.textContent = g.label.toUpperCase();
+    terrLayer.appendChild(el);
+    return { el, x: g.sx / g.n, y: g.sy / g.n };
+  });
+
+  // --- Build SVG lines: hierarchy ("belongs to — sub-theme") wires only.
+  // Cross-region relationships (content/themes/cross-links.json) stay fully
+  // intact as data and surface as clickable cards in the reading panel's
+  // "Connections" section — they're just not drawn as wires here. Each wire
+  // is a slightly irregular, hand-drawn-looking thread (a few random knots
+  // baked into its own geometry) that plucks when you select its branch.
+  // No SVG filter: the turbulence pass was the single heaviest repaint on
+  // the page and made the wires visibly shift each time the map stopped. ---
+  const NS = 'http://www.w3.org/2000/svg';
+  linesSvg.innerHTML = '';
+  const fxGroup = document.createElementNS(NS, 'g');
+  const haloLayer = document.createElementNS(NS, 'g');
+  const coreLayer = document.createElementNS(NS, 'g');
+  fxGroup.appendChild(haloLayer);
+  fxGroup.appendChild(coreLayer);
+  linesSvg.appendChild(fxGroup);
+  const hitLayer = document.createElementNS(NS, 'g');
+  linesSvg.appendChild(hitLayer);
+
+  interface Knot {
+    f: number;
+    off: number;
+  }
+  interface LineRec {
+    a: string;
+    b: string;
+    halo: SVGPathElement;
+    vis: SVGPathElement;
+    hit: SVGLineElement;
+    knots: Knot[];
+    freq: number;
+    phase: number;
+    ampBase: number;
+    amp: number;
+    t0: number;
+    delay: number;
+    dur: number;
+    decay: number;
+    hover: boolean;
+  }
+  const lines: LineRec[] = [];
+  const adj: Record<string, string[]> = {};
+  function addAdj(x: string, y: string) {
+    (adj[x] ??= []).push(y);
+    (adj[y] ??= []).push(x);
+  }
+
+  function addLine(a: ThemeNode, b: ThemeNode) {
+    const halo = document.createElementNS(NS, 'path');
+    halo.setAttribute('class', 'mk-link');
+    halo.setAttribute('stroke', '#cbd2d4');
+    const vis = document.createElementNS(NS, 'path');
+    vis.setAttribute('class', 'mk-link');
+    vis.setAttribute('stroke', '#ffffff');
+    const hit = document.createElementNS(NS, 'line');
+    hit.setAttribute('class', 'mk-link-hit');
+    haloLayer.appendChild(halo);
+    coreLayer.appendChild(vis);
+    hitLayer.appendChild(hit);
+
+    const wlen = Math.hypot(b.x - a.x, b.y - a.y);
+    const nK = 3 + Math.floor(Math.random() * 2);
+    const knots: Knot[] = [];
+    for (let q = 1; q <= nK; q++) {
+      let f = q / (nK + 1) + (Math.random() * 2 - 1) * 0.04;
+      f = Math.max(0.06, Math.min(0.94, f));
+      knots.push({ f, off: (Math.random() * 2 - 1) * 0.05 });
+    }
+    knots.sort((p, q2) => p.f - q2.f);
+
+    const rec: LineRec = {
+      a: a.id,
+      b: b.id,
+      halo,
+      vis,
+      hit,
+      knots,
+      freq: Math.max(1.0, Math.min(2.6, 820 / wlen)),
+      phase: Math.random() * 6.283,
+      ampBase: 0.045 + Math.random() * 0.025,
+      amp: 0,
+      t0: 0,
+      delay: 0,
+      dur: 3.4,
+      decay: 1.45,
+      hover: false,
+    };
+    hit.addEventListener('pointerenter', (ev) => {
+      rec.hover = true;
+      showTip(`${b.label} — sub-theme of ${a.label}`, ev as PointerEvent);
+      requestRender();
+    });
+    hit.addEventListener('pointermove', (ev) => moveTip(ev as PointerEvent));
+    hit.addEventListener('pointerleave', () => {
+      rec.hover = false;
+      hideTip();
+      requestRender();
+    });
+    lines.push(rec);
+  }
+
+  DATA.nodes.forEach((n) => {
+    if (n.parent && byId[n.parent]) addAdj(n.parent, n.id);
+  });
+  DATA.nodes.forEach((n) => {
+    if (n.parent && byId[n.parent]) addLine(byId[n.parent], n);
+  });
+
+  // =====================================================================
+  // Engine. Everything that moves — camera flights, pan inertia, eased
+  // zoom, the focal plane, the panel's projection-centre shift, the
+  // spotlight fade, the lamp, wire vibration — advances inside ONE
+  // requestAnimationFrame pass (frame() below) that draws once and goes
+  // back to sleep the moment nothing is changing. Input handlers only
+  // update state and call requestRender(); they never draw directly.
+  // =====================================================================
+  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // --- Camera: a fake-3D perspective camera (F/dz projection) applied to
+  // each node's auto-computed (x,y) plus a fixed z-depth per hierarchy
+  // level — this is what gives the map its depth-of-field "fly through"
+  // feel while still needing zero hand-placed coordinates. ---
+  const F = 1300;
+  const NEAR = 240;
+  const ZLEVEL: Record<number, number> = { [-1]: 40, 0: 340, 1: 660, 2: 980, 3: 1300 };
+  function zForLvl(l: number) {
+    return ZLEVEL[l] ?? 0;
+  }
+
+  // The intro card lives at a world position above the map itself — the
+  // camera starts there and "flies down" into the map on entry, and back up
+  // again via the Intro pill or by pulling back past the overview edge.
+  const INTRO = { x: root.x, y: root.y - 2980 };
+  const INTRO_THRESHOLD = INTRO.y + 1060;
+
+  const cam = { x: INTRO.x, y: INTRO.y, z: 0 };
+  // refZ is the focal reference plane (drives depth-fade and pan speed);
+  // fitZ is the plane the next camera fit is computed against.
+  let refZ = zForLvl(0);
+  let fitZ = zForLvl(0);
+  // panelWidth is the reading panel's width once open (what camera fits
+  // are computed for); `shift` is the eased value the scene is actually
+  // drawn with. Keeping them separate is what stops the whole map jumping
+  // sideways in a single frame when the panel joins or leaves.
+  let panelWidth = 0;
+  let shift = 0;
+  let selId: string | null = null;
+  let atIntro = true;
+  let userMoved = false;
+  let manualPan = false;
+  let nudgeOn = true;
+  let panelHintSeen = false;
+  let panelHintShownThisSelection = false;
+  try {
+    panelHintSeen = !!localStorage.getItem('pa-mk-hint-panel');
+  } catch (e) {}
+
+  // Layout is read here only — on load, resize, and font settle — never in
+  // the per-frame path, where a read right after a style write forces the
+  // browser to recalculate layout mid-frame.
+  let vpW = 0;
+  let vpH = 0;
+  let vpLeft = 0;
+  let vpTop = 0;
+  let introH = 0;
+  const nodeH: Record<string, number> = {};
+  function measure() {
+    const r = viewport.getBoundingClientRect();
+    vpW = r.width;
+    vpH = r.height;
+    vpLeft = r.left;
+    vpTop = r.top;
+    introH = introEl.offsetHeight;
+    DATA.nodes.forEach((n) => (nodeH[n.id] = nodeEls[n.id].offsetHeight));
+  }
+  function panelW() {
+    // matches the CSS: min(452px, 42vw), and a full-width sheet under 780px
+    // (where there is no map left beside it to re-centre)
+    return vpW <= 780 ? 0 : Math.min(452, vpW * 0.42);
+  }
+  function centerXY() {
+    return { cx: (vpW - shift) / 2, cy: vpH / 2 };
+  }
+
+  const REGION_BB = (() => {
+    let minx = Infinity;
+    let miny = Infinity;
+    let maxx = -Infinity;
+    let maxy = -Infinity;
+    DATA.nodes.forEach((n) => {
+      if (n.level <= 0) {
+        minx = Math.min(minx, n.x);
+        miny = Math.min(miny, n.y);
+        maxx = Math.max(maxx, n.x);
+        maxy = Math.max(maxy, n.y);
+      }
+    });
+    return { minx, miny, maxx, maxy };
+  })();
+
+  // Everything the overview shows lit: root, regions and their first ring.
+  // The overview is framed to this, so no first-ring theme is cropped by
+  // the screen edge.
+  const OVERVIEW_BB = (() => {
+    let minx = Infinity;
+    let miny = Infinity;
+    let maxx = -Infinity;
+    let maxy = -Infinity;
+    DATA.nodes.forEach((n) => {
+      if (n.level <= 1) {
+        minx = Math.min(minx, n.x);
+        miny = Math.min(miny, n.y);
+        maxx = Math.max(maxx, n.x);
+        maxy = Math.max(maxy, n.y);
+      }
+    });
+    return { minx, miny, maxx, maxy };
+  })();
+  const OVERVIEW_PAD = 190;
+
+  // Camera distance that frames the intro card (unchanged from the
+  // original: it sets how large the intro text is drawn).
+  function introDz() {
+    if (!vpW || !vpH) return F * 6;
+    const pad = 460;
+    const bw = REGION_BB.maxx - REGION_BB.minx + pad * 2;
+    const bh = REGION_BB.maxy - REGION_BB.miny + pad * 2;
+    let s = Math.min((vpW * 0.97) / bw, (vpH * 0.97) / bh);
+    s = Math.max(0.1, Math.min(1.2, s));
+    return F / s;
+  }
+  // Camera distance of the map overview (same fill factors as boxTarget).
+  function mapDz() {
+    if (!vpW || !vpH) return F * 6;
+    const bw = OVERVIEW_BB.maxx - OVERVIEW_BB.minx + OVERVIEW_PAD * 2;
+    const bh = OVERVIEW_BB.maxy - OVERVIEW_BB.miny + OVERVIEW_PAD * 2;
+    let s = Math.min((vpW * 0.86) / bw, (vpH * 0.9) / bh);
+    s = Math.max(0.1, Math.min(3.6, s));
+    return F / s;
+  }
+  function maxDz() {
+    return Math.max(introDz(), mapDz()) * 1.3;
+  }
+
+  // --- Spotlight: which nodes are "lit" right now.
+  // Browsing (nothing selected): the overview shows the shape of the map —
+  // root, the four regions, and their first ring — and deeper levels only
+  // come up as you zoom in. Reading (a theme selected): house lights down.
+  // The theme and its direct sub-themes are fully lit, its ancestors stay
+  // faintly visible as a path home, and everything else sinks to near
+  // black so the map stops competing with the text. ---
+  function focusMul(id: string): number {
+    if (!selId) {
+      const n0 = byId[id];
+      if (!n0 || n0.level <= 0) return 1;
+      const s = F / Math.max(1, refZ - cam.z);
+      const k = Math.max(0, Math.min(1, (s - 0.46) / 0.36));
+      if (n0.level === 1) return 0.62 + 0.38 * k;
+      return k * k;
+    }
+    if (id === selId) return 1;
+    const n = byId[id];
+    if (!n) return 0.03;
+    let cur: ThemeNode | undefined = n;
+    let steps = 0;
+    while (cur && cur.parent) {
+      steps++;
+      if (cur.parent === selId) break;
+      cur = byId[cur.parent];
+    }
+    if (cur && cur.parent === selId) {
+      if (steps === 1) return 1;
+      if (steps === 2) return 0.12;
+      return 0.03;
+    }
+    let s: ThemeNode | undefined = byId[selId];
+    while (s && s.parent) {
+      if (s.parent === id) return 0.2;
+      s = byId[s.parent];
+    }
+    return 0.03;
+  }
+
+  let fm: Record<string, number> = {};
+  let fmFrom: Record<string, number> = {};
+  let focusT0: number | null = null;
+  let focusDur = 900;
+  // readK: 0 = browsing, 1 = reading. Eased with the spotlight; it dims the
+  // region captions and unrelated wires and brings the lamp up.
+  let readK = 0;
+  let readFrom = 0;
+  const zBoost: Record<string, number> = {};
+  function startFocus() {
+    fmFrom = { ...fm };
+    readFrom = readK;
+    focusT0 = performance.now();
+    focusDur = REDUCED ? 0 : 900;
+    // Lit nodes sit above dimmed ones. Decided once per selection rather
+    // than at a brightness threshold mid-fade, which used to make
+    // overlapping nodes swap stacking order in a single frame.
+    DATA.nodes.forEach((n) => (zBoost[n.id] = selId && focusMul(n.id) >= 0.99 ? 500 : 0));
+    requestRender();
+  }
+
+  function setAtIntro(v: boolean) {
+    atIntro = v;
+    toIntroBtn.hidden = v;
+    updateNudge();
+  }
+  function updateNudge() {
+    nudgeEl.hidden = !(nudgeOn && !selId && !atIntro);
+  }
+
+  // --- Motion state, all advanced by frame() ---
+  // Soft start, long settle: moving within the first frames after a click
+  // (the old in-out cubic covered 0.4% of the distance in its first 10%).
+  const ease = (k: number) => 1 - Math.pow(1 - Math.pow(k, 1.6), 3);
+  interface Tween {
+    from: number;
+    to: number;
+    t0: number;
+    dur: number;
+  }
+  function tweenVal(tw: Tween, now: number) {
+    const k = tw.dur <= 0 ? 1 : Math.min(1, (now - tw.t0) / tw.dur);
+    return { v: tw.from + (tw.to - tw.from) * ease(k), done: k >= 1 };
+  }
+  let flight: { sx: number; sy: number; sz: number; tx: number; ty: number; tz: number; plane: number; t0: number; dur: number } | null =
+    null;
+  // The focal plane and the centre shift ride their own tweens (started
+  // together with a flight, same duration and curve) so that interrupting
+  // the flight by grabbing the map doesn't strand them half-way.
+  let refTw: Tween | null = null;
+  let shiftTw: Tween | null = null;
+  let inertia: { vx: number; vy: number } | null = null; // screen px / ms
+  let zoom: { dzT: number; mx: number; my: number; wx: number; wy: number } | null = null;
+
+  function flyTo(target: { x: number; y: number; z: number }, opts: { refZ?: number; shift?: number; dur?: number } = {}) {
+    manualPan = false;
+    inertia = null;
+    zoom = null;
+    const dist = Math.hypot(target.x - cam.x, target.y - cam.y) + Math.abs(target.z - cam.z);
+    let dur = opts.dur ?? Math.max(750, Math.min(1350, 650 + dist * 0.22));
+    if (REDUCED) dur = 0;
+    const now = performance.now();
+    flight = {
+      sx: cam.x,
+      sy: cam.y,
+      sz: cam.z,
+      tx: target.x,
+      ty: target.y,
+      tz: target.z,
+      plane: opts.refZ ?? refZ,
+      t0: now,
+      dur,
+    };
+    if (opts.refZ != null) refTw = { from: refZ, to: opts.refZ, t0: now, dur };
+    if (opts.shift != null) shiftTw = { from: shift, to: opts.shift, t0: now, dur };
+    requestRender();
+  }
+
+  // Zoom towards a screen point. Wheel, pinch, the +/- buttons and keys all
+  // feed the same target, which the camera then eases toward — so repeated
+  // input accumulates instead of restarting, and a mouse notch no longer
+  // lands as a visible step.
+  function zoomAt(mx: number, my: number, factor: number) {
+    flight = null;
+    inertia = null;
+    manualPan = true;
+    userMoved = true;
+    const { cx, cy } = centerXY();
+    const dzNow = Math.max(NEAR + 1, refZ - cam.z);
+    const base = zoom ? zoom.dzT : dzNow;
+    const dzT = Math.max(NEAR + 60, Math.min(maxDz(), base / factor));
+    const m0 = F / dzNow;
+    zoom = { dzT, mx, my, wx: cam.x + (mx - cx) / m0, wy: cam.y + (my - cy) / m0 };
+    requestRender();
+  }
+  function zoomBy(f: number) {
+    zoomAt((vpW - shift) / 2, vpH / 2, f);
+  }
+
+  let rafId: number | null = null;
+  let lastNow = 0;
+  let lampBusy = false;
+  // Preview-only instrumentation for the verification scripts.
+  const dbg = ((window as any).__mkDebug = {
+    frames: 0,
+    draws: 0,
+    state: () => ({ x: cam.x, y: cam.y, z: cam.z, refZ, shift, flying: !!flight, coasting: !!inertia, zooming: !!zoom }),
+  });
+  function requestRender() {
+    if (rafId == null) rafId = requestAnimationFrame(frame);
+  }
+  function frame(now: number) {
+    rafId = null;
+    dbg.frames++;
+    const dt = lastNow ? Math.min(48, now - lastNow) : 16.7;
+    lastNow = now;
+    let active = false;
+
+    if (flight) {
+      const k = flight.dur <= 0 ? 1 : Math.min(1, (now - flight.t0) / flight.dur);
+      const e = ease(k);
+      cam.x = flight.sx + (flight.tx - flight.sx) * e;
+      cam.y = flight.sy + (flight.ty - flight.sy) * e;
+      // Depth is eased in log-distance from the destination's focal plane,
+      // so the apparent zoom rate stays even instead of rushing at the end.
+      const d0 = flight.plane - flight.sz;
+      const d1 = flight.plane - flight.tz;
+      cam.z = d0 > 1 && d1 > 1 ? flight.plane - d0 * Math.pow(d1 / d0, e) : flight.sz + (flight.tz - flight.sz) * e;
+      if (k >= 1) flight = null;
+      else active = true;
+    }
+    if (inertia) {
+      const mRef = F / Math.max(1, refZ - cam.z);
+      cam.x -= (inertia.vx * dt) / mRef;
+      cam.y -= (inertia.vy * dt) / mRef;
+      const decay = Math.exp(-dt / 260);
+      inertia.vx *= decay;
+      inertia.vy *= decay;
+      if (Math.hypot(inertia.vx, inertia.vy) < 0.02) inertia = null;
+      else active = true;
+    }
+    if (refTw) {
+      const r = tweenVal(refTw, now);
+      refZ = r.v;
+      if (r.done) refTw = null;
+      else active = true;
+    }
+    if (shiftTw) {
+      const r = tweenVal(shiftTw, now);
+      shift = r.v;
+      if (r.done) shiftTw = null;
+      else active = true;
+    }
+    if (zoom) {
+      const dzNow = Math.max(NEAR + 1, refZ - cam.z);
+      const k = REDUCED ? 1 : 1 - Math.exp(-dt / 80);
+      let dzNew = dzNow * Math.pow(zoom.dzT / dzNow, k);
+      const done = Math.abs(Math.log(zoom.dzT / dzNew)) < 0.002;
+      if (done) dzNew = zoom.dzT;
+      cam.z = refZ - dzNew;
+      const m = F / dzNew;
+      const { cx, cy } = centerXY();
+      cam.x = zoom.wx - (zoom.mx - cx) / m;
+      cam.y = zoom.wy - (zoom.my - cy) / m;
+      if (done) zoom = null;
+      else active = true;
+    }
+
+    applyCam(now, dt);
+    if (focusT0 != null || lampBusy) active = true;
+    if (renderStrings(now)) active = true;
+
+    if (active) requestRender();
+    else lastNow = 0;
+  }
+  function renderNow() {
+    const now = performance.now();
+    applyCam(now, 16.7);
+    renderStrings(now);
+  }
+
+  // --- Drawing. Every style write is remembered and skipped when the
+  // value hasn't changed, so a frame where little moves costs little. ---
+  const nodePos: Record<string, { sx: number; sy: number; m: number; dz: number; op: number; hw: number; hh: number }> = {};
+  const wc: Record<string, { t: string; o: string; z: string; pe: string }> = {};
+  DATA.nodes.forEach((n) => (wc[n.id] = { t: '', o: '', z: '', pe: '' }));
+  const terrCache = territories.map(() => ({ t: '', o: '' }));
+  const introCache = { t: '', o: '', pe: '' };
+  const lampEl = document.getElementById('mk-lamp')!;
+  const lamp = { x: 0, y: 0, z: zForLvl(0), r: 900 };
+  const lampCache = { t: '', o: '' };
+
+  function applyCam(now: number, dt: number) {
+    dbg.draws++;
+    const { cx, cy } = centerXY();
+    const camZ = cam.z;
+    const refDz = Math.max(NEAR + 1, refZ - camZ);
+
+    let focusK = 1;
+    if (focusT0 != null) {
+      const tt = focusDur <= 0 ? 1 : Math.min(1, (now - focusT0) / focusDur);
+      focusK = tt < 0.5 ? 4 * tt * tt * tt : 1 - Math.pow(-2 * tt + 2, 3) / 2;
+      if (tt >= 1) focusT0 = null;
+    }
+    readK = readFrom + ((selId ? 1 : 0) - readFrom) * focusK;
+
+    territories.forEach((t, i) => {
+      const c = terrCache[i];
+      const dz = zForLvl(0) - camZ;
+      let op = 0;
+      if (dz > NEAR) {
+        const m = F / dz;
+        const sx = cx + (t.x - cam.x) * m;
+        const sy = cy + (t.y - cam.y) * m;
+        const tr = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-50%) scale(${m.toFixed(4)})`;
+        if (tr !== c.t) {
+          t.el.style.transform = tr;
+          c.t = tr;
+        }
+        op = 0.075 * (1 - readK);
+        if (m > 0.5) op *= Math.max(0, 1 - (m - 0.5) / 0.45);
+      }
+      const os = op.toFixed(3);
+      if (os !== c.o) {
+        t.el.style.opacity = os;
+        c.o = os;
+      }
+    });
+
+    let introBottom = -1e9;
+    {
+      const dzI = zForLvl(0) - camZ;
+      let o = '0';
+      let pe = 'none';
+      if (dzI > NEAR) {
+        const mI = F / dzI;
+        const sxI = cx + (INTRO.x - cam.x) * mI;
+        const syI = cy + (INTRO.y - cam.y) * mI;
+        const tr = `translate(${sxI.toFixed(1)}px,${syI.toFixed(1)}px) translate(-50%,-50%) scale(${(mI * 3.2).toFixed(4)})`;
+        if (tr !== introCache.t) {
+          introEl.style.transform = tr;
+          introCache.t = tr;
+        }
+        o = '1';
+        pe = 'auto';
+        introBottom = syI + (introH * mI * 3.2) / 2;
+      }
+      if (o !== introCache.o) {
+        introEl.style.opacity = o;
+        introCache.o = o;
+      }
+      if (pe !== introCache.pe) {
+        introEl.style.pointerEvents = pe;
+        introCache.pe = pe;
+      }
+    }
+
+    DATA.nodes.forEach((n) => {
+      const el = nodeEls[n.id];
+      const c = wc[n.id];
+      const dz = zForLvl(n.level) - camZ;
+      if (dz <= NEAR) {
+        if (c.o !== '0') {
+          el.style.opacity = '0';
+          c.o = '0';
+        }
+        if (c.pe !== 'none') {
+          el.style.pointerEvents = 'none';
+          c.pe = 'none';
+        }
+        delete nodePos[n.id];
+        return;
+      }
+      const m = F / dz;
+      const sx = cx + (n.x - cam.x) * m;
+      const sy = cy + (n.y - cam.y) * m;
+      const tr = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-50%) scale(${m.toFixed(4)})`;
+      if (tr !== c.t) {
+        el.style.transform = tr;
+        c.t = tr;
+      }
+      const ratio = dz / refDz;
+      const fade = ratio <= 1 ? 1 : Math.max(0.05, 1 - (ratio - 1) / 1.7);
+      const tgtFm = focusMul(n.id);
+      const fromFm = fmFrom[n.id] != null ? fmFrom[n.id] : tgtFm;
+      const nfm = fromFm + (tgtFm - fromFm) * focusK;
+      fm[n.id] = nfm;
+      // One continuous blend from "barely there" to "fully lit" — light is
+      // carried by opacity alone (no per-node filters to repaint), and a
+      // lit node holds at least 0.94 even behind the focal plane.
+      const dim = fade * 0.03;
+      let op = dim + (Math.max(fade, 0.94) - dim) * nfm;
+      const nearFade = Math.min(1, Math.max(0, (dz - NEAR) / (NEAR * 1.2)));
+      op *= nearFade;
+      // Keep the intro card's text clear of nodes peeking up from the map.
+      if (introBottom > -1e8) {
+        const top = sy - ((nodeH[n.id] || 0) * m) / 2;
+        const k = (top - introBottom + 6) / 70;
+        if (k < 1) op *= Math.max(0, k);
+      }
+      const os = op.toFixed(2);
+      if (os !== c.o) {
+        el.style.opacity = os;
+        c.o = os;
+      }
+      const z = String(100 - n.level * 10 + (zBoost[n.id] || 0));
+      if (z !== c.z) {
+        el.style.zIndex = z;
+        c.z = z;
+      }
+      const pe = op > 0.12 && nearFade > 0.5 ? 'auto' : 'none';
+      if (pe !== c.pe) {
+        el.style.pointerEvents = pe;
+        c.pe = pe;
+      }
+      nodePos[n.id] = {
+        sx,
+        sy,
+        m,
+        dz,
+        op,
+        hw: ((LEVEL_CFG[n.level] || LEVEL_CFG[3]).width * m) / 2,
+        hh: ((nodeH[n.id] || 0) * m) / 2,
+      };
+    });
+
+    // The lamp: one soft pool of warm light behind the theme being read
+    // and its sub-themes. It lives in world space (so it tracks the camera
+    // exactly) and glides to the next theme when the selection changes.
+    {
+      let busy = false;
+      if (selId) {
+        const s = byId[selId];
+        const pts = [s, ...s.children.map((cid) => byId[cid])];
+        const tx = pts.reduce((a, p) => a + p.x, 0) / pts.length;
+        const ty = pts.reduce((a, p) => a + p.y, 0) / pts.length;
+        const tz = pts.reduce((a, p) => a + zForLvl(p.level), 0) / pts.length;
+        const tr = Math.max(...pts.map((p) => Math.hypot(p.x - tx, p.y - ty))) + 640;
+        if (readFrom < 0.02 && readK < 0.05) {
+          lamp.x = tx;
+          lamp.y = ty;
+          lamp.z = tz;
+          lamp.r = tr;
+        } else {
+          const k = REDUCED ? 1 : 1 - Math.exp(-dt / 170);
+          lamp.x += (tx - lamp.x) * k;
+          lamp.y += (ty - lamp.y) * k;
+          lamp.z += (tz - lamp.z) * k;
+          lamp.r += (tr - lamp.r) * k;
+          busy = Math.abs(tx - lamp.x) + Math.abs(ty - lamp.y) + Math.abs(tr - lamp.r) + Math.abs(tz - lamp.z) > 1.5;
+        }
+      }
+      lampBusy = busy;
+      const dzL = lamp.z - camZ;
+      let o = '0';
+      if (readK > 0.004 && dzL > NEAR * 0.5) {
+        const mL = F / dzL;
+        const sx = cx + (lamp.x - cam.x) * mL;
+        const sy = cy + (lamp.y - cam.y) * mL;
+        const tr = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-50%) scale(${((lamp.r * mL * 2) / 1000).toFixed(4)})`;
+        if (tr !== lampCache.t) {
+          lampEl.style.transform = tr;
+          lampCache.t = tr;
+        }
+        o = readK.toFixed(3);
+      }
+      if (o !== lampCache.o) {
+        lampEl.style.opacity = o;
+        lampCache.o = o;
+      }
+    }
+
+    if (manualPan && !flight) {
+      const inIntro = cam.y < INTRO_THRESHOLD && !selId;
+      if (inIntro !== atIntro) setAtIntro(inIntro);
+    }
+  }
+
+  function boxTarget(minx: number, miny: number, maxx: number, maxy: number) {
+    const availW = (vpW - (panelWidth || 0)) * 0.86;
+    const availH = vpH * 0.9;
+    const bw = Math.max(1, maxx - minx);
+    const bh = Math.max(1, maxy - miny);
+    let s = Math.min(availW / bw, availH / bh);
+    s = Math.max(0.1, Math.min(3.6, s));
+    return { x: (minx + maxx) / 2, y: (miny + maxy) / 2, z: fitZ - F / s };
+  }
+
+  function fitOverview() {
+    const pad = OVERVIEW_PAD;
+    fitZ = zForLvl(0);
+    flyTo(boxTarget(OVERVIEW_BB.minx - pad, OVERVIEW_BB.miny - pad, OVERVIEW_BB.maxx + pad, OVERVIEW_BB.maxy + pad), {
+      refZ: zForLvl(0),
+      shift: 0,
+    });
+  }
+
+  function flyToIntro() {
+    setAtIntro(true);
+    userMoved = true;
+    hideTip();
+    panelWidth = 0;
+    fitZ = zForLvl(0);
+    startFocus();
+    flyTo({ x: INTRO.x, y: INTRO.y, z: zForLvl(0) - introDz() }, { refZ: zForLvl(0), shift: 0 });
+  }
+
+  // --- Wires: hand-drawn wobble (baked into each wire's own knots) and a
+  // gentle "pluck" of the selected branch. ---
+  function bfs(start: string): Record<string, number> {
+    const dist: Record<string, number> = { [start]: 0 };
+    const q = [start];
+    while (q.length) {
+      const u = q.shift()!;
+      (adj[u] || []).forEach((v) => {
+        if (dist[v] == null) {
+          dist[v] = dist[u] + 1;
+          q.push(v);
+        }
+      });
+    }
+    return dist;
+  }
+
+  function pluck(id: string) {
+    if (REDUCED) return;
+    const dist = bfs(id);
+    const now = performance.now();
+    lines.forEach((o) => {
+      const d = Math.min(dist[o.a] ?? 99, dist[o.b] ?? 99);
+      if (d > 1) return; // only the selected branch answers, not the whole web
+      const vibrating = o.amp >= 0.001;
+      o.amp = o.ampBase * Math.exp(-0.5 * d);
+      // a wire that is still ringing takes the new pluck at once — waiting
+      // out a fresh delay used to snap it flat first
+      o.delay = vibrating ? 0 : d * 60;
+      o.t0 = now;
+      o.dur = 2.4;
+      o.decay = 1.9;
+    });
+    requestRender();
+  }
+
+  const lineCache = lines.map(() => ({ d: '', sw: '', so: '', hw: '', ho: '', shown: true }));
+  function renderStrings(now: number): boolean {
+    let vib = false;
+    lines.forEach((o, i) => {
+      const lc = lineCache[i];
+      const A = nodePos[o.a];
+      const B = nodePos[o.b];
+      // A wire runs edge to edge, not centre to centre: the boxes are
+      // translucent, so a wire drawn to the centre showed straight through
+      // the title it was pointing at.
+      let tA = 0;
+      let tB = 0;
+      if (A && B) {
+        const fdx = Math.abs(B.sx - A.sx) || 1e-6;
+        const fdy = Math.abs(B.sy - A.sy) || 1e-6;
+        tA = Math.min((A.hw + 2) / fdx, (A.hh + 2) / fdy);
+        tB = Math.min((B.hw + 2) / fdx, (B.hh + 2) / fdy);
+      }
+      if (!A || !B || tA + tB >= 0.97) {
+        if (lc.shown) {
+          o.vis.style.display = 'none';
+          o.halo.style.display = 'none';
+          o.hit.style.display = 'none';
+          lc.shown = false;
+        }
+        return;
+      }
+      if (!lc.shown) {
+        o.vis.style.display = '';
+        o.halo.style.display = '';
+        o.hit.style.display = '';
+        lc.shown = true;
+      }
+      let decayAmp = 0;
+      let tt = 0;
+      if (o.amp >= 0.001) {
+        const t = (now - o.t0 - o.delay) / 1000;
+        if (t < 0) vib = true;
+        else if (t < o.dur) {
+          vib = true;
+          tt = t;
+          decayAmp = o.amp * Math.exp(-o.decay * t);
+        } else o.amp = 0;
+      }
+      const ax = A.sx + (B.sx - A.sx) * tA;
+      const ay = A.sy + (B.sy - A.sy) * tA;
+      const bx = B.sx - (B.sx - A.sx) * tB;
+      const by = B.sy - (B.sy - A.sy) * tB;
+      const dx = bx - ax;
+      const dy = by - ay;
+      const len = Math.hypot(dx, dy) || 1;
+      const px = -dy / len;
+      const py = dx / len;
+      const pts: [number, number][] = [[ax, ay]];
+      o.knots.forEach((k) => {
+        const f = k.f;
+        const env = Math.sin(Math.PI * f);
+        const vibOff = decayAmp * env * Math.sin(2 * Math.PI * o.freq * tt + o.phase);
+        const amt = (k.off * 0.07 + vibOff) * len;
+        const sagY = len * 0.01 * env;
+        pts.push([ax + dx * f + px * amt, ay + dy * f + py * amt + sagY]);
+      });
+      pts.push([bx, by]);
+      let dpath = `M${ax.toFixed(1)} ${ay.toFixed(1)}`;
+      for (let p = 0; p < pts.length - 1; p++) {
+        const p0 = pts[p - 1] || pts[p];
+        const p1 = pts[p];
+        const p2 = pts[p + 1];
+        const p3 = pts[p + 2] || pts[p + 1];
+        const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+        const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+        const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+        const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+        dpath += ` C${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+      }
+      if (dpath !== lc.d) {
+        o.vis.setAttribute('d', dpath);
+        o.halo.setAttribute('d', dpath);
+        o.hit.setAttribute('x1', ax.toFixed(1));
+        o.hit.setAttribute('y1', ay.toFixed(1));
+        o.hit.setAttribute('x2', bx.toFixed(1));
+        o.hit.setAttribute('y2', by.toFixed(1));
+        lc.d = dpath;
+      }
+      const mAvg = (A.m + B.m) / 2;
+      let w = Math.max(0.5, mAvg * 2.0);
+      // Quiet by default: the wires are scaffolding, the themes are the
+      // content. They come up only along the branch being read, or on hover.
+      let op = 0.45 * Math.min(A.op, B.op);
+      const fmA = fm[o.a] != null ? fm[o.a] : focusMul(o.a);
+      const fmB = fm[o.b] != null ? fm[o.b] : focusMul(o.b);
+      const fmMin = Math.min(fmA, fmB);
+      op *= Math.max(0.2 - 0.18 * readK, fmMin);
+      const lit = readK * Math.max(0, Math.min(1, (fmMin - 0.6) / 0.4));
+      w *= 1 + 0.3 * lit;
+      op = Math.min(1, op + 0.22 * lit);
+      let haloK = 0.45 * lit;
+      if (o.hover) {
+        w *= 1.7;
+        op = Math.min(1, op + 0.4);
+        haloK = 0.55;
+      }
+      const sw = w.toFixed(2);
+      const so = op.toFixed(2);
+      const hw = (w * 3).toFixed(2);
+      const ho = (op * haloK).toFixed(3);
+      if (sw !== lc.sw) {
+        o.vis.setAttribute('stroke-width', sw);
+        lc.sw = sw;
+      }
+      if (so !== lc.so) {
+        o.vis.setAttribute('stroke-opacity', so);
+        lc.so = so;
+      }
+      if (hw !== lc.hw) {
+        o.halo.setAttribute('stroke-width', hw);
+        lc.hw = hw;
+      }
+      if (ho !== lc.ho) {
+        o.halo.setAttribute('stroke-opacity', ho);
+        lc.ho = ho;
+      }
+    });
+    return vib;
+  }
+
+  let tipW = 0;
+  let tipH = 0;
+  function showTip(text: string, ev: PointerEvent) {
+    tooltipEl.textContent = text;
+    tooltipEl.hidden = false;
+    tipW = tooltipEl.offsetWidth;
+    tipH = tooltipEl.offsetHeight;
+    moveTip(ev);
+  }
+  function moveTip(ev: PointerEvent) {
+    const pad = 14;
+    let x = ev.clientX + pad;
+    let y = ev.clientY + pad;
+    if (x + tipW > window.innerWidth - 8) x = ev.clientX - tipW - pad;
+    if (y + tipH > window.innerHeight - 8) y = ev.clientY - tipH - pad;
+    tooltipEl.style.left = `${x}px`;
+    tooltipEl.style.top = `${y}px`;
+  }
+  function hideTip() {
+    tooltipEl.hidden = true;
+  }
+
+  // --- Panel population ---
+  function ancestorPath(id: string): ThemeNode[] {
+    const path: ThemeNode[] = [];
+    let p = byId[id]?.parent;
+    while (p) {
+      path.unshift(byId[p]);
+      p = byId[p]?.parent ?? null;
+    }
+    return path;
+  }
+
+  function crumbLabel(n: ThemeNode) {
+    return n.id === 'root' ? 'The making of' : n.label;
+  }
+
+  function escapeHtml(s: string) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  // Renders each node's content blocks in the exact order an editor set in
+  // the CMS, so text and media interleave however they chose — not a fixed
+  // "text then media" layout.
+  const blocksWrap = document.getElementById('mk-panel-blocks')!;
+  function renderBlocks(blocks: ContentBlock[]) {
+    blocksWrap.innerHTML = '';
+    blocks.forEach((b) => {
+      if (b.type === 'text') {
+        const p = document.createElement('div');
+        p.className = 'mk-block-text';
+        p.textContent = b.text || '';
+        blocksWrap.appendChild(p);
+        return;
+      }
+      // Every CMS field is optional, so a media block can exist with no file
+      // picked yet — skip it rather than emitting an empty-src element that
+      // renders as a broken image / dead player.
+      if (!b.file) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'mk-block-media';
+      const src = b.file;
+      if (b.type === 'image') {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = b.caption || '';
+        img.loading = 'lazy';
+        wrap.appendChild(img);
+      } else if (b.type === 'video') {
+        const video = document.createElement('video');
+        video.src = src;
+        video.controls = true;
+        wrap.appendChild(video);
+      } else if (b.type === 'audio') {
+        const audioWrap = document.createElement('div');
+        audioWrap.className = 'mk-block-audio-wrap';
+        const audio = document.createElement('audio');
+        audio.src = src;
+        audio.controls = true;
+        audioWrap.appendChild(audio);
+        wrap.appendChild(audioWrap);
+      }
+      if (b.caption) {
+        const cap = document.createElement('div');
+        cap.className = 'mk-block-caption';
+        cap.textContent = b.caption;
+        wrap.appendChild(cap);
+      }
+      blocksWrap.appendChild(wrap);
+    });
+  }
+
+  function populatePanel(n: ThemeNode) {
+    const id = n.id;
+    const crumbWrap = document.getElementById('mk-breadcrumb')!;
+    crumbWrap.innerHTML = '';
+    ancestorPath(id).forEach((p) => {
+      const span = document.createElement('span');
+      span.className = 'mk-crumb';
+      span.innerHTML = `<span class="mk-crumb-label">${escapeHtml(crumbLabel(p))}</span><span class="mk-crumb-sep">/</span>`;
+      span.addEventListener('click', () => select(p.id));
+      crumbWrap.appendChild(span);
+    });
+    const cur = document.createElement('span');
+    cur.className = 'mk-crumb-label';
+    cur.style.color = n.color;
+    cur.textContent = crumbLabel(n);
+    crumbWrap.appendChild(cur);
+
+    (document.getElementById('mk-panel-title') as HTMLElement).textContent = crumbLabel(n);
+
+    const authorsEl = document.getElementById('mk-panel-authors')!;
+    if (n.authors) {
+      authorsEl.hidden = false;
+      authorsEl.textContent = `DRAFT · ${n.authors}`;
+    } else {
+      authorsEl.hidden = true;
+    }
+
+    (document.getElementById('mk-panel-rule') as HTMLElement).style.background = n.color;
+    renderBlocks(n.blocks);
+
+    const qWrap = document.getElementById('mk-panel-questions')!;
+    const qList = document.getElementById('mk-panel-questions-list')!;
+    qList.innerHTML = '';
+    if (n.questions.length) {
+      qWrap.hidden = false;
+      n.questions.forEach((q) => {
+        const d = document.createElement('div');
+        d.className = 'mk-question';
+        d.style.borderColor = n.color;
+        d.textContent = q;
+        qList.appendChild(d);
+      });
+    } else {
+      qWrap.hidden = true;
+    }
+
+    const cWrap = document.getElementById('mk-panel-children')!;
+    const cList = document.getElementById('mk-panel-children-list')!;
+    cList.innerHTML = '';
+    if (n.children.length) {
+      cWrap.hidden = false;
+      n.children.forEach((cid) => {
+        const c = byId[cid];
+        const row = document.createElement('div');
+        row.className = 'mk-child-row';
+        row.innerHTML = `<span class="mk-child-num">${escapeHtml(c.number)}</span><span class="mk-child-label">${escapeHtml(c.label)}</span>`;
+        row.addEventListener('click', () => select(cid));
+        cList.appendChild(row);
+      });
+    } else {
+      cWrap.hidden = true;
+    }
+
+    const connWrap = document.getElementById('mk-panel-connections')!;
+    const connList = document.getElementById('mk-panel-connections-list')!;
+    connList.innerHTML = '';
+    const conns = DATA.links
+      .filter((l) => l.from === id || l.to === id)
+      .map((l) => (l.from === id ? { other: byId[l.to], note: l.note } : { other: byId[l.from], note: l.note }));
+    if (conns.length) {
+      connWrap.hidden = false;
+      conns.forEach(({ other, note }) => {
+        const row = document.createElement('div');
+        row.className = 'mk-conn';
+        row.innerHTML = `<div class="mk-conn-head"><span class="mk-conn-num">${escapeHtml(other.number)} →</span><span class="mk-conn-label">${escapeHtml(other.label)}</span></div><div class="mk-conn-text">${escapeHtml(note)}</div>`;
+        row.addEventListener('click', () => select(other.id));
+        connList.appendChild(row);
+      });
+    } else {
+      connWrap.hidden = true;
+    }
+
+    const parentWrap = document.getElementById('mk-panel-parent')!;
+    parentWrap.innerHTML = '';
+    if (n.parent) {
+      parentWrap.hidden = false;
+      const p = byId[n.parent];
+      const link = document.createElement('span');
+      link.className = 'mk-parent-link';
+      link.textContent = `← Part of ${p.number} · ${crumbLabel(p)}`;
+      link.addEventListener('click', () => select(p.id));
+      parentWrap.appendChild(link);
+    } else {
+      parentWrap.hidden = true;
+    }
+  }
+
+  // The panel slides in/out (CSS transition on .is-open) rather than
+  // popping, and when it is already open and the theme changes, the old
+  // text fades out before the new text fades in at the top of the scroll.
+  let swapToken = 0;
+  function showPanelFor(n: ThemeNode, prev: string | null) {
+    const wasOpen = panel.classList.contains('is-open');
+    document.documentElement.classList.add('mk-reading');
+    panel.classList.add('is-open');
+    const token = ++swapToken;
+    if (wasOpen && prev && prev !== n.id && !REDUCED) {
+      panel.classList.add('is-swapping');
+      window.setTimeout(() => {
+        if (token !== swapToken) return;
+        populatePanel(n);
+        panel.scrollTop = 0;
+        panel.classList.remove('is-swapping');
+      }, 150);
+    } else {
+      populatePanel(n);
+      panel.scrollTop = 0;
+      panel.classList.remove('is-swapping');
+    }
+  }
+  function hidePanel() {
+    ++swapToken;
+    document.documentElement.classList.remove('mk-reading');
+    panel.classList.remove('is-open', 'is-swapping');
+  }
+
+  function markSelected(prev: string | null) {
+    if (prev && nodeEls[prev]) nodeEls[prev].classList.remove('is-selected');
+    if (selId && nodeEls[selId]) nodeEls[selId].classList.add('is-selected');
+  }
+
+  function select(id: string) {
+    const n = byId[id];
+    if (!n) return;
+    const prev = selId;
+    selId = id;
+    userMoved = true;
+    hideTip();
+    panelWidth = panelW();
+    nudgeOn = false;
+    updateNudge();
+    panelHintEl.hidden = panelHintSeen;
+    if (!panelHintSeen) panelHintShownThisSelection = true;
+    fitZ = zForLvl(n.level);
+    markSelected(prev);
+    startFocus();
+    pluck(id);
+    showPanelFor(n, prev);
+    setAtIntro(false);
+    toIntroBtn.hidden = false;
+
+    const kids = n.children.map((cid) => byId[cid]);
+    const pts = [n, ...kids];
+    const minx = Math.min(...pts.map((p) => p.x));
+    const miny = Math.min(...pts.map((p) => p.y));
+    const maxx = Math.max(...pts.map((p) => p.x));
+    const maxy = Math.max(...pts.map((p) => p.y));
+    const pad = kids.length ? 360 : 300;
+    flyTo(boxTarget(minx - pad, miny - pad, maxx + pad, maxy + pad), { refZ: zForLvl(n.level), shift: panelWidth });
+  }
+
+  // Drops the selection state without starting any camera move, so callers
+  // decide where to fly (the overview, or the intro) exactly once.
+  function clearSelection() {
+    const prev = selId;
+    selId = null;
+    if (panelHintShownThisSelection && !panelHintSeen) {
+      try {
+        localStorage.setItem('pa-mk-hint-panel', '1');
+      } catch (e) {}
+      panelHintSeen = true;
+    }
+    hidePanel();
+    panelWidth = 0;
+    markSelected(prev);
+  }
+
+  function deselect() {
+    clearSelection();
+    startFocus();
+    setAtIntro(false);
+    fitOverview();
+  }
+
+  // --- Pan / zoom interaction ---
+  // Click-to-select is handled here (not via a plain `click` listener on each
+  // node/link) because `setPointerCapture` below redirects the click that
+  // follows a captured pointer sequence to the capturing element, so a
+  // listener on the node itself never fires.
+  let drag: {
+    x: number;
+    y: number;
+    sx: number;
+    sy: number;
+    moved: boolean;
+    target: EventTarget | null;
+    samples: { t: number; x: number; y: number }[];
+  } | null = null;
+
+  // Belt and braces alongside the viewport's user-select:none — if any text
+  // does end up selected (e.g. selected in the panel, drag started over the
+  // map), never let the browser turn the gesture into a native text drag.
+  viewport.addEventListener('dragstart', (e) => e.preventDefault());
+
+  viewport.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    // touching the map stops whatever it was coasting through
+    inertia = null;
+    zoom = null;
+    drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false, target: e.target, samples: [] };
+    viewport.setPointerCapture(e.pointerId);
+    viewport.classList.add('is-dragging');
+  });
+  viewport.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    if (!drag.moved) {
+      // Under 5px it's a click, not a pan — a slightly unsteady press no
+      // longer nudges the map or kills a flight in progress.
+      if (Math.abs(e.clientX - drag.sx) + Math.abs(e.clientY - drag.sy) <= 5) return;
+      drag.moved = true;
+      userMoved = true;
+      manualPan = true;
+      flight = null;
+      hideTip();
+      drag.x = e.clientX;
+      drag.y = e.clientY;
+    }
+    const mRef = F / Math.max(1, refZ - cam.z);
+    cam.x -= (e.clientX - drag.x) / mRef;
+    cam.y -= (e.clientY - drag.y) / mRef;
+    drag.x = e.clientX;
+    drag.y = e.clientY;
+    drag.samples.push({ t: e.timeStamp, x: e.clientX, y: e.clientY });
+    while (drag.samples.length > 2 && e.timeStamp - drag.samples[0].t > 100) drag.samples.shift();
+    requestRender();
+  });
+  function endDrag(e?: PointerEvent) {
+    viewport.classList.remove('is-dragging');
+    const d = drag;
+    drag = null;
+    if (!d) return { wasClick: false, target: null as EventTarget | null };
+    if (d.moved && e && !REDUCED && d.samples.length >= 2) {
+      // Carry the hand's speed over the last ~100ms into a short glide.
+      const a = d.samples[0];
+      const b = d.samples[d.samples.length - 1];
+      const span = b.t - a.t;
+      if (span > 16 && e.timeStamp - b.t < 70) {
+        const vx = (b.x - a.x) / span;
+        const vy = (b.y - a.y) / span;
+        if (Math.hypot(vx, vy) > 0.12) {
+          inertia = { vx, vy };
+          requestRender();
+        }
+      }
+    }
+    return { wasClick: !d.moved, target: d.moved ? null : d.target };
+  }
+  viewport.addEventListener('pointerup', (e) => {
+    const { wasClick, target } = endDrag(e);
+    if (!wasClick) return;
+    const el = target as HTMLElement | null;
+    if (el?.closest('.mk-link-hit')) return;
+    // The intro's enter button lives inside #mk-viewport (so it can be
+    // camera-projected like a node) — pointer capture above redirects the
+    // native click away from it for real mouse/touch input, so route it the
+    // same way node selection is routed.
+    if (el?.closest('#mk-intro-close')) {
+      userMoved = true;
+      deselect();
+      return;
+    }
+    const nodeEl = el?.closest<HTMLElement>('.mk-node');
+    if (nodeEl?.dataset.id) select(nodeEl.dataset.id);
+    else if (selId) deselect();
+  });
+  viewport.addEventListener('pointercancel', () => endDrag());
+
+  let exitT = 0;
+  let exitAcc = 0;
+  viewport.addEventListener(
+    'wheel',
+    (e) => {
+      e.preventDefault();
+      // Normalise across devices: lines and pages into pixels, so a mouse
+      // notch and a trackpad swipe both zoom in proportion to how far the
+      // hand actually moved (the old fixed step per event made trackpads
+      // rocket and mice crawl).
+      let d = e.deltaY;
+      if (e.deltaMode === 1) d *= 16;
+      else if (e.deltaMode === 2) d *= vpH;
+      const dzCur = zoom ? zoom.dzT : Math.max(NEAR + 1, refZ - cam.z);
+
+      // Pulling back past the overview edge flies back up to the intro.
+      if (d > 0 && !selId && !atIntro && dzCur >= maxDz() * 0.98) {
+        const now = performance.now();
+        if (!exitT || now - exitT > 900) exitAcc = 0;
+        exitT = now;
+        exitAcc += d;
+        if (exitAcc > 260) {
+          exitAcc = 0;
+          flyToIntro();
+        }
+        return;
+      }
+
+      d = Math.max(-240, Math.min(240, d));
+      // pinch (ctrlKey) reports small deltas for a deliberate gesture
+      const factor = Math.pow(2, -d * 0.002 * (e.ctrlKey ? 10 : 1));
+      zoomAt(e.clientX - vpLeft, e.clientY - vpTop, factor);
+    },
+    { passive: false },
+  );
+
+  // --- Header / intro controls ---
+  document.querySelectorAll<HTMLButtonElement>('[data-act]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const act = btn.dataset.act;
+      if (act === 'overview' || act === 'close') deselect();
+      else if (act === 'zoom-in') zoomBy(1.35);
+      else if (act === 'zoom-out') zoomBy(0.74);
+    });
+  });
+
+  document.getElementById('mk-intro-close')!.addEventListener('click', () => {
+    userMoved = true;
+    deselect();
+  });
+  toIntroBtn.addEventListener('click', () => {
+    if (selId) clearSelection();
+    flyToIntro();
+  });
+
+  // Keyboard: Esc closes; while reading, the arrows walk the tree (left /
+  // right between sibling themes, up to the parent, down into the first
+  // sub-theme); + and − zoom.
+  document.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target as HTMLElement | null;
+    if (t && /^(INPUT|TEXTAREA|SELECT|AUDIO|VIDEO)$/.test(t.tagName)) return;
+    if (e.key === 'Escape') {
+      if (selId) deselect();
+      return;
+    }
+    if (e.key === '+' || e.key === '=') {
+      e.preventDefault();
+      zoomBy(1.35);
+      return;
+    }
+    if (e.key === '-' || e.key === '_') {
+      e.preventDefault();
+      zoomBy(0.74);
+      return;
+    }
+    if (!selId) return;
+    const n = byId[selId];
+    let to: string | null | undefined = null;
+    if (e.key === 'ArrowUp') to = n.parent;
+    else if (e.key === 'ArrowDown') to = n.children[0];
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      const sibs = n.parent ? byId[n.parent].children : [];
+      to = sibs[sibs.indexOf(n.id) + (e.key === 'ArrowRight' ? 1 : -1)];
+    }
+    if (to && byId[to]) {
+      e.preventDefault();
+      select(to);
+    }
+  });
+
+  // --- Init ---
+  function measureHeader() {
+    const header = document.querySelector<HTMLElement>('.hd-header');
+    if (header) document.documentElement.style.setProperty('--mk-header-h', `${header.offsetHeight}px`);
+  }
+
+  let resizeRaf = 0;
+  window.addEventListener('resize', () => {
+    if (resizeRaf) return;
+    resizeRaf = requestAnimationFrame(() => {
+      resizeRaf = 0;
+      measureHeader();
+      measure();
+      if (selId) {
+        panelWidth = panelW();
+        shift = panelWidth;
+        shiftTw = null;
+      }
+      requestRender();
+    });
+  });
+
+  // Seat the camera at the fitted overview distance *before* the first
+  // paint. cam.z starts at 0, i.e. the camera sitting almost on top of the
+  // intro card (dz = 340, so ~12x scale) — drawing even one frame from
+  // there shows the intro text hugely magnified before it settles. Measure
+  // the header first: introDz() fits to the viewport, whose height
+  // depends on the --mk-header-h that measureHeader() sets.
+  measureHeader();
+  measure();
+  cam.z = zForLvl(0) - introDz();
+  renderNow();
+  updateNudge();
+
+  // Camera starts on the intro; a short settle loop re-fits it as the
+  // viewport's real size becomes available (fonts/layout can shift it late,
+  // e.g. once web fonts finish loading and the header re-wraps). Redraws are
+  // cheap here: unchanged styles are skipped, so a tick where nothing moved
+  // writes nothing.
+  let fitTries = 0;
+  function initFit() {
+    if (userMoved) return;
+    measureHeader();
+    measure();
+    refZ = zForLvl(0);
+    fitZ = zForLvl(0);
+    cam.x = INTRO.x;
+    cam.y = INTRO.y;
+    cam.z = zForLvl(0) - introDz();
+    requestRender();
+    if (++fitTries < 22) window.setTimeout(initFit, 90);
+  }
+  window.setTimeout(initFit, 30);
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(() => {
+      measure();
+      requestRender();
+    });
+  }
+  } // end initMap()
+</script>

@@ -75,7 +75,122 @@ function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '');
 }
 
-export function buildThemeMap(raw: RawThemesData): ThemeMap {
+export interface ThemeMapOptions {
+  // After the radial placement, nudge apart any nodes whose boxes would
+  // overlap on screen. Off by default so existing callers keep the exact
+  // layout they have.
+  relax?: boolean;
+}
+
+// Mirrors of the map page's own constants (LEVEL_CFG, ZLEVEL, F in
+// making-of*.astro) — the relaxation pass needs to know roughly how big each
+// node is drawn and how its depth plane scales, to tell what overlaps.
+const NODE_BOX: Record<number, { w: number; font: number; px: number; py: number }> = {
+  [-1]: { w: 1400, font: 124, px: 60, py: 46 },
+  0: { w: 760, font: 84, px: 36, py: 30 },
+  1: { w: 440, font: 44, px: 22, py: 18 },
+  2: { w: 380, font: 36, px: 18, py: 14 },
+  3: { w: 330, font: 31, px: 16, py: 12 },
+};
+const PLANE_Z: Record<number, number> = { [-1]: 40, 0: 340, 1: 660, 2: 980, 3: 1300 };
+const FOCAL = 1300;
+// A typical overview camera distance. Nodes on different depth planes
+// shift against each other as the camera moves (parallax), so "overlap" is
+// judged from here; nodes sharing a plane keep their spacing at any zoom.
+const RELAX_CAM_Z = -3800;
+
+function estimateBox(n: RawThemeNode, hasKids: boolean): { w: number; h: number } {
+  const b = NODE_BOX[n.level] ?? NODE_BOX[3];
+  // Courier is monospaced: ~0.6em per character
+  const perLine = Math.max(4, Math.floor((b.w - b.px * 2) / (b.font * 0.6)));
+  let lines = 1;
+  let run = 0;
+  n.label.split(/\s+/).forEach((word) => {
+    const need = run ? run + 1 + word.length : word.length;
+    if (run && need > perLine) {
+      lines++;
+      run = word.length;
+    } else run = need;
+  });
+  let h = b.py * 2 + lines * b.font * 1.15;
+  if (n.level >= 1) h += b.font * 0.44 * 1.2 + b.font * 0.18;
+  if (hasKids && n.level <= 1) h += b.font * 0.19 * 1.3 + b.font * 0.18;
+  return { w: b.w, h };
+}
+
+function relaxLayout(
+  nodes: RawThemeNode[],
+  pos: Record<string, { x: number; y: number; angle: number }>,
+  childrenOf: Record<string, string[]>,
+) {
+  const items = nodes
+    .filter((n) => pos[n.id])
+    .map((n) => {
+      const k = FOCAL / ((PLANE_Z[n.level] ?? 0) - RELAX_CAM_Z);
+      const box = estimateBox(n, !!(childrenOf[n.id] || []).length);
+      const px = pos[n.id].x * k;
+      const py = pos[n.id].y * k;
+      return {
+        id: n.id,
+        k,
+        px,
+        py,
+        ox: px,
+        oy: py,
+        // half-extents on screen, with breathing room
+        hw: (box.w * k * 1.1) / 2,
+        hh: (box.h * k * 1.22) / 2,
+        // the root and the regions are the map's skeleton — they stay put
+        fixed: n.level <= 0,
+      };
+    });
+
+  for (let iter = 0; iter < 120; iter++) {
+    let moved = false;
+    for (let i = 0; i < items.length; i++) {
+      for (let j = i + 1; j < items.length; j++) {
+        const a = items[i];
+        const b = items[j];
+        if (a.fixed && b.fixed) continue;
+        const dx = b.px - a.px;
+        const dy = b.py - a.py;
+        const ox = a.hw + b.hw - Math.abs(dx);
+        const oy = a.hh + b.hh - Math.abs(dy);
+        if (ox <= 0 || oy <= 0) continue;
+        moved = true;
+        // separate along whichever axis needs the smaller push
+        const alongX = ox < oy;
+        const push = (alongX ? ox : oy) + 0.5;
+        const dir = (alongX ? dx : dy) >= 0 ? 1 : -1;
+        const wa = a.fixed ? 0 : b.fixed ? 1 : 0.5;
+        const wb = b.fixed ? 0 : a.fixed ? 1 : 0.5;
+        if (alongX) {
+          a.px -= dir * push * wa;
+          b.px += dir * push * wb;
+        } else {
+          a.py -= dir * push * wa;
+          b.py += dir * push * wb;
+        }
+      }
+    }
+    if (!moved) break;
+    // a light pull back toward where the radial layout put each node, so
+    // the tree keeps its shape instead of drifting apart
+    items.forEach((it) => {
+      if (it.fixed) return;
+      it.px += (it.ox - it.px) * 0.02;
+      it.py += (it.oy - it.py) * 0.02;
+    });
+  }
+
+  items.forEach((it) => {
+    if (it.fixed) return;
+    pos[it.id].x = it.px / it.k;
+    pos[it.id].y = it.py / it.k;
+  });
+}
+
+export function buildThemeMap(raw: RawThemesData, opts: ThemeMapOptions = {}): ThemeMap {
   const byId: Record<string, RawThemeNode> = {};
   raw.nodes.forEach((n) => (byId[n.id] = n));
 
@@ -131,6 +246,8 @@ export function buildThemeMap(raw: RawThemesData): ThemeMap {
     kids.forEach((id) => layoutChildren(id));
   }
   layoutChildren(root.id);
+
+  if (opts.relax) relaxLayout(raw.nodes, pos, childrenOf);
 
   function topRegionLabel(n: RawThemeNode): string | null {
     let cur: RawThemeNode | undefined = n;
