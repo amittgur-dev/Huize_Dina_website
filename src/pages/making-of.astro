@@ -79,6 +79,7 @@ const mkmConns = (id: string) =>
     <div id="mk-bg"></div>
     <svg id="mk-lines" xmlns="http://www.w3.org/2000/svg"></svg>
     <div id="mk-terr"></div>
+    <div id="mk-lamp"></div>
     <div id="mk-nodes">
       <div id="mk-intro" class="mk-intro">
         <div class="mk-eyebrow mk-intro-eyebrow">Polyphonic Archive · the making-of</div>
@@ -116,7 +117,9 @@ const mkmConns = (id: string) =>
 
   <div id="mk-tooltip" class="mk-tooltip" hidden></div>
 
-  <aside id="mk-panel" class="mk-panel" hidden>
+  <div id="mk-spill" aria-hidden="true"></div>
+
+  <aside id="mk-panel" class="mk-panel">
     <div class="mk-panel-top">
       <div id="mk-breadcrumb" class="mk-breadcrumb"></div>
       <button type="button" class="mk-btn" data-act="close">Close ×</button>
@@ -317,6 +320,28 @@ const mkmConns = (id: string) =>
     z-index: 3;
   }
 
+  /* The reading lamp: one warm pool of light behind the selected theme and
+     its sub-themes, positioned and faded by the camera code. A single
+     element instead of stacked drop-shadow filters on every node. */
+  #mk-lamp {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1000px;
+    height: 1000px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 4;
+    opacity: 0;
+    background: radial-gradient(
+      closest-side,
+      rgba(255, 214, 150, 0.2),
+      rgba(255, 200, 120, 0.09) 42%,
+      rgba(255, 196, 110, 0) 100%
+    );
+    will-change: transform, opacity;
+  }
+
   #mk-nodes {
     position: absolute;
     inset: 0;
@@ -337,6 +362,15 @@ const mkmConns = (id: string) =>
   :global(.mk-node:hover .mk-node-title) {
     text-decoration: underline;
     text-underline-offset: 4px;
+  }
+
+  :global(.mk-node:hover) {
+    filter: brightness(1.14);
+  }
+
+  :global(.mk-node.is-selected) {
+    outline: 2px solid #f4cb7a;
+    outline-offset: 3px;
   }
 
   :global(.mk-node-title) {
@@ -368,20 +402,6 @@ const mkmConns = (id: string) =>
     stroke-width: 16;
     pointer-events: stroke;
     cursor: default;
-  }
-
-  @keyframes mkpulse {
-    0%,
-    100% {
-      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42), 0 0 0 0 rgba(244, 203, 122, 0);
-    }
-    50% {
-      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42), 0 0 0 16px rgba(244, 203, 122, 0.17);
-    }
-  }
-
-  :global(.mk-node.mk-pulse) {
-    animation: mkpulse 2.4s ease-in-out infinite;
   }
 
   @keyframes mkfadein {
@@ -417,6 +437,7 @@ const mkmConns = (id: string) =>
     font-size: 13px;
     line-height: 1.5;
     color: #e6e1d9;
+    animation: mkfadein 0.14s ease;
   }
 
   .mk-tooltip[hidden] {
@@ -425,7 +446,7 @@ const mkmConns = (id: string) =>
 
   .mk-nudge {
     position: fixed;
-    top: calc(var(--mk-header-h, 72px) + 28px);
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 41;
@@ -434,6 +455,9 @@ const mkmConns = (id: string) =>
     font-size: 13px;
     letter-spacing: 0.06em;
     color: #48c6a8;
+    background: rgba(18, 15, 24, 0.82);
+    border: 1px solid rgba(72, 198, 168, 0.28);
+    padding: 7px 14px;
     animation: mkfadein 0.5s ease;
   }
 
@@ -470,11 +494,6 @@ const mkmConns = (id: string) =>
     width: 33px;
     height: 33px;
     padding: 0;
-  }
-
-  .mk-btn-sm {
-    font-size: 11px;
-    padding: 6px 10px;
   }
 
   .mk-pill {
@@ -641,17 +660,67 @@ const mkmConns = (id: string) =>
     bottom: 0;
     width: min(452px, 42vw);
     z-index: 45;
-    background: #262230;
-    border-left: 1px solid rgba(230, 225, 217, 0.2);
+    /* the brightest surface on screen while reading: the map goes dark
+       around it, this stays lit */
+    background: #2b2735;
+    border-left: 1px solid rgba(255, 224, 170, 0.16);
     padding: 26px 28px 44px;
     overflow-y: auto;
     box-sizing: border-box;
     font-family: 'Courier Prime', monospace;
-    color: #e6e1d9;
+    color: #ece7df;
+    /* closed: parked just off the right edge (not display:none, so it can
+       slide rather than pop) */
+    transform: translateX(104%);
+    visibility: hidden;
+    transition:
+      transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s linear 420ms;
   }
 
-  .mk-panel[hidden] {
-    display: none;
+  .mk-panel.is-open {
+    transform: none;
+    visibility: visible;
+    transition:
+      transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s;
+  }
+
+  /* text swap between themes: out, replace, back in */
+  .mk-panel > * {
+    transition: opacity 150ms ease;
+  }
+
+  .mk-panel.is-swapping > * {
+    opacity: 0;
+  }
+
+  /* Where the map meets the panel: a soft falloff into shadow instead of
+     a hard edge, so the map recedes toward the text. */
+  #mk-spill {
+    position: fixed;
+    top: var(--mk-header-h, 72px);
+    bottom: 0;
+    right: min(452px, 42vw);
+    width: 150px;
+    z-index: 44;
+    pointer-events: none;
+    background: linear-gradient(to right, rgba(18, 15, 24, 0), rgba(18, 15, 24, 0.55));
+    opacity: 0;
+    transition: opacity 420ms ease;
+  }
+
+  :global(html.mk-reading) #mk-spill {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mk-panel,
+    .mk-panel.is-open,
+    .mk-panel > *,
+    #mk-spill {
+      transition: none;
+    }
   }
 
   .mk-panel-top {
@@ -883,6 +952,9 @@ const mkmConns = (id: string) =>
     .mk-panel {
       width: 100%;
     }
+    #mk-spill {
+      display: none;
+    }
   }
 
   /* ---- Phone version: hierarchical browser instead of the map ---- */
@@ -894,6 +966,7 @@ const mkmConns = (id: string) =>
   @media (max-width: 680px) {
     #mk-viewport,
     #mk-panel,
+    #mk-spill,
     #mk-to-intro,
     #mk-nudge,
     #mk-tooltip,
@@ -1238,16 +1311,12 @@ const mkmConns = (id: string) =>
   // intact as data and surface as clickable cards in the reading panel's
   // "Connections" section — they're just not drawn as wires here. Each wire
   // is a slightly irregular, hand-drawn-looking thread (a few random knots
-  // plus an SVG turbulence filter) that plucks when you select a theme and
-  // drifts gently on its own now and then. ---
+  // baked into its own geometry) that plucks when you select its branch.
+  // No SVG filter: the turbulence pass was the single heaviest repaint on
+  // the page and made the wires visibly shift each time the map stopped. ---
   const NS = 'http://www.w3.org/2000/svg';
   linesSvg.innerHTML = '';
-  const defs = document.createElementNS(NS, 'defs');
-  defs.innerHTML =
-    '<filter id="mk-thread"><feTurbulence type="fractalNoise" baseFrequency="0.011 0.018" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter>';
-  linesSvg.appendChild(defs);
   const fxGroup = document.createElementNS(NS, 'g');
-  fxGroup.setAttribute('filter', 'url(#mk-thread)');
   const haloLayer = document.createElementNS(NS, 'g');
   const coreLayer = document.createElementNS(NS, 'g');
   fxGroup.appendChild(haloLayer);
@@ -1327,13 +1396,13 @@ const mkmConns = (id: string) =>
     hit.addEventListener('pointerenter', (ev) => {
       rec.hover = true;
       showTip(`${b.label} — sub-theme of ${a.label}`, ev as PointerEvent);
-      renderStrings();
+      requestRender();
     });
     hit.addEventListener('pointermove', (ev) => moveTip(ev as PointerEvent));
     hit.addEventListener('pointerleave', () => {
       rec.hover = false;
       hideTip();
-      renderStrings();
+      requestRender();
     });
     lines.push(rec);
   }
@@ -1345,21 +1414,15 @@ const mkmConns = (id: string) =>
     if (n.parent && byId[n.parent]) addLine(byId[n.parent], n);
   });
 
-  // During pans/zooms/flights, drop the SVG displacement filter on the
-  // threads (the most expensive repaint) and restore it once movement rests.
-  let fxHeld = false;
-  let motionTimer: number | undefined;
-  function motion() {
-    if (!fxHeld) {
-      fxHeld = true;
-      fxGroup.removeAttribute('filter');
-    }
-    window.clearTimeout(motionTimer);
-    motionTimer = window.setTimeout(() => {
-      fxHeld = false;
-      fxGroup.setAttribute('filter', 'url(#mk-thread)');
-    }, 180);
-  }
+  // =====================================================================
+  // Engine. Everything that moves — camera flights, pan inertia, eased
+  // zoom, the focal plane, the panel's projection-centre shift, the
+  // spotlight fade, the lamp, wire vibration — advances inside ONE
+  // requestAnimationFrame pass (frame() below) that draws once and goes
+  // back to sleep the moment nothing is changing. Input handlers only
+  // update state and call requestRender(); they never draw directly.
+  // =====================================================================
+  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // --- Camera: a fake-3D perspective camera (F/dz projection) applied to
   // each node's auto-computed (x,y) plus a fixed z-depth per hierarchy
@@ -1379,9 +1442,16 @@ const mkmConns = (id: string) =>
   const INTRO_THRESHOLD = INTRO.y + 1060;
 
   const cam = { x: INTRO.x, y: INTRO.y, z: 0 };
+  // refZ is the focal reference plane (drives depth-fade and pan speed);
+  // fitZ is the plane the next camera fit is computed against.
   let refZ = zForLvl(0);
   let fitZ = zForLvl(0);
+  // panelWidth is the reading panel's width once open (what camera fits
+  // are computed for); `shift` is the eased value the scene is actually
+  // drawn with. Keeping them separate is what stops the whole map jumping
+  // sideways in a single frame when the panel joins or leaves.
   let panelWidth = 0;
+  let shift = 0;
   let selId: string | null = null;
   let atIntro = true;
   let userMoved = false;
@@ -1393,15 +1463,34 @@ const mkmConns = (id: string) =>
     panelHintSeen = !!localStorage.getItem('pa-mk-hint-panel');
   } catch (e) {}
 
-  function vpSize() {
-    return { w: viewport.clientWidth, h: viewport.clientHeight };
+  // Layout is read here only — on load, resize, and font settle — never in
+  // the per-frame path, where a read right after a style write forces the
+  // browser to recalculate layout mid-frame.
+  let vpW = 0;
+  let vpH = 0;
+  let vpLeft = 0;
+  let vpTop = 0;
+  let introH = 0;
+  const nodeH: Record<string, number> = {};
+  function measure() {
+    const r = viewport.getBoundingClientRect();
+    vpW = r.width;
+    vpH = r.height;
+    vpLeft = r.left;
+    vpTop = r.top;
+    introH = introEl.offsetHeight;
+    DATA.nodes.forEach((n) => (nodeH[n.id] = nodeEls[n.id].offsetHeight));
+  }
+  function panelW() {
+    // matches the CSS: min(452px, 42vw), and a full-width sheet under 780px
+    // (where there is no map left beside it to re-centre)
+    return vpW <= 780 ? 0 : Math.min(452, vpW * 0.42);
   }
   function centerXY() {
-    const { w, h } = vpSize();
-    return { cx: (w - panelWidth) / 2, cy: h / 2 };
+    return { cx: (vpW - shift) / 2, cy: vpH / 2 };
   }
 
-  function regionBBox() {
+  const REGION_BB = (() => {
     let minx = Infinity;
     let miny = Infinity;
     let maxx = -Infinity;
@@ -1415,37 +1504,71 @@ const mkmConns = (id: string) =>
       }
     });
     return { minx, miny, maxx, maxy };
-  }
+  })();
 
-  function overviewDz() {
-    const { w, h } = vpSize();
-    if (!w || !h) return F * 6;
-    const b = regionBBox();
+  // Everything the overview shows lit: root, regions and their first ring.
+  // The overview is framed to this, so no first-ring theme is cropped by
+  // the screen edge.
+  const OVERVIEW_BB = (() => {
+    let minx = Infinity;
+    let miny = Infinity;
+    let maxx = -Infinity;
+    let maxy = -Infinity;
+    DATA.nodes.forEach((n) => {
+      if (n.level <= 1) {
+        minx = Math.min(minx, n.x);
+        miny = Math.min(miny, n.y);
+        maxx = Math.max(maxx, n.x);
+        maxy = Math.max(maxy, n.y);
+      }
+    });
+    return { minx, miny, maxx, maxy };
+  })();
+  const OVERVIEW_PAD = 190;
+
+  // Camera distance that frames the intro card (unchanged from the
+  // original: it sets how large the intro text is drawn).
+  function introDz() {
+    if (!vpW || !vpH) return F * 6;
     const pad = 460;
-    const bw = b.maxx - b.minx + pad * 2;
-    const bh = b.maxy - b.miny + pad * 2;
-    let s = Math.min((w * 0.97) / bw, (h * 0.97) / bh);
+    const bw = REGION_BB.maxx - REGION_BB.minx + pad * 2;
+    const bh = REGION_BB.maxy - REGION_BB.miny + pad * 2;
+    let s = Math.min((vpW * 0.97) / bw, (vpH * 0.97) / bh);
     s = Math.max(0.1, Math.min(1.2, s));
     return F / s;
   }
+  // Camera distance of the map overview (same fill factors as boxTarget).
+  function mapDz() {
+    if (!vpW || !vpH) return F * 6;
+    const bw = OVERVIEW_BB.maxx - OVERVIEW_BB.minx + OVERVIEW_PAD * 2;
+    const bh = OVERVIEW_BB.maxy - OVERVIEW_BB.miny + OVERVIEW_PAD * 2;
+    let s = Math.min((vpW * 0.86) / bw, (vpH * 0.9) / bh);
+    s = Math.max(0.1, Math.min(3.6, s));
+    return F / s;
+  }
+  function maxDz() {
+    return Math.max(introDz(), mapDz()) * 1.3;
+  }
 
-  // --- Theatrical spotlight: which nodes are "lit" right now. With nothing
-  // selected, deeper levels fade in smoothly as you zoom past the overview;
-  // with a theme selected, its direct sub-themes stay fully lit, its
-  // grandchildren and unrelated branches sink into shadow, and its
-  // ancestors stay dimly visible for context. ---
+  // --- Spotlight: which nodes are "lit" right now.
+  // Browsing (nothing selected): the overview shows the shape of the map —
+  // root, the four regions, and their first ring — and deeper levels only
+  // come up as you zoom in. Reading (a theme selected): house lights down.
+  // The theme and its direct sub-themes are fully lit, its ancestors stay
+  // faintly visible as a path home, and everything else sinks to near
+  // black so the map stops competing with the text. ---
   function focusMul(id: string): number {
     if (!selId) {
       const n0 = byId[id];
       if (!n0 || n0.level <= 0) return 1;
       const s = F / Math.max(1, refZ - cam.z);
-      const k = Math.max(0, Math.min(1, (s - 0.42) / 0.33));
-      const base = n0.level === 1 ? 0.3 : n0.level === 2 ? 0.16 : 0.1;
-      return base + (1 - base) * k;
+      const k = Math.max(0, Math.min(1, (s - 0.46) / 0.36));
+      if (n0.level === 1) return 0.62 + 0.38 * k;
+      return k * k;
     }
     if (id === selId) return 1;
     const n = byId[id];
-    if (!n) return 0.18;
+    if (!n) return 0.03;
     let cur: ThemeNode | undefined = n;
     let steps = 0;
     while (cur && cur.parent) {
@@ -1455,31 +1578,36 @@ const mkmConns = (id: string) =>
     }
     if (cur && cur.parent === selId) {
       if (steps === 1) return 1;
-      if (steps === 2) return 0.1;
-      return 0.05;
+      if (steps === 2) return 0.12;
+      return 0.03;
     }
     let s: ThemeNode | undefined = byId[selId];
     while (s && s.parent) {
-      if (s.parent === id) return 0.26;
+      if (s.parent === id) return 0.2;
       s = byId[s.parent];
     }
-    return 0.05;
+    return 0.03;
   }
 
   let fm: Record<string, number> = {};
   let fmFrom: Record<string, number> = {};
   let focusT0: number | null = null;
-  let focusDur = 1500;
-  let focusRaf: number | null = null;
-  function tickFocus() {
-    applyCam();
-    focusRaf = focusT0 != null ? requestAnimationFrame(tickFocus) : null;
-  }
+  let focusDur = 900;
+  // readK: 0 = browsing, 1 = reading. Eased with the spotlight; it dims the
+  // region captions and unrelated wires and brings the lamp up.
+  let readK = 0;
+  let readFrom = 0;
+  const zBoost: Record<string, number> = {};
   function startFocus() {
     fmFrom = { ...fm };
+    readFrom = readK;
     focusT0 = performance.now();
-    focusDur = 1600;
-    if (!focusRaf) focusRaf = requestAnimationFrame(tickFocus);
+    focusDur = REDUCED ? 0 : 900;
+    // Lit nodes sit above dimmed ones. Decided once per selection rather
+    // than at a brightness threshold mid-fade, which used to make
+    // overlapping nodes swap stacking order in a single frame.
+    DATA.nodes.forEach((n) => (zBoost[n.id] = selId && focusMul(n.id) >= 0.99 ? 500 : 0));
+    requestRender();
   }
 
   function setAtIntro(v: boolean) {
@@ -1491,169 +1619,363 @@ const mkmConns = (id: string) =>
     nudgeEl.hidden = !(nudgeOn && !selId && !atIntro);
   }
 
-  const nodePos: Record<string, { sx: number; sy: number; m: number; dz: number; op: number }> = {};
+  // --- Motion state, all advanced by frame() ---
+  // Soft start, long settle: moving within the first frames after a click
+  // (the old in-out cubic covered 0.4% of the distance in its first 10%).
+  const ease = (k: number) => 1 - Math.pow(1 - Math.pow(k, 1.6), 3);
+  interface Tween {
+    from: number;
+    to: number;
+    t0: number;
+    dur: number;
+  }
+  function tweenVal(tw: Tween, now: number) {
+    const k = tw.dur <= 0 ? 1 : Math.min(1, (now - tw.t0) / tw.dur);
+    return { v: tw.from + (tw.to - tw.from) * ease(k), done: k >= 1 };
+  }
+  let flight: { sx: number; sy: number; sz: number; tx: number; ty: number; tz: number; plane: number; t0: number; dur: number } | null =
+    null;
+  // The focal plane and the centre shift ride their own tweens (started
+  // together with a flight, same duration and curve) so that interrupting
+  // the flight by grabbing the map doesn't strand them half-way.
+  let refTw: Tween | null = null;
+  let shiftTw: Tween | null = null;
+  let inertia: { vx: number; vy: number } | null = null; // screen px / ms
+  let zoom: { dzT: number; mx: number; my: number; wx: number; wy: number } | null = null;
 
-  function applyCam() {
+  function flyTo(target: { x: number; y: number; z: number }, opts: { refZ?: number; shift?: number; dur?: number } = {}) {
+    manualPan = false;
+    inertia = null;
+    zoom = null;
+    const dist = Math.hypot(target.x - cam.x, target.y - cam.y) + Math.abs(target.z - cam.z);
+    let dur = opts.dur ?? Math.max(750, Math.min(1350, 650 + dist * 0.22));
+    if (REDUCED) dur = 0;
+    const now = performance.now();
+    flight = {
+      sx: cam.x,
+      sy: cam.y,
+      sz: cam.z,
+      tx: target.x,
+      ty: target.y,
+      tz: target.z,
+      plane: opts.refZ ?? refZ,
+      t0: now,
+      dur,
+    };
+    if (opts.refZ != null) refTw = { from: refZ, to: opts.refZ, t0: now, dur };
+    if (opts.shift != null) shiftTw = { from: shift, to: opts.shift, t0: now, dur };
+    requestRender();
+  }
+
+  // Zoom towards a screen point. Wheel, pinch, the +/- buttons and keys all
+  // feed the same target, which the camera then eases toward — so repeated
+  // input accumulates instead of restarting, and a mouse notch no longer
+  // lands as a visible step.
+  function zoomAt(mx: number, my: number, factor: number) {
+    flight = null;
+    inertia = null;
+    manualPan = true;
+    userMoved = true;
+    const { cx, cy } = centerXY();
+    const dzNow = Math.max(NEAR + 1, refZ - cam.z);
+    const base = zoom ? zoom.dzT : dzNow;
+    const dzT = Math.max(NEAR + 60, Math.min(maxDz(), base / factor));
+    const m0 = F / dzNow;
+    zoom = { dzT, mx, my, wx: cam.x + (mx - cx) / m0, wy: cam.y + (my - cy) / m0 };
+    requestRender();
+  }
+  function zoomBy(f: number) {
+    zoomAt((vpW - shift) / 2, vpH / 2, f);
+  }
+
+  let rafId: number | null = null;
+  let lastNow = 0;
+  let lampBusy = false;
+  function requestRender() {
+    if (rafId == null) rafId = requestAnimationFrame(frame);
+  }
+  function frame(now: number) {
+    rafId = null;
+    const dt = lastNow ? Math.min(48, now - lastNow) : 16.7;
+    lastNow = now;
+    let active = false;
+
+    if (flight) {
+      const k = flight.dur <= 0 ? 1 : Math.min(1, (now - flight.t0) / flight.dur);
+      const e = ease(k);
+      cam.x = flight.sx + (flight.tx - flight.sx) * e;
+      cam.y = flight.sy + (flight.ty - flight.sy) * e;
+      // Depth is eased in log-distance from the destination's focal plane,
+      // so the apparent zoom rate stays even instead of rushing at the end.
+      const d0 = flight.plane - flight.sz;
+      const d1 = flight.plane - flight.tz;
+      cam.z = d0 > 1 && d1 > 1 ? flight.plane - d0 * Math.pow(d1 / d0, e) : flight.sz + (flight.tz - flight.sz) * e;
+      if (k >= 1) flight = null;
+      else active = true;
+    }
+    if (inertia) {
+      const mRef = F / Math.max(1, refZ - cam.z);
+      cam.x -= (inertia.vx * dt) / mRef;
+      cam.y -= (inertia.vy * dt) / mRef;
+      const decay = Math.exp(-dt / 260);
+      inertia.vx *= decay;
+      inertia.vy *= decay;
+      if (Math.hypot(inertia.vx, inertia.vy) < 0.02) inertia = null;
+      else active = true;
+    }
+    if (refTw) {
+      const r = tweenVal(refTw, now);
+      refZ = r.v;
+      if (r.done) refTw = null;
+      else active = true;
+    }
+    if (shiftTw) {
+      const r = tweenVal(shiftTw, now);
+      shift = r.v;
+      if (r.done) shiftTw = null;
+      else active = true;
+    }
+    if (zoom) {
+      const dzNow = Math.max(NEAR + 1, refZ - cam.z);
+      const k = REDUCED ? 1 : 1 - Math.exp(-dt / 80);
+      let dzNew = dzNow * Math.pow(zoom.dzT / dzNow, k);
+      const done = Math.abs(Math.log(zoom.dzT / dzNew)) < 0.002;
+      if (done) dzNew = zoom.dzT;
+      cam.z = refZ - dzNew;
+      const m = F / dzNew;
+      const { cx, cy } = centerXY();
+      cam.x = zoom.wx - (zoom.mx - cx) / m;
+      cam.y = zoom.wy - (zoom.my - cy) / m;
+      if (done) zoom = null;
+      else active = true;
+    }
+
+    applyCam(now, dt);
+    if (focusT0 != null || lampBusy) active = true;
+    if (renderStrings(now)) active = true;
+
+    if (active) requestRender();
+    else lastNow = 0;
+  }
+  function renderNow() {
+    const now = performance.now();
+    applyCam(now, 16.7);
+    renderStrings(now);
+  }
+
+  // --- Drawing. Every style write is remembered and skipped when the
+  // value hasn't changed, so a frame where little moves costs little. ---
+  const nodePos: Record<string, { sx: number; sy: number; m: number; dz: number; op: number; hw: number; hh: number }> = {};
+  const wc: Record<string, { t: string; o: string; z: string; pe: string }> = {};
+  DATA.nodes.forEach((n) => (wc[n.id] = { t: '', o: '', z: '', pe: '' }));
+  const terrCache = territories.map(() => ({ t: '', o: '' }));
+  const introCache = { t: '', o: '', pe: '' };
+  const lampEl = document.getElementById('mk-lamp')!;
+  const lamp = { x: 0, y: 0, z: zForLvl(0), r: 900 };
+  const lampCache = { t: '', o: '' };
+
+  function applyCam(now: number, dt: number) {
     const { cx, cy } = centerXY();
     const camZ = cam.z;
     const refDz = Math.max(NEAR + 1, refZ - camZ);
 
-    territories.forEach((t) => {
+    let focusK = 1;
+    if (focusT0 != null) {
+      const tt = focusDur <= 0 ? 1 : Math.min(1, (now - focusT0) / focusDur);
+      focusK = tt < 0.5 ? 4 * tt * tt * tt : 1 - Math.pow(-2 * tt + 2, 3) / 2;
+      if (tt >= 1) focusT0 = null;
+    }
+    readK = readFrom + ((selId ? 1 : 0) - readFrom) * focusK;
+
+    territories.forEach((t, i) => {
+      const c = terrCache[i];
       const dz = zForLvl(0) - camZ;
-      if (dz <= NEAR) {
-        t.el.style.opacity = '0';
-        return;
+      let op = 0;
+      if (dz > NEAR) {
+        const m = F / dz;
+        const sx = cx + (t.x - cam.x) * m;
+        const sy = cy + (t.y - cam.y) * m;
+        const tr = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-50%) scale(${m.toFixed(4)})`;
+        if (tr !== c.t) {
+          t.el.style.transform = tr;
+          c.t = tr;
+        }
+        op = 0.075 * (1 - readK);
+        if (m > 0.5) op *= Math.max(0, 1 - (m - 0.5) / 0.45);
       }
-      const m = F / dz;
-      const sx = cx + (t.x - cam.x) * m;
-      const sy = cy + (t.y - cam.y) * m;
-      t.el.style.transform = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-50%) scale(${m.toFixed(4)})`;
-      let op = 0.11;
-      if (m > 0.5) op *= Math.max(0, 1 - (m - 0.5) / 0.45);
-      t.el.style.opacity = op.toFixed(3);
+      const os = op.toFixed(3);
+      if (os !== c.o) {
+        t.el.style.opacity = os;
+        c.o = os;
+      }
     });
 
+    let introBottom = -1e9;
     {
       const dzI = zForLvl(0) - camZ;
-      if (dzI <= NEAR) {
-        introEl.style.opacity = '0';
-        introEl.style.pointerEvents = 'none';
-      } else {
+      let o = '0';
+      let pe = 'none';
+      if (dzI > NEAR) {
         const mI = F / dzI;
         const sxI = cx + (INTRO.x - cam.x) * mI;
         const syI = cy + (INTRO.y - cam.y) * mI;
-        introEl.style.transform = `translate(${sxI.toFixed(1)}px,${syI.toFixed(1)}px) translate(-50%,-50%) scale(${(mI * 3.2).toFixed(4)})`;
-        introEl.style.opacity = '1';
-        introEl.style.pointerEvents = 'auto';
+        const tr = `translate(${sxI.toFixed(1)}px,${syI.toFixed(1)}px) translate(-50%,-50%) scale(${(mI * 3.2).toFixed(4)})`;
+        if (tr !== introCache.t) {
+          introEl.style.transform = tr;
+          introCache.t = tr;
+        }
+        o = '1';
+        pe = 'auto';
+        introBottom = syI + (introH * mI * 3.2) / 2;
       }
-    }
-
-    let focusK = 1;
-    let focusActive = false;
-    if (focusT0 != null) {
-      const tt = Math.min(1, (performance.now() - focusT0) / focusDur);
-      focusK = tt < 0.5 ? 4 * tt * tt * tt : 1 - Math.pow(-2 * tt + 2, 3) / 2;
-      if (tt >= 1) focusT0 = null;
-      else focusActive = true;
+      if (o !== introCache.o) {
+        introEl.style.opacity = o;
+        introCache.o = o;
+      }
+      if (pe !== introCache.pe) {
+        introEl.style.pointerEvents = pe;
+        introCache.pe = pe;
+      }
     }
 
     DATA.nodes.forEach((n) => {
       const el = nodeEls[n.id];
-      const wz = zForLvl(n.level);
-      const dz = wz - camZ;
+      const c = wc[n.id];
+      const dz = zForLvl(n.level) - camZ;
       if (dz <= NEAR) {
-        el.style.opacity = '0';
-        el.style.pointerEvents = 'none';
+        if (c.o !== '0') {
+          el.style.opacity = '0';
+          c.o = '0';
+        }
+        if (c.pe !== 'none') {
+          el.style.pointerEvents = 'none';
+          c.pe = 'none';
+        }
+        delete nodePos[n.id];
         return;
       }
       const m = F / dz;
       const sx = cx + (n.x - cam.x) * m;
       const sy = cy + (n.y - cam.y) * m;
-      el.style.transform = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-50%) scale(${m.toFixed(4)})`;
+      const tr = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-50%) scale(${m.toFixed(4)})`;
+      if (tr !== c.t) {
+        el.style.transform = tr;
+        c.t = tr;
+      }
       const ratio = dz / refDz;
       const fade = ratio <= 1 ? 1 : Math.max(0.05, 1 - (ratio - 1) / 1.7);
-      let blur = ratio <= 1.05 ? 0 : Math.min(2.4, (ratio - 1.05) * 2.2);
       const tgtFm = focusMul(n.id);
       const fromFm = fmFrom[n.id] != null ? fmFrom[n.id] : tgtFm;
       const nfm = fromFm + (tgtFm - fromFm) * focusK;
       fm[n.id] = nfm;
-      let op = fade * (0.5 + 0.5 * nfm);
-      if (nfm >= 0.985) op = Math.max(op, 0.94);
-      else blur = Math.max(blur, (1 - nfm) * 1.2);
-      op = Math.max(op, 0.05);
+      // One continuous blend from "barely there" to "fully lit" — light is
+      // carried by opacity alone (no per-node filters to repaint), and a
+      // lit node holds at least 0.94 even behind the focal plane.
+      const dim = fade * 0.03;
+      let op = dim + (Math.max(fade, 0.94) - dim) * nfm;
       const nearFade = Math.min(1, Math.max(0, (dz - NEAR) / (NEAR * 1.2)));
       op *= nearFade;
-      el.style.opacity = op.toFixed(2);
-      const fmq = Math.round(nfm * 16) / 16;
-      // Blur + multiple stacked drop-shadows, recomputed on every node every
-      // frame, is expensive enough on some GPUs to visibly stutter or even
-      // corrupt a frame during an active camera flight — so during motion
-      // (see motion() below, same flag the SVG thread filter uses) fall back
-      // to a single cheap brightness filter, and restore the full glow once
-      // the camera actually settles.
-      let filt: string;
-      if (fxHeld) {
-        filt = `brightness(${Math.min(1.08, 0.5 + 0.58 * fmq).toFixed(2)})`;
-      } else {
-        const blq = Math.round(blur * 3) / 3;
-        filt = (blq > 0.1 ? `blur(${blq.toFixed(2)}px) ` : '') + `brightness(${Math.min(1.08, 0.5 + 0.58 * fmq).toFixed(2)})`;
-        filt += ` drop-shadow(0 0 ${(8 + 14 * fmq).toFixed(0)}px ${hexA(n.color, 0.18 + 0.42 * fmq)})`;
-        const lit = fmq >= 0.985 && (!!selId || focusActive || n.level <= 0);
-        if (lit) filt += ' drop-shadow(0 0 24px rgba(255,209,130,0.45)) drop-shadow(0 0 58px rgba(255,196,110,0.22))';
+      // Keep the intro card's text clear of nodes peeking up from the map.
+      if (introBottom > -1e8) {
+        const top = sy - ((nodeH[n.id] || 0) * m) / 2;
+        const k = (top - introBottom + 6) / 70;
+        if (k < 1) op *= Math.max(0, k);
       }
-      el.style.filter = filt;
-      el.style.zIndex = String(4000 - Math.round(dz / 40) * 20 + (nfm >= 0.985 ? 500 : 0));
-      el.style.pointerEvents = op > 0.12 && nearFade > 0.5 ? 'auto' : 'none';
-      el.style.outline = n.id === selId ? '2px solid #f4cb7a' : '';
-      el.style.outlineOffset = n.id === selId ? '3px' : '';
-      nodePos[n.id] = { sx, sy, m, dz, op };
+      const os = op.toFixed(2);
+      if (os !== c.o) {
+        el.style.opacity = os;
+        c.o = os;
+      }
+      const z = String(100 - n.level * 10 + (zBoost[n.id] || 0));
+      if (z !== c.z) {
+        el.style.zIndex = z;
+        c.z = z;
+      }
+      const pe = op > 0.12 && nearFade > 0.5 ? 'auto' : 'none';
+      if (pe !== c.pe) {
+        el.style.pointerEvents = pe;
+        c.pe = pe;
+      }
+      nodePos[n.id] = {
+        sx,
+        sy,
+        m,
+        dz,
+        op,
+        hw: ((LEVEL_CFG[n.level] || LEVEL_CFG[3]).width * m) / 2,
+        hh: ((nodeH[n.id] || 0) * m) / 2,
+      };
     });
 
-    if (manualPan && !flyRaf) {
+    // The lamp: one soft pool of warm light behind the theme being read
+    // and its sub-themes. It lives in world space (so it tracks the camera
+    // exactly) and glides to the next theme when the selection changes.
+    {
+      let busy = false;
+      if (selId) {
+        const s = byId[selId];
+        const pts = [s, ...s.children.map((cid) => byId[cid])];
+        const tx = pts.reduce((a, p) => a + p.x, 0) / pts.length;
+        const ty = pts.reduce((a, p) => a + p.y, 0) / pts.length;
+        const tz = pts.reduce((a, p) => a + zForLvl(p.level), 0) / pts.length;
+        const tr = Math.max(...pts.map((p) => Math.hypot(p.x - tx, p.y - ty))) + 640;
+        if (readFrom < 0.02 && readK < 0.05) {
+          lamp.x = tx;
+          lamp.y = ty;
+          lamp.z = tz;
+          lamp.r = tr;
+        } else {
+          const k = REDUCED ? 1 : 1 - Math.exp(-dt / 170);
+          lamp.x += (tx - lamp.x) * k;
+          lamp.y += (ty - lamp.y) * k;
+          lamp.z += (tz - lamp.z) * k;
+          lamp.r += (tr - lamp.r) * k;
+          busy = Math.abs(tx - lamp.x) + Math.abs(ty - lamp.y) + Math.abs(tr - lamp.r) + Math.abs(tz - lamp.z) > 1.5;
+        }
+      }
+      lampBusy = busy;
+      const dzL = lamp.z - camZ;
+      let o = '0';
+      if (readK > 0.004 && dzL > NEAR * 0.5) {
+        const mL = F / dzL;
+        const sx = cx + (lamp.x - cam.x) * mL;
+        const sy = cy + (lamp.y - cam.y) * mL;
+        const tr = `translate(${sx.toFixed(1)}px,${sy.toFixed(1)}px) translate(-50%,-50%) scale(${((lamp.r * mL * 2) / 1000).toFixed(4)})`;
+        if (tr !== lampCache.t) {
+          lampEl.style.transform = tr;
+          lampCache.t = tr;
+        }
+        o = readK.toFixed(3);
+      }
+      if (o !== lampCache.o) {
+        lampEl.style.opacity = o;
+        lampCache.o = o;
+      }
+    }
+
+    if (manualPan && !flight) {
       const inIntro = cam.y < INTRO_THRESHOLD && !selId;
       if (inIntro !== atIntro) setAtIntro(inIntro);
     }
-
-    renderStrings();
   }
 
-  // --- Camera flight (rAF-eased) ---
-  let flyRaf: number | null = null;
-  let flyTimer: number | undefined;
-  // target.refZ, when given, is eased along with the camera: refZ is the
-  // focal reference plane that drives every node's depth-fade and blur, so
-  // snapping it to the new level in one frame (as select() used to) made
-  // the whole map visibly jump while the camera itself was still mid-glide.
-  function animateTo(target: { x: number; y: number; z: number; refZ?: number }, dur = 700) {
-    manualPan = false;
-    const start = { x: cam.x, y: cam.y, z: cam.z, refZ: refZ };
-    const t0 = performance.now();
-    const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-    const step = (now: number) => {
-      const k = Math.min(1, (now - t0) / dur);
-      const e = ease(k);
-      motion();
-      cam.x = start.x + (target.x - start.x) * e;
-      cam.y = start.y + (target.y - start.y) * e;
-      cam.z = start.z + (target.z - start.z) * e;
-      if (target.refZ != null) refZ = start.refZ + (target.refZ - start.refZ) * e;
-      applyCam();
-      if (k < 1) flyRaf = requestAnimationFrame(step);
-    };
-    cancelFly();
-    flyRaf = requestAnimationFrame(step);
-    flyTimer = window.setTimeout(() => {
-      cam.x = target.x;
-      cam.y = target.y;
-      cam.z = target.z;
-      if (target.refZ != null) refZ = target.refZ;
-      applyCam();
-    }, dur + 60);
-  }
-  function cancelFly() {
-    if (flyRaf) cancelAnimationFrame(flyRaf);
-    flyRaf = null;
-    if (flyTimer) window.clearTimeout(flyTimer);
-    flyTimer = undefined;
-  }
-
-  function fitBox(minx: number, miny: number, maxx: number, maxy: number, dur: number, refZTarget?: number) {
-    const { w, h } = vpSize();
-    const availW = (w - (panelWidth || 0)) * 0.86;
-    const availH = h * 0.9;
+  function boxTarget(minx: number, miny: number, maxx: number, maxy: number) {
+    const availW = (vpW - (panelWidth || 0)) * 0.86;
+    const availH = vpH * 0.9;
     const bw = Math.max(1, maxx - minx);
     const bh = Math.max(1, maxy - miny);
     let s = Math.min(availW / bw, availH / bh);
     s = Math.max(0.1, Math.min(3.6, s));
-    const planeZ = fitZ != null ? fitZ : refZ;
-    animateTo({ x: (minx + maxx) / 2, y: (miny + maxy) / 2, z: planeZ - F / s, refZ: refZTarget }, dur);
+    return { x: (minx + maxx) / 2, y: (miny + maxy) / 2, z: fitZ - F / s };
   }
 
-  function fitOverview(dur = 1200) {
-    const b = regionBBox();
-    const pad = 480;
+  function fitOverview() {
+    const pad = OVERVIEW_PAD;
     fitZ = zForLvl(0);
-    fitBox(b.minx - pad, b.miny - pad, b.maxx + pad, b.maxy + pad, dur, zForLvl(0));
+    flyTo(boxTarget(OVERVIEW_BB.minx - pad, OVERVIEW_BB.miny - pad, OVERVIEW_BB.maxx + pad, OVERVIEW_BB.maxy + pad), {
+      refZ: zForLvl(0),
+      shift: 0,
+    });
   }
 
   function flyToIntro() {
@@ -1663,22 +1985,11 @@ const mkmConns = (id: string) =>
     panelWidth = 0;
     fitZ = zForLvl(0);
     startFocus();
-    animateTo({ x: INTRO.x, y: INTRO.y, z: zForLvl(0) - overviewDz(), refZ: zForLvl(0) }, 1400);
+    flyTo({ x: INTRO.x, y: INTRO.y, z: zForLvl(0) - introDz() }, { refZ: zForLvl(0), shift: 0 });
   }
 
-  // Belt and braces alongside the viewport's user-select:none — if any text
-  // does end up selected (e.g. selected in the panel, drag started over the
-  // map), never let the browser turn the gesture into a native text drag.
-  viewport.addEventListener('dragstart', (e) => e.preventDefault());
-
-  function zoomBy(f: number) {
-    let dz = (refZ - cam.z) / f;
-    dz = Math.max(NEAR + 60, Math.min(overviewDz() * 1.3, dz));
-    animateTo({ x: cam.x, y: cam.y, z: refZ - dz }, 300);
-  }
-
-  // --- Wires: hand-drawn wobble + gentle "pluck" on select / ambient
-  // "breeze" over time ---
+  // --- Wires: hand-drawn wobble (baked into each wire's own knots) and a
+  // gentle "pluck" of the selected branch. ---
   function bfs(start: string): Record<string, number> {
     const dist: Record<string, number> = { [start]: 0 };
     const q = [start];
@@ -1694,82 +2005,58 @@ const mkmConns = (id: string) =>
     return dist;
   }
 
-  let vibTimer: number | undefined;
-  let anyVib = false;
-  function vibStep() {
-    renderStrings(false);
-    if (!anyVib && vibTimer) {
-      window.clearInterval(vibTimer);
-      vibTimer = undefined;
-    }
-  }
-
-  function pluck(id: string, strength = 1) {
+  function pluck(id: string) {
+    if (REDUCED) return;
     const dist = bfs(id);
     const now = performance.now();
     lines.forEach((o) => {
-      const da = dist[o.a] == null ? 99 : dist[o.a];
-      const db = dist[o.b] == null ? 99 : dist[o.b];
-      const d = Math.min(da, db);
-      o.amp = strength * o.ampBase * Math.exp(-0.5 * d);
-      o.delay = d * 60;
+      const d = Math.min(dist[o.a] ?? 99, dist[o.b] ?? 99);
+      if (d > 1) return; // only the selected branch answers, not the whole web
+      const vibrating = o.amp >= 0.001;
+      o.amp = o.ampBase * Math.exp(-0.5 * d);
+      // a wire that is still ringing takes the new pluck at once — waiting
+      // out a fresh delay used to snap it flat first
+      o.delay = vibrating ? 0 : d * 60;
       o.t0 = now;
-      o.dur = 3.8;
-      o.decay = 1.25;
+      o.dur = 2.4;
+      o.decay = 1.9;
     });
-    if (!vibTimer) vibTimer = window.setInterval(vibStep, 16);
+    requestRender();
   }
 
-  function scheduleBreeze() {
-    const next = 2400 + Math.random() * 6800;
-    window.setTimeout(() => {
-      breeze();
-      scheduleBreeze();
-    }, next);
-  }
-  function breeze() {
-    if (!lines.length) return;
-    const strength = 0.05 + Math.random() * 0.13;
-    const origin = DATA.nodes[Math.floor(Math.random() * DATA.nodes.length)].id;
-    const dist = bfs(origin);
-    const now = performance.now();
-    lines.forEach((o) => {
-      const da = dist[o.a] == null ? 99 : dist[o.a];
-      const db = dist[o.b] == null ? 99 : dist[o.b];
-      const d = Math.min(da, db);
-      const a = strength * o.ampBase * 0.32 * Math.exp(-0.4 * d) * (0.4 + Math.random() * 0.7);
-      if (a > 0.0015) {
-        o.amp = Math.max(o.amp, a);
-        o.t0 = now;
-        o.delay = d * 110 + Math.random() * 240;
-        o.dur = 6.5;
-        o.decay = 0.62;
-      }
-    });
-    if (!vibTimer) vibTimer = window.setInterval(vibStep, 16);
-  }
-
-  // `force=false` (used by the ambient breeze/pluck ticker, which fires every
-  // 16ms without the camera having moved) skips every line that isn't
-  // currently vibrating — its geometry is unchanged since the last render,
-  // so re-walking its knots and rewriting its path/attributes would just be
-  // wasted work repeated dozens of times a second.
-  function renderStrings(force = true) {
-    const now = performance.now();
+  const lineCache = lines.map(() => ({ d: '', sw: '', so: '', hw: '', ho: '', shown: true }));
+  function renderStrings(now: number): boolean {
     let vib = false;
-    lines.forEach((o) => {
-      if (!force && o.amp < 0.001) return;
+    lines.forEach((o, i) => {
+      const lc = lineCache[i];
       const A = nodePos[o.a];
       const B = nodePos[o.b];
-      if (!A || !B) {
-        o.vis.style.display = 'none';
-        o.halo.style.display = 'none';
-        o.hit.style.display = 'none';
+      // A wire runs edge to edge, not centre to centre: the boxes are
+      // translucent, so a wire drawn to the centre showed straight through
+      // the title it was pointing at.
+      let tA = 0;
+      let tB = 0;
+      if (A && B) {
+        const fdx = Math.abs(B.sx - A.sx) || 1e-6;
+        const fdy = Math.abs(B.sy - A.sy) || 1e-6;
+        tA = Math.min((A.hw + 2) / fdx, (A.hh + 2) / fdy);
+        tB = Math.min((B.hw + 2) / fdx, (B.hh + 2) / fdy);
+      }
+      if (!A || !B || tA + tB >= 0.97) {
+        if (lc.shown) {
+          o.vis.style.display = 'none';
+          o.halo.style.display = 'none';
+          o.hit.style.display = 'none';
+          lc.shown = false;
+        }
         return;
       }
-      o.vis.style.display = '';
-      o.halo.style.display = '';
-      o.hit.style.display = '';
+      if (!lc.shown) {
+        o.vis.style.display = '';
+        o.halo.style.display = '';
+        o.hit.style.display = '';
+        lc.shown = true;
+      }
       let decayAmp = 0;
       let tt = 0;
       if (o.amp >= 0.001) {
@@ -1781,10 +2068,10 @@ const mkmConns = (id: string) =>
           decayAmp = o.amp * Math.exp(-o.decay * t);
         } else o.amp = 0;
       }
-      const ax = A.sx;
-      const ay = A.sy;
-      const bx = B.sx;
-      const by = B.sy;
+      const ax = A.sx + (B.sx - A.sx) * tA;
+      const ay = A.sy + (B.sy - A.sy) * tA;
+      const bx = B.sx - (B.sx - A.sx) * tB;
+      const by = B.sy - (B.sy - A.sy) * tB;
       const dx = bx - ax;
       const dy = by - ay;
       const len = Math.hypot(dx, dy) || 1;
@@ -1812,52 +2099,72 @@ const mkmConns = (id: string) =>
         const c2y = p2[1] - (p3[1] - p1[1]) / 6;
         dpath += ` C${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
       }
-      o.vis.setAttribute('d', dpath);
-      o.halo.setAttribute('d', dpath);
-      o.hit.setAttribute('x1', ax.toFixed(1));
-      o.hit.setAttribute('y1', ay.toFixed(1));
-      o.hit.setAttribute('x2', bx.toFixed(1));
-      o.hit.setAttribute('y2', by.toFixed(1));
+      if (dpath !== lc.d) {
+        o.vis.setAttribute('d', dpath);
+        o.halo.setAttribute('d', dpath);
+        o.hit.setAttribute('x1', ax.toFixed(1));
+        o.hit.setAttribute('y1', ay.toFixed(1));
+        o.hit.setAttribute('x2', bx.toFixed(1));
+        o.hit.setAttribute('y2', by.toFixed(1));
+        lc.d = dpath;
+      }
       const mAvg = (A.m + B.m) / 2;
       let w = Math.max(0.5, mAvg * 2.0);
-      let op = 0.6 * Math.min(A.op, B.op);
+      // Quiet by default: the wires are scaffolding, the themes are the
+      // content. They come up only along the branch being read, or on hover.
+      let op = 0.45 * Math.min(A.op, B.op);
       const fmA = fm[o.a] != null ? fm[o.a] : focusMul(o.a);
       const fmB = fm[o.b] != null ? fm[o.b] : focusMul(o.b);
       const fmMin = Math.min(fmA, fmB);
-      op *= Math.max(selId ? 0.04 : 0.25, fmMin);
-      let haloK = 0.22;
-      if (selId && fmMin > 0.9) {
-        w *= 1.3;
-        op = Math.min(1, op + 0.22);
-        haloK = 0.5;
-      }
+      op *= Math.max(0.2 - 0.18 * readK, fmMin);
+      const lit = readK * Math.max(0, Math.min(1, (fmMin - 0.6) / 0.4));
+      w *= 1 + 0.3 * lit;
+      op = Math.min(1, op + 0.22 * lit);
+      let haloK = 0.45 * lit;
       if (o.hover) {
         w *= 1.7;
         op = Math.min(1, op + 0.4);
         haloK = 0.55;
       }
-      o.vis.setAttribute('stroke-width', w.toFixed(2));
-      o.vis.setAttribute('stroke-opacity', op.toFixed(2));
-      o.halo.setAttribute('stroke-width', (w * 3).toFixed(2));
-      o.halo.setAttribute('stroke-opacity', (op * haloK).toFixed(3));
+      const sw = w.toFixed(2);
+      const so = op.toFixed(2);
+      const hw = (w * 3).toFixed(2);
+      const ho = (op * haloK).toFixed(3);
+      if (sw !== lc.sw) {
+        o.vis.setAttribute('stroke-width', sw);
+        lc.sw = sw;
+      }
+      if (so !== lc.so) {
+        o.vis.setAttribute('stroke-opacity', so);
+        lc.so = so;
+      }
+      if (hw !== lc.hw) {
+        o.halo.setAttribute('stroke-width', hw);
+        lc.hw = hw;
+      }
+      if (ho !== lc.ho) {
+        o.halo.setAttribute('stroke-opacity', ho);
+        lc.ho = ho;
+      }
     });
-    anyVib = vib;
-    if (vib && !vibTimer) vibTimer = window.setInterval(vibStep, 16);
+    return vib;
   }
 
+  let tipW = 0;
+  let tipH = 0;
   function showTip(text: string, ev: PointerEvent) {
     tooltipEl.textContent = text;
     tooltipEl.hidden = false;
+    tipW = tooltipEl.offsetWidth;
+    tipH = tooltipEl.offsetHeight;
     moveTip(ev);
   }
   function moveTip(ev: PointerEvent) {
     const pad = 14;
     let x = ev.clientX + pad;
     let y = ev.clientY + pad;
-    const w = tooltipEl.offsetWidth;
-    const h = tooltipEl.offsetHeight;
-    if (x + w > window.innerWidth - 8) x = ev.clientX - w - pad;
-    if (y + h > window.innerHeight - 8) y = ev.clientY - h - pad;
+    if (x + tipW > window.innerWidth - 8) x = ev.clientX - tipW - pad;
+    if (y + tipH > window.innerHeight - 8) y = ev.clientY - tipH - pad;
     tooltipEl.style.left = `${x}px`;
     tooltipEl.style.top = `${y}px`;
   }
@@ -1880,22 +2187,65 @@ const mkmConns = (id: string) =>
     return n.id === 'root' ? 'The making of' : n.label;
   }
 
-  function select(id: string) {
-    const n = byId[id];
-    if (!n) return;
-    selId = id;
-    userMoved = true;
-    hideTip();
-    panelWidth = Math.min(452, viewport.clientWidth * 0.42);
-    nudgeOn = false;
-    updateNudge();
-    panelHintEl.hidden = panelHintSeen;
-    if (!panelHintSeen) panelHintShownThisSelection = true;
-    fitZ = zForLvl(n.level);
-    startFocus();
-    pluck(id);
+  function escapeHtml(s: string) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
 
-    // Breadcrumb
+  // Renders each node's content blocks in the exact order an editor set in
+  // the CMS, so text and media interleave however they chose — not a fixed
+  // "text then media" layout.
+  const blocksWrap = document.getElementById('mk-panel-blocks')!;
+  function renderBlocks(blocks: ContentBlock[]) {
+    blocksWrap.innerHTML = '';
+    blocks.forEach((b) => {
+      if (b.type === 'text') {
+        const p = document.createElement('div');
+        p.className = 'mk-block-text';
+        p.textContent = b.text || '';
+        blocksWrap.appendChild(p);
+        return;
+      }
+      // Every CMS field is optional, so a media block can exist with no file
+      // picked yet — skip it rather than emitting an empty-src element that
+      // renders as a broken image / dead player.
+      if (!b.file) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'mk-block-media';
+      const src = b.file;
+      if (b.type === 'image') {
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = b.caption || '';
+        img.loading = 'lazy';
+        wrap.appendChild(img);
+      } else if (b.type === 'video') {
+        const video = document.createElement('video');
+        video.src = src;
+        video.controls = true;
+        wrap.appendChild(video);
+      } else if (b.type === 'audio') {
+        const audioWrap = document.createElement('div');
+        audioWrap.className = 'mk-block-audio-wrap';
+        const audio = document.createElement('audio');
+        audio.src = src;
+        audio.controls = true;
+        audioWrap.appendChild(audio);
+        wrap.appendChild(audioWrap);
+      }
+      if (b.caption) {
+        const cap = document.createElement('div');
+        cap.className = 'mk-block-caption';
+        cap.textContent = b.caption;
+        wrap.appendChild(cap);
+      }
+      blocksWrap.appendChild(wrap);
+    });
+  }
+
+  function populatePanel(n: ThemeNode) {
+    const id = n.id;
     const crumbWrap = document.getElementById('mk-breadcrumb')!;
     crumbWrap.innerHTML = '';
     ancestorPath(id).forEach((p) => {
@@ -1989,8 +2339,59 @@ const mkmConns = (id: string) =>
     } else {
       parentWrap.hidden = true;
     }
+  }
 
-    panel.hidden = false;
+  // The panel slides in/out (CSS transition on .is-open) rather than
+  // popping, and when it is already open and the theme changes, the old
+  // text fades out before the new text fades in at the top of the scroll.
+  let swapToken = 0;
+  function showPanelFor(n: ThemeNode, prev: string | null) {
+    const wasOpen = panel.classList.contains('is-open');
+    document.documentElement.classList.add('mk-reading');
+    panel.classList.add('is-open');
+    const token = ++swapToken;
+    if (wasOpen && prev && prev !== n.id && !REDUCED) {
+      panel.classList.add('is-swapping');
+      window.setTimeout(() => {
+        if (token !== swapToken) return;
+        populatePanel(n);
+        panel.scrollTop = 0;
+        panel.classList.remove('is-swapping');
+      }, 150);
+    } else {
+      populatePanel(n);
+      panel.scrollTop = 0;
+      panel.classList.remove('is-swapping');
+    }
+  }
+  function hidePanel() {
+    ++swapToken;
+    document.documentElement.classList.remove('mk-reading');
+    panel.classList.remove('is-open', 'is-swapping');
+  }
+
+  function markSelected(prev: string | null) {
+    if (prev && nodeEls[prev]) nodeEls[prev].classList.remove('is-selected');
+    if (selId && nodeEls[selId]) nodeEls[selId].classList.add('is-selected');
+  }
+
+  function select(id: string) {
+    const n = byId[id];
+    if (!n) return;
+    const prev = selId;
+    selId = id;
+    userMoved = true;
+    hideTip();
+    panelWidth = panelW();
+    nudgeOn = false;
+    updateNudge();
+    panelHintEl.hidden = panelHintSeen;
+    if (!panelHintSeen) panelHintShownThisSelection = true;
+    fitZ = zForLvl(n.level);
+    markSelected(prev);
+    startFocus();
+    pluck(id);
+    showPanelFor(n, prev);
     setAtIntro(false);
     toIntroBtn.hidden = false;
 
@@ -2001,10 +2402,13 @@ const mkmConns = (id: string) =>
     const maxx = Math.max(...pts.map((p) => p.x));
     const maxy = Math.max(...pts.map((p) => p.y));
     const pad = kids.length ? 360 : 300;
-    fitBox(minx - pad, miny - pad, maxx + pad, maxy + pad, 1700, zForLvl(n.level));
+    flyTo(boxTarget(minx - pad, miny - pad, maxx + pad, maxy + pad), { refZ: zForLvl(n.level), shift: panelWidth });
   }
 
-  function deselect() {
+  // Drops the selection state without starting any camera move, so callers
+  // decide where to fly (the overview, or the intro) exactly once.
+  function clearSelection() {
+    const prev = selId;
     selId = null;
     if (panelHintShownThisSelection && !panelHintSeen) {
       try {
@@ -2012,68 +2416,16 @@ const mkmConns = (id: string) =>
       } catch (e) {}
       panelHintSeen = true;
     }
-    panel.hidden = true;
+    hidePanel();
     panelWidth = 0;
+    markSelected(prev);
+  }
+
+  function deselect() {
+    clearSelection();
     startFocus();
     setAtIntro(false);
-    fitOverview(1500);
-  }
-
-  function escapeHtml(s: string) {
-    const d = document.createElement('div');
-    d.textContent = s;
-    return d.innerHTML;
-  }
-
-  // Renders each node's content blocks in the exact order an editor set in
-  // the CMS, so text and media interleave however they chose — not a fixed
-  // "text then media" layout.
-  const blocksWrap = document.getElementById('mk-panel-blocks')!;
-  function renderBlocks(blocks: ContentBlock[]) {
-    blocksWrap.innerHTML = '';
-    blocks.forEach((b) => {
-      if (b.type === 'text') {
-        const p = document.createElement('div');
-        p.className = 'mk-block-text';
-        p.textContent = b.text || '';
-        blocksWrap.appendChild(p);
-        return;
-      }
-      // Every CMS field is optional, so a media block can exist with no file
-      // picked yet — skip it rather than emitting an empty-src element that
-      // renders as a broken image / dead player.
-      if (!b.file) return;
-      const wrap = document.createElement('div');
-      wrap.className = 'mk-block-media';
-      const src = b.file;
-      if (b.type === 'image') {
-        const img = document.createElement('img');
-        img.src = src;
-        img.alt = b.caption || '';
-        img.loading = 'lazy';
-        wrap.appendChild(img);
-      } else if (b.type === 'video') {
-        const video = document.createElement('video');
-        video.src = src;
-        video.controls = true;
-        wrap.appendChild(video);
-      } else if (b.type === 'audio') {
-        const audioWrap = document.createElement('div');
-        audioWrap.className = 'mk-block-audio-wrap';
-        const audio = document.createElement('audio');
-        audio.src = src;
-        audio.controls = true;
-        audioWrap.appendChild(audio);
-        wrap.appendChild(audioWrap);
-      }
-      if (b.caption) {
-        const cap = document.createElement('div');
-        cap.className = 'mk-block-caption';
-        cap.textContent = b.caption;
-        wrap.appendChild(cap);
-      }
-      blocksWrap.appendChild(wrap);
-    });
+    fitOverview();
   }
 
   // --- Pan / zoom interaction ---
@@ -2081,40 +2433,76 @@ const mkmConns = (id: string) =>
   // node/link) because `setPointerCapture` below redirects the click that
   // follows a captured pointer sequence to the capturing element, so a
   // listener on the node itself never fires.
-  let drag: { x: number; y: number; sx: number; sy: number; moved: boolean; target: EventTarget | null } | null = null;
+  let drag: {
+    x: number;
+    y: number;
+    sx: number;
+    sy: number;
+    moved: boolean;
+    target: EventTarget | null;
+    samples: { t: number; x: number; y: number }[];
+  } | null = null;
+
+  // Belt and braces alongside the viewport's user-select:none — if any text
+  // does end up selected (e.g. selected in the panel, drag started over the
+  // map), never let the browser turn the gesture into a native text drag.
+  viewport.addEventListener('dragstart', (e) => e.preventDefault());
 
   viewport.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
-    drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false, target: e.target };
+    // touching the map stops whatever it was coasting through
+    inertia = null;
+    zoom = null;
+    drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, moved: false, target: e.target, samples: [] };
     viewport.setPointerCapture(e.pointerId);
     viewport.classList.add('is-dragging');
   });
   viewport.addEventListener('pointermove', (e) => {
     if (!drag) return;
-    const dx = e.clientX - drag.x;
-    const dy = e.clientY - drag.y;
-    if (Math.abs(e.clientX - drag.sx) + Math.abs(e.clientY - drag.sy) > 5) {
+    if (!drag.moved) {
+      // Under 5px it's a click, not a pan — a slightly unsteady press no
+      // longer nudges the map or kills a flight in progress.
+      if (Math.abs(e.clientX - drag.sx) + Math.abs(e.clientY - drag.sy) <= 5) return;
       drag.moved = true;
       userMoved = true;
       manualPan = true;
+      flight = null;
+      hideTip();
+      drag.x = e.clientX;
+      drag.y = e.clientY;
     }
     const mRef = F / Math.max(1, refZ - cam.z);
-    cam.x -= dx / mRef;
-    cam.y -= dy / mRef;
+    cam.x -= (e.clientX - drag.x) / mRef;
+    cam.y -= (e.clientY - drag.y) / mRef;
     drag.x = e.clientX;
     drag.y = e.clientY;
-    motion();
-    cancelFly();
-    applyCam();
+    drag.samples.push({ t: e.timeStamp, x: e.clientX, y: e.clientY });
+    while (drag.samples.length > 2 && e.timeStamp - drag.samples[0].t > 100) drag.samples.shift();
+    requestRender();
   });
-  function endDrag() {
+  function endDrag(e?: PointerEvent) {
     viewport.classList.remove('is-dragging');
-    const result = drag && !drag.moved ? { wasClick: true, target: drag.target } : { wasClick: false, target: null };
+    const d = drag;
     drag = null;
-    return result;
+    if (!d) return { wasClick: false, target: null as EventTarget | null };
+    if (d.moved && e && !REDUCED && d.samples.length >= 2) {
+      // Carry the hand's speed over the last ~100ms into a short glide.
+      const a = d.samples[0];
+      const b = d.samples[d.samples.length - 1];
+      const span = b.t - a.t;
+      if (span > 16 && e.timeStamp - b.t < 70) {
+        const vx = (b.x - a.x) / span;
+        const vy = (b.y - a.y) / span;
+        if (Math.hypot(vx, vy) > 0.12) {
+          inertia = { vx, vy };
+          requestRender();
+        }
+      }
+    }
+    return { wasClick: !d.moved, target: d.moved ? null : d.target };
   }
-  viewport.addEventListener('pointerup', () => {
-    const { wasClick, target } = endDrag();
+  viewport.addEventListener('pointerup', (e) => {
+    const { wasClick, target } = endDrag(e);
     if (!wasClick) return;
     const el = target as HTMLElement | null;
     if (el?.closest('.mk-link-hit')) return;
@@ -2139,21 +2527,21 @@ const mkmConns = (id: string) =>
     'wheel',
     (e) => {
       e.preventDefault();
-      userMoved = true;
-      manualPan = true;
-      const rect = viewport.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
-      const my = e.clientY - rect.top;
-      const { cx, cy } = centerXY();
-      const dz0 = Math.max(NEAR + 1, refZ - cam.z);
-      const maxDz = overviewDz() * 1.3;
+      // Normalise across devices: lines and pages into pixels, so a mouse
+      // notch and a trackpad swipe both zoom in proportion to how far the
+      // hand actually moved (the old fixed step per event made trackpads
+      // rocket and mice crawl).
+      let d = e.deltaY;
+      if (e.deltaMode === 1) d *= 16;
+      else if (e.deltaMode === 2) d *= vpH;
+      const dzCur = zoom ? zoom.dzT : Math.max(NEAR + 1, refZ - cam.z);
 
       // Pulling back past the overview edge flies back up to the intro.
-      if (e.deltaY > 0 && !selId && !atIntro && dz0 >= maxDz * 0.98) {
+      if (d > 0 && !selId && !atIntro && dzCur >= maxDz() * 0.98) {
         const now = performance.now();
         if (!exitT || now - exitT > 900) exitAcc = 0;
         exitT = now;
-        exitAcc += e.deltaY;
+        exitAcc += d;
         if (exitAcc > 260) {
           exitAcc = 0;
           flyToIntro();
@@ -2161,25 +2549,10 @@ const mkmConns = (id: string) =>
         return;
       }
 
-      const m0 = F / dz0;
-      const worldX = cam.x + (mx - cx) / m0;
-      const worldY = cam.y + (my - cy) / m0;
-      // Zoom step per wheel event (the magnitude of deltaY is deliberately
-      // ignored, so a trackpad's many small events don't rocket through the
-      // zoom range). These are the previous 1.07 / 0.934 steps raised to
-      // 1/1.6, i.e. reaching any given zoom now takes ~60% more physical
-      // scrolling. Keep them near-reciprocal so zooming in then back out
-      // returns to roughly where you started.
-      const f = e.deltaY < 0 ? 1.0432 : 0.9582;
-      let dz1 = dz0 / f;
-      dz1 = Math.max(NEAR + 60, Math.min(maxDz, dz1));
-      const m1 = F / dz1;
-      cam.z = refZ - dz1;
-      cam.x = worldX - (mx - cx) / m1;
-      cam.y = worldY - (my - cy) / m1;
-      motion();
-      cancelFly();
-      applyCam();
+      d = Math.max(-240, Math.min(240, d));
+      // pinch (ctrlKey) reports small deltas for a deliberate gesture
+      const factor = Math.pow(2, -d * 0.002 * (e.ctrlKey ? 10 : 1));
+      zoomAt(e.clientX - vpLeft, e.clientY - vpTop, factor);
     },
     { passive: false },
   );
@@ -2199,13 +2572,44 @@ const mkmConns = (id: string) =>
     deselect();
   });
   toIntroBtn.addEventListener('click', () => {
-    if (selId) deselect();
+    if (selId) clearSelection();
     flyToIntro();
   });
 
-  window.addEventListener('resize', () => applyCam());
+  // Keyboard: Esc closes; while reading, the arrows walk the tree (left /
+  // right between sibling themes, up to the parent, down into the first
+  // sub-theme); + and − zoom.
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && selId) deselect();
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target as HTMLElement | null;
+    if (t && /^(INPUT|TEXTAREA|SELECT|AUDIO|VIDEO)$/.test(t.tagName)) return;
+    if (e.key === 'Escape') {
+      if (selId) deselect();
+      return;
+    }
+    if (e.key === '+' || e.key === '=') {
+      e.preventDefault();
+      zoomBy(1.35);
+      return;
+    }
+    if (e.key === '-' || e.key === '_') {
+      e.preventDefault();
+      zoomBy(0.74);
+      return;
+    }
+    if (!selId) return;
+    const n = byId[selId];
+    let to: string | null | undefined = null;
+    if (e.key === 'ArrowUp') to = n.parent;
+    else if (e.key === 'ArrowDown') to = n.children[0];
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      const sibs = n.parent ? byId[n.parent].children : [];
+      to = sibs[sibs.indexOf(n.id) + (e.key === 'ArrowRight' ? 1 : -1)];
+    }
+    if (to && byId[to]) {
+      e.preventDefault();
+      select(to);
+    }
   });
 
   // --- Init ---
@@ -2213,51 +2617,59 @@ const mkmConns = (id: string) =>
     const header = document.querySelector<HTMLElement>('.hd-header');
     if (header) document.documentElement.style.setProperty('--mk-header-h', `${header.offsetHeight}px`);
   }
-  function syncHeaderHeight() {
-    measureHeader();
-    applyCam();
-  }
-  window.addEventListener('resize', syncHeaderHeight);
+
+  let resizeRaf = 0;
+  window.addEventListener('resize', () => {
+    if (resizeRaf) return;
+    resizeRaf = requestAnimationFrame(() => {
+      resizeRaf = 0;
+      measureHeader();
+      measure();
+      if (selId) {
+        panelWidth = panelW();
+        shift = panelWidth;
+        shiftTw = null;
+      }
+      requestRender();
+    });
+  });
 
   // Seat the camera at the fitted overview distance *before* the first
   // paint. cam.z starts at 0, i.e. the camera sitting almost on top of the
-  // intro card (dz = 340, so ~12x scale), and initFit below only pulled it
-  // back to the fitted distance a tick later — which showed as the intro
-  // text appearing hugely magnified before snapping into place. Measure the
-  // header first: overviewDz() fits to the viewport, whose height depends on
-  // the --mk-header-h that measureHeader() sets.
+  // intro card (dz = 340, so ~12x scale) — drawing even one frame from
+  // there shows the intro text hugely magnified before it settles. Measure
+  // the header first: introDz() fits to the viewport, whose height
+  // depends on the --mk-header-h that measureHeader() sets.
   measureHeader();
-  cam.z = zForLvl(0) - overviewDz();
-  syncHeaderHeight();
-
+  measure();
+  cam.z = zForLvl(0) - introDz();
+  renderNow();
   updateNudge();
-  scheduleBreeze();
 
   // Camera starts on the intro; a short settle loop re-fits it as the
   // viewport's real size becomes available (fonts/layout can shift it late,
-  // e.g. once web fonts finish loading and the header re-wraps). Each tick
-  // only actually repaints (33 nodes plus the SVG-filtered wires) when the
-  // computed camera target has genuinely changed from last time — otherwise
-  // this would repaint the whole scene on a fixed timer regardless of
-  // whether anything moved, which is expensive enough (the turbulence
-  // filter especially) to visibly stutter for the ~2s this loop runs.
+  // e.g. once web fonts finish loading and the header re-wraps). Redraws are
+  // cheap here: unchanged styles are skipped, so a tick where nothing moved
+  // writes nothing.
   let fitTries = 0;
-  let lastFitZ: number | null = null;
   function initFit() {
     if (userMoved) return;
-    const z = zForLvl(0) - overviewDz();
-    if (z !== lastFitZ) {
-      lastFitZ = z;
-      motion();
-      refZ = zForLvl(0);
-      fitZ = zForLvl(0);
-      cam.x = INTRO.x;
-      cam.y = INTRO.y;
-      cam.z = z;
-      applyCam();
-    }
+    measureHeader();
+    measure();
+    refZ = zForLvl(0);
+    fitZ = zForLvl(0);
+    cam.x = INTRO.x;
+    cam.y = INTRO.y;
+    cam.z = zForLvl(0) - introDz();
+    requestRender();
     if (++fitTries < 22) window.setTimeout(initFit, 90);
   }
   window.setTimeout(initFit, 30);
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(() => {
+      measure();
+      requestRender();
+    });
+  }
   } // end initMap()
 </script>

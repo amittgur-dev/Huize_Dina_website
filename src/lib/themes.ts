@@ -3,7 +3,8 @@
 // coordinates. Each node is placed relative to its parent: regions spread
 // evenly in a full circle around the root, and every deeper generation fans
 // out across an arc centered on its own parent's outward direction, so the
-// tree visibly "grows" outward from the center. Re-nesting a theme in the
+// tree visibly "grows" outward from the center. A final pass then nudges
+// apart any boxes that would overlap on screen. Re-nesting a theme in the
 // CMS just changes which parent it fans out from; nothing needs re-placing.
 
 // Node content is an ordered list of blocks, not a fixed blurb+media split —
@@ -75,16 +76,10 @@ function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '');
 }
 
-export interface ThemeMapOptions {
-  // After the radial placement, nudge apart any nodes whose boxes would
-  // overlap on screen. Off by default so existing callers keep the exact
-  // layout they have.
-  relax?: boolean;
-}
-
 // Mirrors of the map page's own constants (LEVEL_CFG, ZLEVEL, F in
-// making-of*.astro) — the relaxation pass needs to know roughly how big each
-// node is drawn and how its depth plane scales, to tell what overlaps.
+// making-of.astro) — the relaxation pass below needs to know roughly how big
+// each node is drawn and how its depth plane scales, to tell what overlaps.
+// Change one, change the other.
 const NODE_BOX: Record<number, { w: number; font: number; px: number; py: number }> = {
   [-1]: { w: 1400, font: 124, px: 60, py: 46 },
   0: { w: 760, font: 84, px: 36, py: 30 },
@@ -190,7 +185,7 @@ function relaxLayout(
   });
 }
 
-export function buildThemeMap(raw: RawThemesData, opts: ThemeMapOptions = {}): ThemeMap {
+export function buildThemeMap(raw: RawThemesData): ThemeMap {
   const byId: Record<string, RawThemeNode> = {};
   raw.nodes.forEach((n) => (byId[n.id] = n));
 
@@ -206,13 +201,10 @@ export function buildThemeMap(raw: RawThemesData, opts: ThemeMapOptions = {}): T
     [root.id]: { x: 0, y: 0, angle: -90 },
   };
 
-  // Nodes are allowed to sit close together, even overlap a little at the
-  // edges — the reading panel's theatrical spotlight (see focusMul in
-  // making-of.astro) is what keeps things legible: whatever isn't part of
-  // the selected branch fades into the background, so a dim box behind a
-  // lit one reads as depth, not clutter. Only the root needs a hard rule —
-  // it's a single very wide, short box that stays lit at all times, so a
-  // same-brightness region sitting behind it would genuinely disappear.
+  // The fan-out below spaces siblings by angle alone, without regard to how
+  // wide their boxes are, so neighbours (and first-ring themes of adjacent
+  // regions) can land on top of each other. relaxLayout() afterwards nudges
+  // any such pairs apart.
   function layoutChildren(parentId: string) {
     const kids = childrenOf[parentId] || [];
     if (!kids.length) return;
@@ -247,7 +239,7 @@ export function buildThemeMap(raw: RawThemesData, opts: ThemeMapOptions = {}): T
   }
   layoutChildren(root.id);
 
-  if (opts.relax) relaxLayout(raw.nodes, pos, childrenOf);
+  relaxLayout(raw.nodes, pos, childrenOf);
 
   function topRegionLabel(n: RawThemeNode): string | null {
     let cur: RawThemeNode | undefined = n;

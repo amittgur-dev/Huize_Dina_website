@@ -36,7 +36,7 @@ jobs:
       - name: Point absolute paths at the sub-path
         run: |
           find dist -name '*.html' -print0 | xargs -0 sed -i -E \
-            -e 's#(href|src|data-audio)="/(assets|home|listen|podcast|timelines|making-of|making-of-preview|team|contact|admin|version\.txt)#\1="/Huize_Dina_website/\2#g' \
+            -e 's#(href|src|data-audio)="/(assets|home|listen|podcast|timelines|making-of|team|contact|admin|version\.txt)#\1="/Huize_Dina_website/\2#g' \
             -e 's#href="/"#href="/Huize_Dina_website/"#g' \
             -e 's#"/assets/#"/Huize_Dina_website/assets/#g'
       - uses: actions/upload-pages-artifact@v3
