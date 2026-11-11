@@ -385,11 +385,6 @@ const mkmConns = (id: string) =>
     letter-spacing: 0.1em;
   }
 
-  :global(.mk-node-sub) {
-    letter-spacing: 0.05em;
-    color: #9a938a;
-  }
-
   :global(.mk-link) {
     fill: none;
     stroke-linecap: round;
@@ -734,10 +729,11 @@ const mkmConns = (id: string) =>
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    row-gap: 5px;
+    row-gap: 6px;
     min-width: 0;
     padding-top: 4px;
-    font-size: 11px;
+    font-size: 14px;
+    line-height: 1.4;
   }
 
   :global(.mk-crumb) {
@@ -747,8 +743,8 @@ const mkmConns = (id: string) =>
   }
 
   :global(.mk-crumb-label) {
-    font-size: 11px;
-    color: #9a938a;
+    font-size: 14px;
+    color: #b3aca2;
   }
 
   :global(.mk-crumb-label:hover) {
@@ -757,9 +753,9 @@ const mkmConns = (id: string) =>
   }
 
   :global(.mk-crumb-sep) {
-    font-size: 11px;
-    color: #655e55;
-    padding: 0 6px;
+    font-size: 14px;
+    color: #7a7268;
+    padding: 0 7px;
   }
 
   .mk-panel-hint {
@@ -1266,15 +1262,6 @@ const mkmConns = (id: string) =>
 
     title.textContent = n.label;
     el.appendChild(title);
-
-    if (n.children.length && n.level <= 1) {
-      const sub = document.createElement('div');
-      sub.className = 'mk-node-sub';
-      sub.style.fontSize = `${cfg.font * 0.19}px`;
-      sub.style.marginTop = `${cfg.font * 0.18}px`;
-      sub.textContent = `${n.children.length} sub-theme${n.children.length > 1 ? 's' : ''} →`;
-      el.appendChild(sub);
-    }
 
     nodesLayer.appendChild(el);
     nodeEls[n.id] = el;

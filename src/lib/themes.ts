@@ -94,7 +94,7 @@ const FOCAL = 1300;
 // judged from here; nodes sharing a plane keep their spacing at any zoom.
 const RELAX_CAM_Z = -3800;
 
-function estimateBox(n: RawThemeNode, hasKids: boolean): { w: number; h: number } {
+function estimateBox(n: RawThemeNode): { w: number; h: number } {
   const b = NODE_BOX[n.level] ?? NODE_BOX[3];
   // Courier is monospaced: ~0.6em per character
   const perLine = Math.max(4, Math.floor((b.w - b.px * 2) / (b.font * 0.6)));
@@ -109,20 +109,15 @@ function estimateBox(n: RawThemeNode, hasKids: boolean): { w: number; h: number 
   });
   let h = b.py * 2 + lines * b.font * 1.15;
   if (n.level >= 1) h += b.font * 0.44 * 1.2 + b.font * 0.18;
-  if (hasKids && n.level <= 1) h += b.font * 0.19 * 1.3 + b.font * 0.18;
   return { w: b.w, h };
 }
 
-function relaxLayout(
-  nodes: RawThemeNode[],
-  pos: Record<string, { x: number; y: number; angle: number }>,
-  childrenOf: Record<string, string[]>,
-) {
+function relaxLayout(nodes: RawThemeNode[], pos: Record<string, { x: number; y: number; angle: number }>) {
   const items = nodes
     .filter((n) => pos[n.id])
     .map((n) => {
       const k = FOCAL / ((PLANE_Z[n.level] ?? 0) - RELAX_CAM_Z);
-      const box = estimateBox(n, !!(childrenOf[n.id] || []).length);
+      const box = estimateBox(n);
       const px = pos[n.id].x * k;
       const py = pos[n.id].y * k;
       return {
@@ -239,7 +234,7 @@ export function buildThemeMap(raw: RawThemesData): ThemeMap {
   }
   layoutChildren(root.id);
 
-  relaxLayout(raw.nodes, pos, childrenOf);
+  relaxLayout(raw.nodes, pos);
 
   function topRegionLabel(n: RawThemeNode): string | null {
     let cur: RawThemeNode | undefined = n;
