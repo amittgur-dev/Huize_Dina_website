@@ -1,18 +1,25 @@
 services:
   web:
     image: ghcr.io/amittgur-dev/huize_dina_website:latest
-    container_name: huize-dina-web
+    # No container_name: update.sh briefly runs two copies side by side for a
+    # zero-downtime swap. The parent nginx reaches it via the network alias.
     restart: unless-stopped
     expose:
       - "80"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
     networks:
-      - nginx_network
+      nginx_network:
+        aliases:
+          - huize-dina-web
 
   # GitHub OAuth provider for the CMS at /admin (see deploy/oauth/).
   # Put OAUTH_CLIENT_ID and OAUTH_CLIENT_SECRET in a .env file next to this one.
   oauth:
     image: ghcr.io/amittgur-dev/huize_dina_oauth:latest
-    container_name: huize-dina-oauth
     restart: unless-stopped
     environment:
       OAUTH_CLIENT_ID: ${OAUTH_CLIENT_ID:?set in .env}
@@ -20,8 +27,15 @@ services:
       SITE_ORIGIN: https://huizedina.nl
     expose:
       - "3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('net').connect(3000,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
     networks:
-      - nginx_network
+      nginx_network:
+        aliases:
+          - huize-dina-oauth
 
 # Shared network the parent nginx reverse proxy is attached to.
 networks:

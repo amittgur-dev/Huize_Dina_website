@@ -166,8 +166,9 @@ builds two multi-platform (amd64 + arm64) images and pushes them to GHCR:
   `deploy/oauth/`.
 
 The server never receives connections from GitHub. It pulls on a schedule:
-`update.sh` runs `docker compose pull && up -d` and removes old untagged
-versions of these two images. Run it from cron, e.g.
+`update.sh` pulls, and for each changed image starts the new container next
+to the old one, waits for its healthcheck, then removes the old one (no
+downtime). It also removes old untagged versions of these two images. Run it from cron, e.g.
 `*/5 * * * * /opt/huize-dina/update.sh >> /var/log/huize-dina-update.log 2>&1`.
 
 **Server setup (once):**
@@ -183,19 +184,31 @@ versions of these two images. Run it from cron, e.g.
    a `read:packages` token.
 4. In the parent nginx, for the `huizedina.nl` server block:
    ```nginx
+   # Re-resolve container names via Docker's DNS instead of once at startup,
+   # and retry on the other container during a rolling update (update.sh).
+   resolver 127.0.0.11 valid=5s ipv6=off;
+   proxy_connect_timeout 2s;
+   proxy_next_upstream error timeout http_502;
+
    location / {
-       proxy_pass http://huize-dina-web:80;
+       set $huize_web http://huize-dina-web:80;
+       proxy_pass $huize_web;
        proxy_set_header Host $host;
        proxy_set_header X-Real-IP $remote_addr;
        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
        proxy_set_header X-Forwarded-Proto $scheme;
    }
    location /oauth/ {
-       proxy_pass http://huize-dina-oauth:3000;
+       set $huize_oauth http://huize-dina-oauth:3000;
+       proxy_pass $huize_oauth;
        proxy_set_header Host $host;
        proxy_set_header X-Forwarded-Proto $scheme;
    }
    ```
+   The variable in `proxy_pass` is what makes nginx honour `resolver`; with a
+   literal hostname it resolves once and keeps hitting a stale IP after the
+   container is replaced. (This requires the parent nginx itself to run in
+   Docker on `nginx_network`; `127.0.0.11` is Docker's embedded DNS.)
 5. `docker compose up -d`.
 
 **Editing content (`/admin`):** Decap CMS uses the `github` backend
