@@ -71,6 +71,8 @@ export interface ThemeMap {
 
 const RADIUS = [950, 780, 560, 500];
 const ARC = [160, 130, 100];
+// How much wider than tall the ring of regions is (1 = a circle).
+const REGION_SPREAD_X = 1.3;
 
 function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '');
@@ -215,10 +217,18 @@ export function buildThemeMap(raw: RawThemesData): ThemeMap {
       // is tall, so an axis-aligned region can sit inside its horizontal
       // extent even at a generous radius, while a diagonal placement clears
       // it using the root's (much smaller) vertical extent instead.
+      // The circle is stretched sideways into an ellipse: screens are wider
+      // than tall, and on a true circle the inner sub-themes of the left
+      // and right regions fan toward each other and all but touch along the
+      // vertical axis. The extra width gives each half of the map room.
       kids.forEach((id, i) => {
         const angle = -45 + (360 / kids.length) * i;
         const rad = (angle * Math.PI) / 180;
-        pos[id] = { x: parent.x + radius * Math.cos(rad), y: parent.y + radius * Math.sin(rad), angle };
+        pos[id] = {
+          x: parent.x + radius * REGION_SPREAD_X * Math.cos(rad),
+          y: parent.y + radius * Math.sin(rad),
+          angle,
+        };
       });
     } else {
       // Deeper generations: fan across an arc centered on the parent's own
