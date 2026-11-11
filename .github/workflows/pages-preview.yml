@@ -1,0 +1,54 @@
+name: Preview on GitHub Pages
+
+# A second, GitHub-hosted copy of the site for trying changes without
+# waiting for the production server to pull a new image:
+#   https://amittgur-dev.github.io/Huize_Dina_website/
+# Runs only when started by hand (Actions tab -> this workflow -> Run
+# workflow), so it stays silent until GitHub Pages is switched on for the
+# repository (Settings -> Pages -> Source: GitHub Actions).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-preview
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build for the Pages sub-path
+        run: npx astro build --site https://amittgur-dev.github.io --base /Huize_Dina_website
+      # The site is written for the root of its own domain, so its links and
+      # media paths start at "/". Under github.io it lives one folder down;
+      # point those paths there.
+      - name: Point absolute paths at the sub-path
+        run: |
+          find dist -name '*.html' -print0 | xargs -0 sed -i -E \
+            -e 's#(href|src|data-audio)="/(assets|home|listen|podcast|timelines|making-of|making-of-preview|team|contact|admin|version\.txt)#\1="/Huize_Dina_website/\2#g' \
+            -e 's#href="/"#href="/Huize_Dina_website/"#g' \
+            -e 's#"/assets/#"/Huize_Dina_website/assets/#g'
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
