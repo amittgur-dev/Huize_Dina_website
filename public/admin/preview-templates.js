@@ -30,6 +30,17 @@
     }
   }
 
+  // Same rule as splitQuote() in src/lib/themes.ts (this file isn't bundled,
+  // so it can't import it): a paragraph that opens with a quotation mark is a
+  // quotation, and what follows the closing mark and a long dash is its
+  // signature. Keep the two in step.
+  function splitQuote(text) {
+    var t = (text || '').trim();
+    if (!/^["\u201c]/.test(t)) return null;
+    var m = t.match(/^([\s\S]*["\u201d])\s*[\u2014\u2013]\s*([^"\u201d]+)$/);
+    return m ? { quote: m[1].trim(), by: m[2].trim() } : { quote: t, by: '' };
+  }
+
   var ThemePreview = createClass({
     render: function () {
       var entry = this.props.entry;
@@ -46,6 +57,15 @@
       var blockEls = blocks.map(function (b, i) {
         if (!b) return null;
         if (b.type === 'text') {
+          var q = splitQuote(b.text);
+          if (q) {
+            return h(
+              'div',
+              { key: i, className: 'mk-block-quote' },
+              h('div', null, q.quote),
+              q.by ? h('div', { className: 'mk-block-quote-by' }, '\u2014 ' + q.by) : null
+            );
+          }
           return h('div', { key: i, className: 'mk-block-text' }, b.text || '');
         }
         var src = resolveSrc(getAsset, b.file);
@@ -428,6 +448,8 @@
       ".mk-panel-rule { height:1px; background:#48c6a8; opacity:0.45; margin:18px 0; }",
       ".mk-panel-blocks { display:flex; flex-direction:column; gap:1.1rem; }",
       ".mk-block-text { font-size:17px; line-height:1.7; color:#e6e1d9; white-space:pre-wrap; }",
+      ".mk-block-quote { font-size:16px; line-height:1.68; color:#c9c3b9; padding-left:16px; border-left:2px solid rgba(72,198,168,0.7); white-space:pre-wrap; }",
+      ".mk-block-quote-by { margin-top:7px; font-size:14px; color:#a39c92; }",
       ".mk-block-media { border:1px solid rgba(230,225,217,0.16); background:rgba(0,0,0,0.22); }",
       ".mk-block-media img, .mk-block-media video { display:block; width:100%; max-height:360px; object-fit:cover; }",
       ".mk-block-media audio { display:block; width:100%; }",

@@ -74,6 +74,17 @@ const ARC = [160, 130, 100];
 // How much wider than tall the ring of regions is (1 = a circle).
 const REGION_SPREAD_X = 1.3;
 
+// A quotation is a paragraph that opens with a quotation mark; by convention
+// it closes with a signature after a long dash:  "…text." — Name
+// Returns the two parts so the page can set quotes apart from the team's own
+// explanatory text, or null for ordinary text. The signature may be empty.
+export function splitQuote(text: string | null | undefined): { quote: string; by: string } | null {
+  const t = (text || '').trim();
+  if (!/^["\u201c]/.test(t)) return null;
+  const m = t.match(/^([\s\S]*["\u201d])\s*[\u2014\u2013]\s*([^"\u201d]+)$/);
+  return m ? { quote: m[1].trim(), by: m[2].trim() } : { quote: t, by: '' };
+}
+
 function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '');
 }

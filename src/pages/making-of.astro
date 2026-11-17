@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import regionColors from '../../content/themes/region-colors.json';
 import crossLinksFile from '../../content/themes/cross-links.json';
-import { buildThemeMap } from '../lib/themes';
+import { buildThemeMap, splitQuote } from '../lib/themes';
 import type { RawThemeNode, RawThemesData } from '../lib/themes';
 
 // One file per theme node (content/themes/nodes/*.json) so editors can add,
@@ -166,9 +166,14 @@ const mkmConns = (id: string) =>
           <h2 class="mkm-title">{n.level >= 1 ? `${n.number} — ${n.label}` : n.label}</h2>
           <div class="mkm-rule" style={`background:${n.color}`} />
 
-          <div class="mkm-blocks">
+          <div class="mkm-blocks" style={`--c:${n.color}`}>
             {n.blocks.map((b) =>
-              b.type === 'text' && b.text ? (
+              b.type === 'text' && b.text && splitQuote(b.text) ? (
+                <blockquote class="mkm-quote">
+                  <p>{splitQuote(b.text)!.quote}</p>
+                  {splitQuote(b.text)!.by && <footer>— {splitQuote(b.text)!.by}</footer>}
+                </blockquote>
+              ) : b.type === 'text' && b.text ? (
                 <p class="mkm-text">{b.text}</p>
               ) : b.type === 'image' && b.file ? (
                 <figure class="mkm-media">
@@ -807,6 +812,22 @@ const mkmConns = (id: string) =>
     color: #e6e1d9;
   }
 
+  /* Quotations sit a step behind the team's own text: a thin line in the
+     theme's colour, slightly smaller and softer, signature on its own line. */
+  :global(.mk-block-quote) {
+    font-size: 16px;
+    line-height: 1.68;
+    color: #c9c3b9;
+    padding-left: 16px;
+    border-left: 2px solid color-mix(in srgb, var(--c, #9a938a) 70%, transparent);
+  }
+
+  :global(.mk-block-quote-by) {
+    margin-top: 7px;
+    font-size: 14px;
+    color: #a39c92;
+  }
+
   :global(.mk-block-media) {
     border: 1px solid rgba(230, 225, 217, 0.16);
     background: rgba(0, 0, 0, 0.22);
@@ -1037,8 +1058,28 @@ const mkmConns = (id: string) =>
       margin: 0 0 1rem;
       font-size: 15px;
       line-height: 1.8;
-      color: rgba(224, 219, 212, 0.74);
+      color: rgba(224, 219, 212, 0.88);
       text-wrap: pretty;
+    }
+
+    .mkm-quote {
+      margin: 0 0 1rem;
+      padding-left: 13px;
+      border-left: 2px solid color-mix(in srgb, var(--c, #9a938a) 70%, transparent);
+    }
+
+    .mkm-quote p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.75;
+      color: rgba(224, 219, 212, 0.7);
+      text-wrap: pretty;
+    }
+
+    .mkm-quote footer {
+      margin-top: 5px;
+      font-size: 12.5px;
+      color: rgba(224, 219, 212, 0.52);
     }
 
     .mkm-media {
@@ -1157,6 +1198,8 @@ const mkmConns = (id: string) =>
 </style>
 
 <script>
+  import { splitQuote } from '../lib/themes';
+
   // On phones the hierarchical browser (#mkm) replaces the map entirely, so
   // skip building the map's DOM and camera. Crossing the breakpoint (e.g.
   // rotating a tablet or resizing a window) reloads once to swap modes —
@@ -2184,13 +2227,28 @@ const mkmConns = (id: string) =>
   // the CMS, so text and media interleave however they chose — not a fixed
   // "text then media" layout.
   const blocksWrap = document.getElementById('mk-panel-blocks')!;
-  function renderBlocks(blocks: ContentBlock[]) {
+  function renderBlocks(blocks: ContentBlock[], color: string) {
     blocksWrap.innerHTML = '';
+    blocksWrap.style.setProperty('--c', color);
     blocks.forEach((b) => {
       if (b.type === 'text') {
         const p = document.createElement('div');
-        p.className = 'mk-block-text';
-        p.textContent = b.text || '';
+        const q = splitQuote(b.text);
+        if (q) {
+          p.className = 'mk-block-quote';
+          const body = document.createElement('div');
+          body.textContent = q.quote;
+          p.appendChild(body);
+          if (q.by) {
+            const by = document.createElement('div');
+            by.className = 'mk-block-quote-by';
+            by.textContent = `\u2014 ${q.by}`;
+            p.appendChild(by);
+          }
+        } else {
+          p.className = 'mk-block-text';
+          p.textContent = b.text || '';
+        }
         blocksWrap.appendChild(p);
         return;
       }
@@ -2259,7 +2317,7 @@ const mkmConns = (id: string) =>
     }
 
     (document.getElementById('mk-panel-rule') as HTMLElement).style.background = n.color;
-    renderBlocks(n.blocks);
+    renderBlocks(n.blocks, n.color);
 
     const qWrap = document.getElementById('mk-panel-questions')!;
     const qList = document.getElementById('mk-panel-questions-list')!;
